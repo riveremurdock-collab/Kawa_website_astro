@@ -1,0 +1,26 @@
+---
+interface Image {
+  src: string;
+  alt: string;
+  caption?: string;
+}
+
+interface Props {
+  images: Image[];
+}
+
+const { images } = Astro.props;
+---
+
+{images && images.length > 0 && (
+    <div class="article-gallery-container" data-images={JSON.stringify(images)}>
+        {images.map((image, index) => (
+            <div class="article-gallery">
+                <div class="gallery-item" data-index={index}>
+                    <img src={image.src} alt={image.alt} loading="lazy">
+                    {image.caption && <span class="caption">{image.caption}</span>}
+                </div>
+            </div>
+        ))}
+    </div>
+)}

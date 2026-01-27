@@ -1,0 +1,116 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import { getCollection } from 'astro:content';
+import { Image } from 'astro:assets';
+import RouteMap from '../../components/RouteMap.astro';
+
+export async function getStaticPaths() {
+    const articles = await getCollection('articles');
+    return articles.map(article => ({
+        params: { slug: article.slug },
+        props: { article },
+    }));
+}
+
+const { article } = Astro.props;
+const { Content } = await article.render();
+
+// Get all articles for sidebar
+const allArticles = await getCollection('articles');
+const sortedArticles = allArticles.sort((a, b) => b.data.date.getTime() - a.data.date.getTime());
+
+// Check if article has GPX route (must have a file path)
+const hasGpxRoute = !!(article.data.gpxRoute?.file);
+---
+
+<BaseLayout title={`${article.data.title} | Kawa Designs`} articles={sortedArticles} currentSlug={article.slug}>
+    <section id="article-content">
+        <article class="article">
+            <header class="article-header">
+                <h1>{article.data.title}</h1>
+                <div class="article-meta">
+                    <time datetime={article.data.date.toISOString()}>
+                        {article.data.date.toLocaleDateString('en-US', {
+                            year: 'numeric',
+                            month: 'long',
+                            day: 'numeric'
+                        })}
+                    </time>
+                    <div class="article-tags">
+                        {article.data.tags.map(tag => (
+                            <span class="tag">{tag}</span>
+                        ))}
+                    </div>
+                </div>
+            </header>
+
+            {hasGpxRoute && (
+                <RouteMap
+                    gpxFile={article.data.gpxRoute.file}
+                    title={article.data.gpxRoute.title || "Route Map"}
+                    showElevation={article.data.gpxRoute.showElevation !== false}
+                    height={article.data.gpxRoute.mapHeight || "450px"}
+                />
+            )}
+
+            {article.data.images && article.data.images.length > 0 && (
+                <div class="article-gallery-container" data-images={JSON.stringify(article.data.images.map(img => ({
+                    src: typeof img.src === 'string' ? img.src : img.src.src,
+                    alt: img.alt,
+                    caption: img.caption
+                })))}>
+                    {article.data.images.map((image, index) => (
+                        <div class="article-gallery">
+                            <div class="gallery-item" data-index={index}>
+                                {typeof image.src === 'string' ? (
+                                    <img src={image.src} alt={image.alt} loading="lazy" />
+                                ) : (
+                                    <Image src={image.src} alt={image.alt} loading="lazy" />
+                                )}
+                                {image.caption && <span class="caption">{image.caption}</span>}
+                            </div>
+                        </div>
+                    ))}
+                </div>
+            )}
+
+            <div class="article-body">
+                <Content />
+            </div>
+
+            <div class="comments-section">
+                <h2>Comments</h2>
+                <div id="cusdis_thread"
+                    data-host="https://cusdis.com"
+                    data-app-id="e5efd1f2-ea0a-4da1-b432-df5979658893"
+                    data-page-id={article.slug}
+                    data-page-url={Astro.url.href}
+                    data-page-title={article.data.title}
+                ></div>
+                <script async defer src="https://cusdis.com/js/cusdis.es.js"></script>
+            </div>
+        </article>
+    </section>
+
+    {hasGpxRoute && (
+        <Fragment>
+            {/* Leaflet CSS */}
+            <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" crossorigin="" />
+
+            {/* Map CSS */}
+            <link rel="stylesheet" href="/styles/map.css" />
+
+            {/* Leaflet JS */}
+            <script is:inline src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" crossorigin=""></script>
+
+            {/* leaflet-gpx plugin */}
+            <script is:inline src="https://cdnjs.cloudflare.com/ajax/libs/leaflet-gpx/1.7.0/gpx.min.js"></script>
+
+            {/* Chart.js */}
+            <script is:inline src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+
+            {/* Route Map JS */}
+            <script is:inline src="/scripts/route-map.js"></script>
+        </Fragment>
+    )}
+</BaseLayout>

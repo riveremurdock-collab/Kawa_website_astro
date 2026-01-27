@@ -1,0 +1,109 @@
+---
+import ArticleCard from './ArticleCard.astro';
+
+interface Props {
+  articles: Array<{
+    slug: string;
+    data: {
+      title: string;
+      date: Date;
+      tags: string[];
+    };
+  }>;
+  currentSlug?: string;
+}
+
+const { articles, currentSlug } = Astro.props;
+
+// Extract all unique tags from articles
+const allTags = [...new Set(articles.flatMap(article => article.data.tags))].sort();
+---
+
+<div class="sidebar-panel">
+    <div class="panel-title-wrapper collapsible collapsed">
+        <div class="panel-title" id="posts-title">
+            <span>Posts</span>
+            <span class="collapse-arrow"></span>
+        </div>
+        <div class="search-content">
+            <input type="text" id="search-input" placeholder="Search articles...">
+            <div id="tag-filters" class="tag-filters">
+                {allTags.map(tag => (
+                    <label class="tag-filter" data-tag={tag}>
+                        <input type="checkbox" value={tag}>
+                        {tag}
+                    </label>
+                ))}
+            </div>
+        </div>
+    </div>
+    <div class="panel-content">
+        <ul id="article-list" class="article-list">
+            {articles.map(article => (
+                <ArticleCard
+                    slug={article.slug}
+                    title={article.data.title}
+                    date={article.data.date}
+                    tags={article.data.tags}
+                    isActive={currentSlug === article.slug}
+                />
+            ))}
+        </ul>
+    </div>
+</div>
+
+<script>
+    // Posts panel collapse toggle
+    const panelTitle = document.getElementById('posts-title');
+    const panelWrapper = panelTitle?.closest('.panel-title-wrapper');
+
+    panelTitle?.addEventListener('click', () => {
+        panelWrapper?.classList.toggle('collapsed');
+    });
+
+    // Search functionality
+    const searchInput = document.getElementById('search-input') as HTMLInputElement;
+    const articleList = document.getElementById('article-list');
+    const tagFilters = document.querySelectorAll('.tag-filter input');
+
+    function filterArticles() {
+        const searchTerm = searchInput?.value.toLowerCase() || '';
+        const activeTags: string[] = [];
+
+        tagFilters.forEach(filter => {
+            const input = filter as HTMLInputElement;
+            if (input.checked) {
+                activeTags.push(input.value);
+            }
+        });
+
+        const articles = articleList?.querySelectorAll('li');
+        articles?.forEach(article => {
+            const title = article.querySelector('.article-title')?.textContent?.toLowerCase() || '';
+            const tags = article.dataset.tags?.split(',') || [];
+
+            const matchesSearch = title.includes(searchTerm);
+            const matchesTags = activeTags.length === 0 || activeTags.some(tag => tags.includes(tag));
+
+            if (matchesSearch && matchesTags) {
+                (article as HTMLElement).style.display = '';
+            } else {
+                (article as HTMLElement).style.display = 'none';
+            }
+        });
+    }
+
+    searchInput?.addEventListener('input', filterArticles);
+
+    tagFilters.forEach(filter => {
+        filter.addEventListener('change', () => {
+            const label = filter.closest('.tag-filter');
+            if ((filter as HTMLInputElement).checked) {
+                label?.classList.add('active');
+            } else {
+                label?.classList.remove('active');
+            }
+            filterArticles();
+        });
+    });
+</script>

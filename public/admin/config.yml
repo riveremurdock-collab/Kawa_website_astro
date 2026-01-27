@@ -1,0 +1,51 @@
+backend:
+  name: git-gateway
+  branch: main
+
+# For local development without Git
+local_backend: true
+
+media_folder: "public/images/articles"
+public_folder: "/images/articles"
+
+collections:
+  - name: "articles"
+    label: "Articles"
+    folder: "src/content/articles"
+    create: true
+    extension: "mdx"
+    format: "frontmatter"
+    slug: "{{slug}}"
+    # Use root media folder for this collection
+    media_folder: ""
+    public_folder: ""
+    fields:
+      - { label: "Title", name: "title", widget: "string", required: true }
+      - { label: "Publish Date", name: "date", widget: "datetime", date_format: "YYYY-MM-DD", time_format: false, required: true }
+      - { label: "Excerpt", name: "excerpt", widget: "text", required: true }
+      - label: "Tags"
+        name: "tags"
+        widget: "list"
+        field: { label: "Tag", name: "tag", widget: "string" }
+      - label: "Gallery Images"
+        name: "images"
+        widget: "list"
+        required: false
+        summary: "{{fields.alt}}"
+        fields:
+          - { label: "Image", name: "src", widget: "image", required: true, media_folder: "/public/images/articles", public_folder: "/images/articles" }
+          - { label: "Alt Text", name: "alt", widget: "string", required: true }
+          - { label: "Caption", name: "caption", widget: "string", required: false }
+      - label: "GPX Route"
+        name: "gpxRoute"
+        widget: "object"
+        required: false
+        collapsed: true
+        fields:
+          - { label: "GPX File Path", name: "file", widget: "string", required: false, hint: "e.g., /gpx/my-route.gpx" }
+          - { label: "Route Title", name: "title", widget: "string", required: false }
+          - { label: "Show Elevation", name: "showElevation", widget: "boolean", default: true }
+          - { label: "Map Height", name: "mapHeight", widget: "string", default: "450px" }
+      - label: "Content"
+        name: "body"
+        widget: "markdown"

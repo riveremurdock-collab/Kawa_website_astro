@@ -1,0 +1,70 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import { getCollection } from 'astro:content';
+import { Image } from 'astro:assets';
+
+// Get all articles and sort by date (newest first)
+const articles = await getCollection('articles');
+const sortedArticles = articles.sort((a, b) => b.data.date.getTime() - a.data.date.getTime());
+
+// Get the about article to display by default
+const aboutArticle = articles.find(a => a.slug === 'about');
+let Content = null;
+if (aboutArticle) {
+    const rendered = await aboutArticle.render();
+    Content = rendered.Content;
+}
+---
+
+<BaseLayout title="Kawa Designs" articles={sortedArticles} currentSlug={aboutArticle?.slug}>
+    <section id="article-content">
+        {aboutArticle && Content ? (
+            <article class="article">
+                <header class="article-header">
+                    <h1>{aboutArticle.data.title}</h1>
+                    <div class="article-meta">
+                        <time datetime={aboutArticle.data.date.toISOString()}>
+                            {aboutArticle.data.date.toLocaleDateString('en-US', {
+                                year: 'numeric',
+                                month: 'long',
+                                day: 'numeric'
+                            })}
+                        </time>
+                        <div class="article-tags">
+                            {aboutArticle.data.tags.map(tag => (
+                                <span class="tag">{tag}</span>
+                            ))}
+                        </div>
+                    </div>
+                </header>
+
+                {aboutArticle.data.images && aboutArticle.data.images.length > 0 && (
+                    <div class="article-gallery-container" data-images={JSON.stringify(aboutArticle.data.images.map(img => ({
+                        src: typeof img.src === 'string' ? img.src : img.src.src,
+                        alt: img.alt,
+                        caption: img.caption
+                    })))}>
+                        {aboutArticle.data.images.map((image, index) => (
+                            <div class="article-gallery">
+                                <div class="gallery-item" data-index={index}>
+                                    {typeof image.src === 'string' ? (
+                                        <img src={image.src} alt={image.alt} loading="lazy" />
+                                    ) : (
+                                        <Image src={image.src} alt={image.alt} loading="lazy" />
+                                    )}
+                                    {image.caption && <span class="caption">{image.caption}</span>}
+                                </div>
+                            </div>
+                        ))}
+                    </div>
+                )}
+
+                <div class="article-body">
+                    <Content />
+                </div>
+            </article>
+        ) : (
+            <div class="loading-message">No articles found.</div>
+        )}
+    </section>
+</BaseLayout>

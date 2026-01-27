@@ -1,0 +1,360 @@
+/* =========================================
+   Route Map Styles
+   ========================================= */
+
+/* -----------------------------------------
+   Map Container
+   ----------------------------------------- */
+.route-map-wrapper {
+    margin: 30px 0;
+    background: var(--green-light);
+    border: 3px solid var(--green-forest);
+    border-radius: 12px;
+    overflow: hidden;
+}
+
+.route-map-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 12px 16px;
+    background: var(--green-light);
+    border-bottom: 2px solid var(--green-forest);
+}
+
+.route-map-title {
+    font-family: var(--font-display);
+    font-size: 1.3rem;
+    color: var(--green-dark);
+    margin: 0;
+    letter-spacing: 0.5px;
+}
+
+.route-download-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 8px 14px;
+    background: var(--yellow-cream);
+    border: 2px solid var(--yellow-gold);
+    border-radius: 6px;
+    color: var(--green-dark);
+    font-family: var(--font-main);
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    text-decoration: none;
+}
+
+.route-download-btn:hover {
+    background: var(--yellow-gold);
+    border-color: var(--yellow-mustard);
+    color: var(--green-dark);
+    transform: translateY(-1px);
+}
+
+.route-download-btn svg {
+    width: 16px;
+    height: 16px;
+}
+
+/* -----------------------------------------
+   Leaflet Map Container
+   ----------------------------------------- */
+.route-map-container {
+    width: 100%;
+    height: 450px;
+    background: var(--bg-main);
+    position: relative;
+    z-index: 1;
+}
+
+/* Override Leaflet default styles */
+.route-map-container .leaflet-container {
+    font-family: var(--font-main);
+    background: var(--bg-main);
+    z-index: 1 !important;
+}
+
+/* Ensure Leaflet controls stay below site popups */
+.route-map-container .leaflet-control-container {
+    z-index: 100 !important;
+}
+
+.route-map-container .leaflet-pane {
+    z-index: 1 !important;
+}
+
+.route-map-container .leaflet-top,
+.route-map-container .leaflet-bottom {
+    z-index: 100 !important;
+}
+
+/* Custom zoom controls */
+.route-map-container .leaflet-control-zoom {
+    border: 2px solid var(--green-forest) !important;
+    border-radius: 6px !important;
+    overflow: hidden;
+}
+
+.route-map-container .leaflet-control-zoom a {
+    background: var(--green-light) !important;
+    color: var(--green-dark) !important;
+    border-color: var(--green-forest) !important;
+    width: 30px !important;
+    height: 30px !important;
+    line-height: 30px !important;
+    font-size: 18px !important;
+}
+
+.route-map-container .leaflet-control-zoom a:hover {
+    background: var(--green-sage) !important;
+    color: var(--green-dark) !important;
+}
+
+.route-map-container .leaflet-control-zoom-in {
+    border-bottom: 1px solid var(--green-forest) !important;
+}
+
+/* Scale control */
+.route-map-container .leaflet-control-scale-line {
+    background: rgba(204, 217, 200, 0.9) !important;
+    border: 2px solid var(--green-forest) !important;
+    border-top: none !important;
+    color: var(--green-dark) !important;
+    font-family: var(--font-main) !important;
+    font-size: 11px !important;
+    padding: 2px 5px !important;
+}
+
+/* Attribution */
+.route-map-container .leaflet-control-attribution {
+    background: rgba(204, 217, 200, 0.85) !important;
+    color: var(--green-forest) !important;
+    font-size: 10px !important;
+    padding: 2px 6px !important;
+}
+
+.route-map-container .leaflet-control-attribution a {
+    color: var(--rust-brown) !important;
+}
+
+/* Custom waypoint markers */
+.route-waypoint-marker {
+    background: var(--yellow-mustard);
+    border: 2px solid var(--yellow-dark);
+    border-radius: 50%;
+    width: 12px !important;
+    height: 12px !important;
+    margin-left: -6px !important;
+    margin-top: -6px !important;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+}
+
+.route-waypoint-marker.start-marker {
+    background: var(--green-forest);
+    border-color: var(--green-dark);
+    width: 16px !important;
+    height: 16px !important;
+    margin-left: -8px !important;
+    margin-top: -8px !important;
+}
+
+.route-waypoint-marker.end-marker {
+    background: var(--rust-orange);
+    border-color: var(--rust-brown);
+    width: 16px !important;
+    height: 16px !important;
+    margin-left: -8px !important;
+    margin-top: -8px !important;
+}
+
+/* Elevation popup */
+.route-map-container .leaflet-popup-content-wrapper {
+    background: var(--green-dark) !important;
+    border: 2px solid var(--green-forest) !important;
+    border-radius: 8px !important;
+    color: var(--green-light) !important;
+}
+
+.route-map-container .leaflet-popup-content {
+    margin: 10px 12px !important;
+    font-family: var(--font-main) !important;
+    font-size: 13px !important;
+    line-height: 1.4 !important;
+}
+
+.route-map-container .leaflet-popup-tip {
+    background: var(--green-dark) !important;
+    border: 1px solid var(--green-forest) !important;
+}
+
+.route-map-container .leaflet-popup-close-button {
+    color: var(--green-sage) !important;
+}
+
+.route-map-container .leaflet-popup-close-button:hover {
+    color: var(--yellow-cream) !important;
+}
+
+.elevation-popup-value {
+    font-weight: 600;
+    color: var(--yellow-gold);
+}
+
+/* Highlight marker when hovering on chart */
+.route-highlight-marker {
+    background: var(--rust-salmon) !important;
+    border: 3px solid var(--rust-orange) !important;
+    border-radius: 50%;
+    width: 14px !important;
+    height: 14px !important;
+    margin-left: -7px !important;
+    margin-top: -7px !important;
+    box-shadow: 0 0 10px rgba(232, 144, 112, 0.6);
+    z-index: 1000 !important;
+}
+
+/* -----------------------------------------
+   Elevation Chart
+   ----------------------------------------- */
+.route-elevation-wrapper {
+    padding-top: 12px;
+    background: transparent;
+    border-top: 2px solid var(--green-forest);
+}
+
+.route-elevation-chart {
+    width: 100%;
+    height: 150px;
+    background: transparent;
+}
+
+.route-elevation-chart canvas {
+    cursor: crosshair;
+}
+
+/* -----------------------------------------
+   Route Statistics (Text Style)
+   ----------------------------------------- */
+.route-stats-text {
+    padding: 12px 16px;
+    background: var(--green-light);
+    border-top: none;
+}
+
+.route-stat-line {
+    margin: 0;
+    padding: 4px 0;
+    font-family: var(--font-main);
+    font-size: 0.95rem;
+    color: var(--green-dark);
+    line-height: 1.5;
+}
+
+.route-stat-line strong {
+    color: var(--green-forest);
+}
+
+.route-stat-line span {
+    color: var(--rust-brown);
+}
+
+/* -----------------------------------------
+   Loading State
+   ----------------------------------------- */
+.route-map-loading {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 300px;
+    color: var(--green-forest);
+    font-family: var(--font-main);
+}
+
+.route-map-loading-spinner {
+    width: 40px;
+    height: 40px;
+    border: 3px solid var(--green-light);
+    border-top-color: var(--rust-orange);
+    border-radius: 50%;
+    animation: route-map-spin 1s linear infinite;
+    margin-bottom: 12px;
+}
+
+@keyframes route-map-spin {
+    to { transform: rotate(360deg); }
+}
+
+/* -----------------------------------------
+   Error State
+   ----------------------------------------- */
+.route-map-error {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 200px;
+    padding: 20px;
+    text-align: center;
+    color: var(--rust-orange);
+    font-family: var(--font-main);
+}
+
+.route-map-error-icon {
+    font-size: 2rem;
+    margin-bottom: 10px;
+}
+
+/* -----------------------------------------
+   Responsive Styles
+   ----------------------------------------- */
+@media (max-width: 768px) {
+    .route-map-header {
+        flex-direction: column;
+        gap: 10px;
+        padding: 12px;
+    }
+
+    .route-map-title {
+        font-size: 1.1rem;
+        text-align: center;
+    }
+
+    .route-download-btn {
+        width: 100%;
+        justify-content: center;
+    }
+
+    .route-map-container {
+        height: 350px;
+    }
+
+    .route-elevation-chart {
+        height: 100px;
+    }
+
+    .route-stats-text {
+        padding: 10px 12px;
+    }
+
+    .route-stat-line {
+        font-size: 0.9rem;
+    }
+}
+
+@media (max-width: 480px) {
+    .route-map-container {
+        height: 300px;
+    }
+
+    .route-elevation-chart {
+        height: 80px;
+    }
+
+    .route-stat-line {
+        font-size: 0.85rem;
+    }
+}

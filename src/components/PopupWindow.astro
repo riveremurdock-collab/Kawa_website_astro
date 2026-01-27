@@ -1,0 +1,18 @@
+---
+interface Props {
+  id: string;
+  title: string;
+}
+
+const { id, title } = Astro.props;
+---
+
+<div class="popup-window" data-popup={id}>
+    <div class="popup-frame">
+        <button class="popup-close" aria-label="Close">ESC</button>
+        <div class="popup-content">
+            <h2>{title}</h2>
+            <slot />
+        </div>
+    </div>
+</div>
