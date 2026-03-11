@@ -1,0 +1,375 @@
+---
+import '../styles/global.css';
+import PostsSidebar from '../components/PostsSidebar.astro';
+
+interface Props {
+    title?: string;
+    description?: string;
+    articles: Array<{
+        slug: string;
+        data: { title: string; date: Date; tags: string[] };
+    }>;
+    currentSlug?: string;
+    loadGallery?: boolean;
+}
+
+const {
+    title = 'Kawa Designs',
+    description = 'Kawa Designs — outdoor adventure blog and design',
+    articles,
+    currentSlug,
+    loadGallery = false,
+} = Astro.props;
+---
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="description" content={description} />
+    <title>{title}</title>
+    <link rel="icon" type="image/png" href="/images/logos/kawa_logo_darksandstone.png" />
+    <link rel="stylesheet" href="/styles/map.css" />
+</head>
+<body class="blog-body">
+    <div class="blog-page">
+
+        <!-- Left column: logo + sidebar -->
+        <div class="blog-left-col">
+            <a href="/" class="blog-logo-link">
+                <img src="/images/logos/kawa lichen landing page logo.png" alt="KAWA" class="blog-logo-img" />
+            </a>
+            <div class="blog-sidebar-box">
+                <PostsSidebar articles={articles} currentSlug={currentSlug} />
+            </div>
+        </div>
+
+        <!-- Right column: article content -->
+        <div class="blog-right-col">
+            <div class="blog-article-box">
+                <slot />
+            </div>
+        </div>
+
+    </div>
+    {loadGallery && <script is:inline src="/scripts/gallery.js"></script>}
+</body>
+</html>
+
+<style is:global>
+    /* ---- Page shell ---- */
+    .blog-body {
+        margin: 0;
+        padding: 0;
+        min-height: 100vh;
+        background-image: url('/images/backgrounds/landing page sandstone background.png');
+        background-size: cover;
+        background-position: center;
+        background-attachment: fixed;
+    }
+
+    .blog-page {
+        display: flex;
+        align-items: flex-start;
+        gap: 20px;
+        padding: 28px 28px 48px;
+        min-height: 100vh;
+        box-sizing: border-box;
+    }
+
+    /* ---- Left column ---- */
+    .blog-left-col {
+        width: 280px;
+        flex-shrink: 0;
+        display: flex;
+        flex-direction: column;
+        gap: 16px;
+        position: sticky;
+        top: 28px;
+    }
+
+    .blog-logo-link {
+        display: block;
+        line-height: 0;
+    }
+
+    .blog-logo-img {
+        width: 100%;
+        height: auto;
+        transition: transform 0.3s ease;
+    }
+
+    .blog-logo-link:hover .blog-logo-img {
+        transform: scale(1.06);
+    }
+
+    /* Olive sidebar box */
+    .blog-sidebar-box {
+        background: #717045;
+        border-radius: 24px;
+        padding: 20px 16px;
+        overflow: hidden;
+    }
+
+    /* Sidebar heading: POSTS > */
+    .blog-sidebar-box .sidebar-heading {
+        font-family: 'SodaSans', 'Futura', sans-serif;
+        font-size: 1.3rem;
+        letter-spacing: 2px;
+        color: #edf2e9;
+        padding: 0 4px 12px;
+        border-bottom: none;
+        cursor: pointer;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        user-select: none;
+    }
+
+    .blog-sidebar-box .sidebar-heading .collapse-arrow {
+        border-color: #edf2e9;
+    }
+
+    /* Search area */
+    .blog-sidebar-box .sidebar-search-area {
+        background: transparent;
+        border: none;
+        padding: 12px 0;
+    }
+
+    .blog-sidebar-box #search-input {
+        background: rgba(237, 242, 233, 0.15);
+        border: none;
+        border-radius: 20px;
+        color: #edf2e9;
+        padding: 7px 14px;
+        font-size: 13px;
+    }
+
+    .blog-sidebar-box #search-input::placeholder {
+        color: rgba(237, 242, 233, 0.6);
+    }
+
+    .blog-sidebar-box #search-input:focus {
+        outline: none;
+        background: rgba(237, 242, 233, 0.25);
+    }
+
+    /* Tag filters */
+    .blog-sidebar-box .tag-filters {
+        margin-top: 8px;
+    }
+
+    .blog-sidebar-box .tag-filter {
+        background: rgba(237, 242, 233, 0.15);
+        border: none;
+        color: #edf2e9;
+        font-size: 12px;
+        border-radius: 12px;
+        padding: 3px 9px;
+    }
+
+    .blog-sidebar-box .tag-filter:hover,
+    .blog-sidebar-box .tag-filter.active {
+        background: rgba(237, 242, 233, 0.3);
+        border: none;
+    }
+
+    /* Article list */
+    .blog-sidebar-box .article-list {
+        padding: 4px 0 0;
+    }
+
+    .blog-sidebar-box .article-link {
+        color: #edf2e9;
+        border-left: 3px solid transparent;
+        border-radius: 8px;
+        padding: 8px 10px;
+    }
+
+    .blog-sidebar-box .article-link:hover {
+        background: rgba(237, 242, 233, 0.15);
+        border-left-color: transparent;
+        color: #edf2e9;
+    }
+
+    .blog-sidebar-box .article-link.active {
+        background: rgba(237, 242, 233, 0.22);
+        border-left-color: transparent;
+        color: #edf2e9;
+    }
+
+    .blog-sidebar-box .article-title {
+        font-weight: 600;
+        color: #edf2e9;
+    }
+
+    .blog-sidebar-box .article-date {
+        color: rgba(237, 242, 233, 0.65);
+        font-size: 12px;
+    }
+
+    /* ---- Right column ---- */
+    .blog-right-col {
+        flex: 1;
+        min-width: 0;
+    }
+
+    /* Light sage article box */
+    .blog-article-box {
+        background: #edf2e9;
+        border-radius: 24px;
+        padding: 44px 48px;
+    }
+
+    /* Article typography overrides inside blog box */
+    .blog-article-box .article-header h1 {
+        color: #717045;
+        font-weight: 700;
+        font-size: 2.4rem;
+    }
+
+    .blog-article-box .article-meta time {
+        color: #717045;
+        font-style: italic;
+        font-size: 1rem;
+    }
+
+    .blog-article-box .tag {
+        background: #717045;
+        color: #edf2e9;
+        border-radius: 20px;
+        font-size: 13px;
+        padding: 4px 14px;
+    }
+
+    .blog-article-box .article-body {
+        color: #1c1c1c;
+    }
+
+    .blog-article-box .article-body h2 {
+        color: #717045;
+    }
+
+    .blog-article-box .article-body h3 {
+        color: #717045;
+    }
+
+    .blog-article-box .article-body a {
+        color: #9b5108;
+    }
+
+    .blog-article-box .article-body a:hover {
+        color: #f78f28;
+    }
+
+    .blog-article-box .article-body img {
+        border: none;
+        border-radius: 12px;
+    }
+
+    .blog-article-box .article-gallery-container .gallery-item {
+        border: none;
+        border-radius: 12px;
+    }
+
+    .blog-article-box .comments-section {
+        border-top: none;
+        padding-top: 32px;
+        margin-top: 48px;
+    }
+
+    .blog-article-box .comments-section h2 {
+        color: #717045;
+    }
+
+    /* ---- Responsive ---- */
+    @media (max-width: 900px) {
+        .blog-page {
+            flex-direction: column;
+            padding: 16px;
+            gap: 16px;
+            align-items: stretch;
+        }
+
+        .blog-left-col {
+            width: 100%;
+            position: relative;
+            top: 0;
+            flex-direction: column;
+            align-items: stretch;
+            gap: 12px;
+        }
+
+        .blog-logo-link {
+            display: block;
+            text-align: center;
+        }
+
+        .blog-logo-img {
+            width: 220px;
+            height: auto;
+        }
+
+        .blog-sidebar-box {
+            width: 100%;
+            box-sizing: border-box;
+        }
+
+        .blog-right-col {
+            width: 100%;
+            box-sizing: border-box;
+        }
+
+        .blog-article-box {
+            width: 100%;
+            box-sizing: border-box;
+            padding: 28px 24px;
+        }
+
+        .blog-article-box .article-header h1 {
+            font-size: 1.8rem;
+        }
+
+        /* Cap article list to ~3 items then scroll */
+        .blog-sidebar-box .article-list {
+            max-height: 175px;
+            overflow-y: auto;
+            scrollbar-width: thin;
+            scrollbar-color: rgba(237, 242, 233, 0.4) transparent;
+        }
+
+        .blog-sidebar-box .article-list::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        .blog-sidebar-box .article-list::-webkit-scrollbar-track {
+            background: transparent;
+        }
+
+        .blog-sidebar-box .article-list::-webkit-scrollbar-thumb {
+            background: rgba(237, 242, 233, 0.4);
+            border-radius: 3px;
+        }
+    }
+
+    @media (max-width: 480px) {
+        .blog-page {
+            padding: 12px;
+        }
+
+        .blog-logo-img {
+            width: 180px;
+        }
+
+        .blog-article-box {
+            padding: 20px 16px;
+            border-radius: 18px;
+        }
+
+        .blog-article-box .article-header h1 {
+            font-size: 1.4rem;
+        }
+    }
+</style>

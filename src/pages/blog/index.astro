@@ -1,0 +1,75 @@
+---
+import BlogLayout from '../../layouts/BlogLayout.astro';
+import { getCollection } from 'astro:content';
+import { Image } from 'astro:assets';
+import InstagramEmbed from '../../components/InstagramEmbed.astro';
+import InstagramInline from '../../components/InstagramInline.astro';
+import PhotoInline from '../../components/PhotoInline.astro';
+
+const articles = await getCollection('articles');
+const sortedArticles = articles.sort((a, b) => b.data.date.getTime() - a.data.date.getTime());
+
+const featuredArticle = sortedArticles[0];
+let Content = null;
+if (featuredArticle) {
+    const rendered = await featuredArticle.render();
+    Content = rendered.Content;
+}
+---
+
+<BlogLayout
+    title="Kawa Blog"
+    description="Kawa Designs blog — adventure stories and route reports"
+    articles={sortedArticles}
+    currentSlug={featuredArticle?.slug}
+    loadGallery={true}
+>
+    {featuredArticle && Content ? (
+        <article class="article">
+            <header class="article-header">
+                <h1>{featuredArticle.data.title}</h1>
+                <div class="article-meta">
+                    <time datetime={featuredArticle.data.date.toISOString()}>
+                        {featuredArticle.data.date.toLocaleDateString('en-US', {
+                            year: 'numeric',
+                            month: 'long',
+                            day: 'numeric'
+                        })}
+                    </time>
+                    <div class="article-tags">
+                        {featuredArticle.data.tags.map(tag => (
+                            <span class="tag">{tag}</span>
+                        ))}
+                    </div>
+                </div>
+            </header>
+
+            {featuredArticle.data.images && featuredArticle.data.images.length > 0 && (
+                <div class="article-gallery-container" data-images={JSON.stringify(featuredArticle.data.images.map(img => ({
+                    src: typeof img.src === 'string' ? img.src : img.src.src,
+                    alt: img.alt,
+                    caption: img.caption
+                })))}>
+                    {featuredArticle.data.images.map((image, index) => (
+                        <div class="article-gallery">
+                            <div class="gallery-item" data-index={index}>
+                                {typeof image.src === 'string' ? (
+                                    <img src={image.src} alt={image.alt} loading="lazy" />
+                                ) : (
+                                    <Image src={image.src} alt={image.alt} loading="lazy" />
+                                )}
+                                {image.caption && <span class="caption">{image.caption}</span>}
+                            </div>
+                        </div>
+                    ))}
+                </div>
+            )}
+
+            <div class="article-body">
+                <Content components={{ InstagramEmbed, InstagramInline, PhotoInline }} />
+            </div>
+        </article>
+    ) : (
+        <div class="loading-message">No articles found.</div>
+    )}
+</BlogLayout>

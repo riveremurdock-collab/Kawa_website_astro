@@ -1,0 +1,29 @@
+---
+const { url } = Astro.props;
+const cleanUrl = url.endsWith('/') ? url : url + '/';
+---
+
+<div class="instagram-embed-wrapper">
+    <blockquote
+        class="instagram-media"
+        data-instgrm-captioned
+        data-instgrm-permalink={cleanUrl}
+        data-instgrm-version="14"
+    >
+        <a href={cleanUrl}>View this post on Instagram</a>
+    </blockquote>
+</div>
+
+<script async src="//www.instagram.com/embed.js"></script>
+
+<style>
+    .instagram-embed-wrapper {
+        max-width: 480px;
+        margin: 2rem auto;
+    }
+
+    .instagram-embed-wrapper :global(.instagram-media) {
+        margin: 0 auto !important;
+        min-width: unset !important;
+    }
+</style>

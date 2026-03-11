@@ -1,0 +1,72 @@
+---
+import '../styles/global.css';
+---
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="description" content="Interactive route maps for Kawa Designs adventures" />
+    <title>Route Maps | Kawa Designs</title>
+    <link rel="icon" type="image/png" href="/images/logos/kawa_logo_darksandstone.png" />
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" crossorigin="" />
+    <link rel="stylesheet" href="/styles/map.css" />
+    <style>
+        *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+        html, body {
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+        }
+
+        #overview-map-container {
+            width: 100%;
+            height: 100%;
+        }
+
+        .map-logo-link {
+            position: fixed;
+            top: 20px;
+            left: 24px;
+            z-index: 1000;
+            line-height: 0;
+            display: inline-block;
+        }
+
+        .map-logo {
+            height: 80px;
+            width: auto;
+            transition: transform 0.3s ease;
+            filter: drop-shadow(0 2px 8px rgba(0,0,0,0.35));
+        }
+
+        .map-logo-link:hover .map-logo {
+            transform: scale(1.06);
+        }
+    </style>
+</head>
+<body>
+    <a href="/" class="map-logo-link">
+        <img src="/images/logos/kawa lichen landing page logo.png" alt="KAWA" class="map-logo" />
+    </a>
+
+    <div id="overview-map-container"></div>
+
+    <script is:inline src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" crossorigin=""></script>
+    <script is:inline src="/scripts/overview-map.js"></script>
+    <script is:inline>
+        function initMap() {
+            if (window.OverviewMap) {
+                new window.OverviewMap('overview-map-container');
+            }
+        }
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', initMap);
+        } else {
+            initMap();
+        }
+    </script>
+</body>
+</html>

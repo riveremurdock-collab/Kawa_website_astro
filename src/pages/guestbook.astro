@@ -1,0 +1,41 @@
+---
+import InnerPageLayout from '../layouts/InnerPageLayout.astro';
+---
+
+<InnerPageLayout title="Guest Book | Kawa Designs" description="Sign the Kawa Designs guestbook and leave your mark">
+    <div class="page-content-box guestbook-box">
+        <h1>Guest Book</h1>
+        <p class="guestbook-intro">Leave your mark on the trail! Say hello and sign the logbook.</p>
+        <div class="cusdis-wrapper">
+            <div id="cusdis_thread"
+                data-host="https://cusdis.com"
+                data-app-id="e5efd1f2-ea0a-4da1-b432-df5979658893"
+                data-page-id="guestbook"
+                data-page-url="https://kawadesign.us/guestbook"
+                data-page-title="Guestbook"
+            ></div>
+            <script async defer src="https://cusdis.com/js/cusdis.es.js"></script>
+        </div>
+    </div>
+</InnerPageLayout>
+
+<style>
+    .guestbook-box {
+        gap: 16px;
+    }
+
+    .guestbook-intro {
+        color: #717045;
+        font-size: 1.05rem;
+        flex-shrink: 0;
+    }
+
+    .cusdis-wrapper {
+        background: white;
+        border-radius: 16px;
+        padding: 20px;
+        flex: 1;
+        min-height: 0;
+        overflow-y: auto;
+    }
+</style>

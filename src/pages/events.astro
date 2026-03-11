@@ -1,0 +1,43 @@
+---
+import InnerPageLayout from '../layouts/InnerPageLayout.astro';
+---
+
+<InnerPageLayout title="Events | Kawa Designs" description="Upcoming Kawa Designs events and adventures">
+    <div class="page-content-box events-box">
+        <h1>Events</h1>
+        <div class="calendar-wrapper">
+            <iframe
+                src="https://calendar.google.com/calendar/embed?height=450&wkst=1&ctz=America%2FDenver&showCalendars=0&showPrint=0&mode=AGENDA&title=Kawa%20Events&src=YWYzNmU2NDdjZGZkYzUyYjkzOTRiMDRjNDFiOTRhMWQ0YTc4MzU1YWMxNmFhOGEzYmUxNjM3YzcyYzg4YzI1NUBncm91cC5jYWxlbmRhci5nb29nbGUuY29t&color=%233f51b5"
+                style="border-width:0"
+                width="100%"
+                height="100%"
+                frameborder="0"
+                scrolling="no"
+                title="Kawa Events Calendar"
+            ></iframe>
+        </div>
+    </div>
+</InnerPageLayout>
+
+<style>
+    .events-box {
+        gap: 20px;
+    }
+
+    .calendar-wrapper {
+        background: #d6e8bd;
+        border-radius: 16px;
+        padding: 16px;
+        flex: 1;
+        min-height: 0;
+        display: flex;
+        flex-direction: column;
+    }
+
+    .calendar-wrapper iframe {
+        display: block;
+        flex: 1;
+        min-height: 0;
+        border-radius: 8px;
+    }
+</style>

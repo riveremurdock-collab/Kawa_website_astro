@@ -1,0 +1,71 @@
+---
+import InnerPageLayout from '../layouts/InnerPageLayout.astro';
+---
+
+<InnerPageLayout title="Contact & Socials | Kawa Designs" description="Contact Kawa Designs and follow on social media">
+    <div class="page-content-box contact-box">
+        <h1>Stay In Touch</h1>
+
+        <section class="contact-section">
+            <h2>Social Media</h2>
+            <p>Follow Kawa Designs for updates, behind-the-scenes content, and adventure inspiration.</p>
+            <div class="social-links">
+                <a href="https://www.instagram.com/kawa.designs" class="social-link" target="_blank" rel="noopener noreferrer">Instagram</a>
+                <a href="https://www.youtube.com/channel/UC30b-MFWLis865vGaivkwrQ" class="social-link" target="_blank" rel="noopener noreferrer">YouTube</a>
+                <a href="https://www.facebook.com/p/Kawa-Designs-61550865273634/" class="social-link" target="_blank" rel="noopener noreferrer">Facebook</a>
+            </div>
+        </section>
+
+        <section class="contact-section">
+            <h2>Get In Touch</h2>
+            <p><strong>Email:</strong> <a href="mailto:kawa.outdoor.designs@gmail.com" class="contact-email">kawa.outdoor.designs@gmail.com</a></p>
+            <p><strong>Location:</strong> Salt Lake City, Utah</p>
+        </section>
+    </div>
+</InnerPageLayout>
+
+<style>
+    .contact-box {
+        gap: 0;
+    }
+
+    .contact-section {
+        background: #d6e8bd;
+        border-radius: 16px;
+        padding: 24px;
+        margin-bottom: 20px;
+    }
+
+    .social-links {
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+        margin-top: 16px;
+    }
+
+    .social-link {
+        display: block;
+        padding: 12px 20px;
+        background: #717045;
+        border-radius: 8px;
+        color: #edf2e9;
+        font-weight: 500;
+        text-align: center;
+        transition: background 0.2s ease;
+        text-decoration: none;
+    }
+
+    .social-link:hover {
+        background: #a4a97f;
+        color: #edf2e9;
+    }
+
+    .contact-email {
+        color: #9b5108;
+        text-decoration: underline;
+    }
+
+    .contact-email:hover {
+        color: #f78f28;
+    }
+</style>

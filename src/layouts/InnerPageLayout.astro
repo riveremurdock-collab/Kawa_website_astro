@@ -1,0 +1,141 @@
+---
+import '../styles/global.css';
+
+interface Props {
+    title?: string;
+    description?: string;
+    loadGallery?: boolean;
+    loadRouteMap?: boolean;
+}
+
+const {
+    title = "Kawa Designs",
+    description = "Kawa Designs — outdoor adventure blog and design",
+    loadGallery = false,
+    loadRouteMap = false
+} = Astro.props;
+---
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="description" content={description} />
+    <title>{title}</title>
+    <link rel="icon" type="image/png" href="/images/logos/kawa_logo_darksandstone.png" />
+    <link rel="stylesheet" href="/styles/map.css" />
+</head>
+<body class="inner-body">
+    <div class="inner-shell">
+        <header class="inner-topbar">
+            <a href="/" class="inner-logo-link">
+                <img src="/images/logos/kawa lichen landing page logo.png" alt="KAWA" class="inner-logo" />
+            </a>
+        </header>
+        <slot />
+    </div>
+    {loadGallery && <script is:inline src="/scripts/gallery.js"></script>}
+</body>
+</html>
+
+<style is:global>
+    .inner-body {
+        margin: 0;
+        padding: 0;
+        min-height: 100vh;
+        background-image: url('/images/backgrounds/landing page sandstone background.png');
+        background-size: cover;
+        background-position: center;
+        background-attachment: fixed;
+    }
+
+    .inner-shell {
+        height: 100vh;
+        display: flex;
+        flex-direction: column;
+        padding: 28px;
+        gap: 20px;
+        box-sizing: border-box;
+        overflow: hidden;
+    }
+
+    .inner-topbar {
+        flex-shrink: 0;
+    }
+
+    .inner-logo-link {
+        display: inline-block;
+        line-height: 0;
+    }
+
+    .inner-logo {
+        height: 80px;
+        width: auto;
+        transition: transform 0.3s ease;
+    }
+
+    .inner-logo-link:hover .inner-logo {
+        transform: scale(1.06);
+    }
+
+    /* Shared content box used by all inner pages */
+    .page-content-box {
+        background: #edf2e9;
+        border-radius: 24px;
+        padding: 44px 48px;
+        flex: 1;
+        min-height: 0;
+        overflow-y: auto;
+        display: flex;
+        flex-direction: column;
+    }
+
+    .page-content-box h1 {
+        font-family: var(--font-main);
+        font-weight: 700;
+        font-size: 2rem;
+        color: #717045;
+        margin-bottom: 28px;
+    }
+
+    .page-content-box h2 {
+        font-family: var(--font-main);
+        font-weight: 700;
+        font-size: 1.3rem;
+        color: #717045;
+        margin-bottom: 12px;
+    }
+
+    .page-content-box p {
+        color: #1c1c1c;
+        margin-bottom: 12px;
+        line-height: 1.7;
+    }
+
+    @media (max-width: 768px) {
+        .inner-shell {
+            padding: 16px;
+            gap: 14px;
+        }
+
+        .inner-logo {
+            height: 60px;
+        }
+
+        .page-content-box {
+            padding: 28px 24px;
+            border-radius: 18px;
+        }
+    }
+
+    @media (max-width: 480px) {
+        .inner-shell {
+            padding: 12px;
+        }
+
+        .page-content-box {
+            padding: 20px 16px;
+        }
+    }
+</style>

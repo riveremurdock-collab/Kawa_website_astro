@@ -1,0 +1,93 @@
+---
+import ArticleCard from './ArticleCard.astro';
+
+interface Props {
+  articles: Array<{
+    slug: string;
+    data: {
+      title: string;
+      date: Date;
+      tags: string[];
+    };
+  }>;
+  currentSlug?: string;
+}
+
+const { articles, currentSlug } = Astro.props;
+
+const allTags = [...new Set(articles.flatMap(article => article.data.tags))].sort();
+---
+
+<div class="sidebar-heading" id="posts-heading">
+    <span>POSTS</span>
+    <span class="collapse-arrow"></span>
+</div>
+<div class="sidebar-search-area" id="sidebar-search-area">
+    <input type="text" id="search-input" placeholder="Search articles...">
+    <div id="tag-filters" class="tag-filters">
+        {allTags.map(tag => (
+            <label class="tag-filter" data-tag={tag}>
+                <input type="checkbox" value={tag}>
+                {tag}
+            </label>
+        ))}
+    </div>
+</div>
+<ul id="article-list" class="article-list">
+    {articles.map(article => (
+        <ArticleCard
+            slug={article.slug}
+            title={article.data.title}
+            date={article.data.date}
+            tags={article.data.tags}
+            isActive={currentSlug === article.slug}
+        />
+    ))}
+</ul>
+
+<script>
+    const heading = document.getElementById('posts-heading');
+    const searchArea = document.getElementById('sidebar-search-area');
+
+    heading?.addEventListener('click', () => {
+        heading.classList.toggle('collapsed');
+        searchArea?.classList.toggle('collapsed');
+    });
+
+    const searchInput = document.getElementById('search-input') as HTMLInputElement;
+    const articleList = document.getElementById('article-list');
+    const tagFilters = document.querySelectorAll('.tag-filter input');
+
+    function filterArticles() {
+        const searchTerm = searchInput?.value.toLowerCase() || '';
+        const activeTags: string[] = [];
+
+        tagFilters.forEach(filter => {
+            const input = filter as HTMLInputElement;
+            if (input.checked) activeTags.push(input.value);
+        });
+
+        const items = articleList?.querySelectorAll('li');
+        items?.forEach(item => {
+            const title = item.querySelector('.article-title')?.textContent?.toLowerCase() || '';
+            const tags = item.dataset.tags?.split(',') || [];
+            const matchesSearch = title.includes(searchTerm);
+            const matchesTags = activeTags.length === 0 || activeTags.some(tag => tags.includes(tag));
+            (item as HTMLElement).style.display = (matchesSearch && matchesTags) ? '' : 'none';
+        });
+    }
+
+    searchInput?.addEventListener('input', filterArticles);
+
+    tagFilters.forEach(filter => {
+        filter.addEventListener('change', () => {
+            const label = filter.closest('.tag-filter');
+            if ((filter as HTMLInputElement).checked) {
+                label?.classList.add('active');
+            } else {
+                label?.classList.remove('active');
+            }
+            filterArticles();
+        });
+    });
+</script>

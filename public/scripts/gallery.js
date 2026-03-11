@@ -11,68 +11,6 @@ class ImageGallery {
         this.keyHandler = null;
     }
 
-    init(images) {
-        this.images = images || [];
-        if (this.images.length === 0) return;
-
-        this.bindGalleryEvents();
-    }
-
-    initInlineImages(images, imgElements) {
-        this.images = images || [];
-        if (this.images.length === 0) return;
-
-        imgElements.forEach((img) => {
-            const index = parseInt(img.dataset.galleryIndex, 10) || 0;
-
-            // Make image clickable
-            img.style.cursor = 'pointer';
-
-            img.addEventListener('click', (e) => {
-                e.preventDefault();
-                this.openLightbox(index);
-            });
-
-            // Keyboard accessibility
-            img.setAttribute('tabindex', '0');
-            img.setAttribute('role', 'button');
-            img.setAttribute('aria-label', `View image ${index + 1}`);
-
-            img.addEventListener('keydown', (e) => {
-                if (e.key === 'Enter' || e.key === ' ') {
-                    e.preventDefault();
-                    this.openLightbox(index);
-                }
-            });
-        });
-    }
-
-    bindGalleryEvents() {
-        // Find all gallery items in the article content
-        const items = document.querySelectorAll('.article-gallery-container .gallery-item');
-        if (!items || items.length === 0) return;
-
-        items.forEach((item) => {
-            const index = parseInt(item.dataset.index, 10) || 0;
-
-            item.addEventListener('click', () => {
-                this.openLightbox(index);
-            });
-
-            // Keyboard accessibility
-            item.setAttribute('tabindex', '0');
-            item.setAttribute('role', 'button');
-            item.setAttribute('aria-label', `View image ${index + 1}`);
-
-            item.addEventListener('keydown', (e) => {
-                if (e.key === 'Enter' || e.key === ' ') {
-                    e.preventDefault();
-                    this.openLightbox(index);
-                }
-            });
-        });
-    }
-
     openLightbox(index) {
         if (this.images.length === 0) return;
 
@@ -250,33 +188,58 @@ class ImageGallery {
     }
 }
 
-// Initialize global instance and setup on page load
+function makeClickable(el, index) {
+    el.style.cursor = 'pointer';
+    el.setAttribute('tabindex', '0');
+    el.setAttribute('role', 'button');
+    el.setAttribute('aria-label', `View image ${index + 1}`);
+    el.addEventListener('click', () => window.gallery.openLightbox(index));
+    el.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter' || e.key === ' ') {
+            e.preventDefault();
+            window.gallery.openLightbox(index);
+        }
+    });
+}
+
+// Initialize on page load — unifies frontmatter gallery and inline body images
 document.addEventListener('DOMContentLoaded', () => {
     window.gallery = new ImageGallery();
 
-    // Find all images in the article body
+    const allImages = [];
+
+    // 1. Frontmatter gallery images (defined in article YAML header)
+    const galleryContainer = document.querySelector('.article-gallery-container');
+    if (galleryContainer) {
+        try {
+            const frontmatterImages = JSON.parse(galleryContainer.dataset.images || '[]');
+            allImages.push(...frontmatterImages);
+        } catch (e) {}
+
+        galleryContainer.querySelectorAll('.gallery-item').forEach((item) => {
+            const index = parseInt(item.dataset.index, 10) || 0;
+            makeClickable(item, index);
+        });
+    }
+
+    // 2. Inline images within the article body (including PhotoInline components)
     const articleBody = document.querySelector('.article-body');
     if (articleBody) {
-        const imgElements = articleBody.querySelectorAll('img');
-        const images = [];
-
-        imgElements.forEach((img, index) => {
-            // Build image data from the img element
+        const frontmatterCount = allImages.length;
+        articleBody.querySelectorAll('img').forEach((img, bodyIndex) => {
+            const globalIndex = frontmatterCount + bodyIndex;
             const figure = img.closest('figure');
             const caption = figure ? figure.querySelector('figcaption')?.textContent : '';
 
-            images.push({
+            allImages.push({
                 src: img.src,
                 alt: img.alt || '',
                 caption: caption || ''
             });
 
-            // Store index on the image for click handling
-            img.dataset.galleryIndex = index;
+            makeClickable(img, globalIndex);
         });
-
-        if (images.length > 0) {
-            window.gallery.initInlineImages(images, imgElements);
-        }
     }
+
+    window.gallery.images = allImages;
 });

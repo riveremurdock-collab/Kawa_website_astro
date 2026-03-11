@@ -1,0 +1,59 @@
+---
+const { src, alt, caption, text } = Astro.props;
+---
+
+<div class="photo-inline-wrapper">
+    <div class="photo-inline-text">
+        <p>{text}</p>
+    </div>
+    <figure class="photo-inline-figure">
+        <img src={src} alt={alt} loading="lazy" />
+        {caption && <figcaption>{caption}</figcaption>}
+    </figure>
+</div>
+
+<style>
+    .photo-inline-wrapper {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 2rem;
+        align-items: start;
+        margin: 2rem 0;
+    }
+
+    .photo-inline-text {
+        line-height: 1.8;
+    }
+
+    .photo-inline-figure {
+        margin: 0;
+    }
+
+    .photo-inline-figure img {
+        width: 100%;
+        height: auto;
+        border-radius: 4px;
+        display: block;
+        transition: transform 0.2s ease, border-color 0.2s ease;
+    }
+
+    .photo-inline-figure img:hover {
+        transform: scale(1.02);
+        border-color: var(--rust-orange);
+    }
+
+    .photo-inline-figure figcaption {
+        font-family: var(--font-pixel);
+        font-size: 11px;
+        text-align: center;
+        margin-top: 6px;
+        color: var(--green-forest);
+        padding: 4px;
+    }
+
+    @media (max-width: 700px) {
+        .photo-inline-wrapper {
+            grid-template-columns: 1fr;
+        }
+    }
+</style>

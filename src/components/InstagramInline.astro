@@ -1,0 +1,53 @@
+---
+const { url, text } = Astro.props;
+const cleanUrl = url.endsWith('/') ? url : url + '/';
+---
+
+<div class="instagram-inline-wrapper">
+    <div class="instagram-inline-text">
+        <p>{text}</p>
+    </div>
+    <div class="instagram-inline-embed">
+        <blockquote
+            class="instagram-media"
+            data-instgrm-captioned
+            data-instgrm-permalink={cleanUrl}
+            data-instgrm-version="14"
+        >
+            <a href={cleanUrl}>View this post on Instagram</a>
+        </blockquote>
+    </div>
+</div>
+
+<script async src="//www.instagram.com/embed.js"></script>
+
+<style>
+    .instagram-inline-wrapper {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 2rem;
+        align-items: start;
+        margin: 2rem 0;
+    }
+
+    .instagram-inline-text {
+        line-height: 1.8;
+    }
+
+    /* Reset article blockquote styles that would bleed in before the embed renders */
+    .instagram-inline-embed :global(blockquote.instagram-media) {
+        border-left: none !important;
+        padding-left: 0 !important;
+        margin: 0 auto !important;
+        font-style: normal !important;
+        color: inherit !important;
+        min-width: unset !important;
+        max-width: 100% !important;
+    }
+
+    @media (max-width: 700px) {
+        .instagram-inline-wrapper {
+            grid-template-columns: 1fr;
+        }
+    }
+</style>

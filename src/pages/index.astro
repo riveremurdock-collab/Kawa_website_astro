@@ -1,70 +1,439 @@
 ---
-import BaseLayout from '../layouts/BaseLayout.astro';
-import { getCollection } from 'astro:content';
-import { Image } from 'astro:assets';
-
-// Get all articles and sort by date (newest first)
-const articles = await getCollection('articles');
-const sortedArticles = articles.sort((a, b) => b.data.date.getTime() - a.data.date.getTime());
-
-// Get the about article to display by default
-const aboutArticle = articles.find(a => a.slug === 'about');
-let Content = null;
-if (aboutArticle) {
-    const rendered = await aboutArticle.render();
-    Content = rendered.Content;
-}
+import LandingLayout from '../layouts/LandingLayout.astro';
 ---
 
-<BaseLayout title="Kawa Designs" articles={sortedArticles} currentSlug={aboutArticle?.slug}>
-    <section id="article-content">
-        {aboutArticle && Content ? (
-            <article class="article">
-                <header class="article-header">
-                    <h1>{aboutArticle.data.title}</h1>
-                    <div class="article-meta">
-                        <time datetime={aboutArticle.data.date.toISOString()}>
-                            {aboutArticle.data.date.toLocaleDateString('en-US', {
-                                year: 'numeric',
-                                month: 'long',
-                                day: 'numeric'
-                            })}
-                        </time>
-                        <div class="article-tags">
-                            {aboutArticle.data.tags.map(tag => (
-                                <span class="tag">{tag}</span>
-                            ))}
-                        </div>
-                    </div>
-                </header>
+<LandingLayout title="Kawa Designs" description="Kawa Designs — outdoor adventure, route maps, and design">
+    <main class="landing">
+        <div class="landing-content">
+            <img
+                src="/images/logos/kawa lichen landing page logo.png"
+                alt="KAWA"
+                class="landing-logo"
+            />
+            <nav class="landing-nav">
+                <ul>
+                    <li>
+                        <img src="/images/icons/lichen bullet point.png" class="nav-bullet" alt="" />
+                        <a href="/blog">KAWA BLOG</a>
+                    </li>
+                    <li>
+                        <img src="/images/icons/lichen bullet point.png" class="nav-bullet" alt="" />
+                        <a href="/map">ROUTE MAPS</a>
+                    </li>
+                    <li>
+                        <img src="/images/icons/lichen bullet point.png" class="nav-bullet" alt="" />
+                        <a href="https://kawadesign.bigcartel.com" target="_blank" rel="noopener noreferrer">STORE</a>
+                    </li>
+                    <li>
+                        <img src="/images/icons/lichen bullet point.png" class="nav-bullet" alt="" />
+                        <a href="/events">EVENTS</a>
+                    </li>
+                    <li>
+                        <img src="/images/icons/lichen bullet point.png" class="nav-bullet" alt="" />
+                        <a href="/guestbook">GUEST BOOK</a>
+                    </li>
+                    <li>
+                        <img src="/images/icons/lichen bullet point.png" class="nav-bullet" alt="" />
+                        <a href="/contact">STAY IN TOUCH</a>
+                    </li>
+                </ul>
+            </nav>
+        </div>
+    </main>
+</LandingLayout>
 
-                {aboutArticle.data.images && aboutArticle.data.images.length > 0 && (
-                    <div class="article-gallery-container" data-images={JSON.stringify(aboutArticle.data.images.map(img => ({
-                        src: typeof img.src === 'string' ? img.src : img.src.src,
-                        alt: img.alt,
-                        caption: img.caption
-                    })))}>
-                        {aboutArticle.data.images.map((image, index) => (
-                            <div class="article-gallery">
-                                <div class="gallery-item" data-index={index}>
-                                    {typeof image.src === 'string' ? (
-                                        <img src={image.src} alt={image.alt} loading="lazy" />
-                                    ) : (
-                                        <Image src={image.src} alt={image.alt} loading="lazy" />
-                                    )}
-                                    {image.caption && <span class="caption">{image.caption}</span>}
-                                </div>
-                            </div>
-                        ))}
-                    </div>
-                )}
+<style is:global>
+    .landing {
+        width: 100%;
+        min-height: 100vh;
+        background-image: url('/images/backgrounds/landing page sandstone background.png');
+        background-size: cover;
+        background-position: center;
+        background-repeat: no-repeat;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
 
-                <div class="article-body">
-                    <Content />
-                </div>
-            </article>
-        ) : (
-            <div class="loading-message">No articles found.</div>
-        )}
-    </section>
-</BaseLayout>
+    @media (max-width: 768px) {
+        .landing {
+            background-image: url('/images/backgrounds/landing page sandstone background mobille.png');
+        }
+    }
+
+    .landing-content {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 32px;
+        padding: 40px 24px;
+    }
+
+    .landing-logo {
+        max-width: 800px;
+        width: 88vw;
+        height: auto;
+    }
+
+    .landing-nav ul {
+        list-style: none;
+        display: flex;
+        flex-direction: column;
+        gap: 14px;
+        padding: 0;
+        margin: 0;
+    }
+
+    .landing-nav li {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+    }
+
+    .nav-bullet {
+        width: 28px;
+        height: auto;
+        flex-shrink: 0;
+        transition: transform 0.2s ease;
+    }
+
+    .landing-nav li:hover .nav-bullet {
+        transform: scale(1.4);
+    }
+
+    .landing-nav a {
+        font-family: 'SodaSans', sans-serif;
+        font-size: 1.5rem;
+        letter-spacing: 3px;
+        color: #1c1c1c;
+        text-decoration: none;
+        transition: color 0.2s ease, transform 0.15s ease;
+        display: inline-block;
+    }
+
+    .landing-nav a:hover {
+        color: #9b5108;
+        transform: translateX(4px);
+    }
+
+    @media (max-width: 480px) {
+        .landing-logo {
+            max-width: 360px;
+        }
+        .landing-nav a {
+            font-size: 1.2rem;
+            letter-spacing: 2px;
+        }
+    }
+</style>
+
+<script is:inline>
+    (function () {
+        let ctx = null;
+
+        function getCtx() {
+            if (!ctx) ctx = new (window.AudioContext || window.webkitAudioContext)();
+            return ctx;
+        }
+
+        // Soft, airy blip on hover — short sine wave with fast decay
+        function playHover() {
+            try {
+                const ac = getCtx();
+                const osc = ac.createOscillator();
+                const gain = ac.createGain();
+
+                osc.connect(gain);
+                gain.connect(ac.destination);
+
+                osc.type = 'sine';
+                osc.frequency.setValueAtTime(880, ac.currentTime);
+                osc.frequency.exponentialRampToValueAtTime(660, ac.currentTime + 0.08);
+
+                gain.gain.setValueAtTime(0.12, ac.currentTime);
+                gain.gain.exponentialRampToValueAtTime(0.001, ac.currentTime + 0.1);
+
+                osc.start(ac.currentTime);
+                osc.stop(ac.currentTime + 0.1);
+            } catch (e) {}
+        }
+
+        // Punchy click — quick thump with a low frequency drop
+        function playClick() {
+            try {
+                const ac = getCtx();
+                const osc = ac.createOscillator();
+                const gain = ac.createGain();
+
+                osc.connect(gain);
+                gain.connect(ac.destination);
+
+                osc.type = 'sine';
+                osc.frequency.setValueAtTime(400, ac.currentTime);
+                osc.frequency.exponentialRampToValueAtTime(80, ac.currentTime + 0.12);
+
+                gain.gain.setValueAtTime(0.25, ac.currentTime);
+                gain.gain.exponentialRampToValueAtTime(0.001, ac.currentTime + 0.15);
+
+                osc.start(ac.currentTime);
+                osc.stop(ac.currentTime + 0.15);
+            } catch (e) {}
+        }
+
+        document.addEventListener('DOMContentLoaded', function () {
+            const items = document.querySelectorAll('.landing-nav li');
+            items.forEach(function (li) {
+                li.addEventListener('mouseenter', playHover);
+                const link = li.querySelector('a');
+                if (link) link.addEventListener('click', playClick);
+            });
+        });
+    })();
+</script>
+
+<script is:inline>
+    (function () {
+        let ctx = null;
+        let rumbleNodes = null;
+        let hoverTimer = null;
+        let rumbleActive = false;
+
+        function getCtx() {
+            if (!ctx) ctx = new (window.AudioContext || window.webkitAudioContext)();
+            return ctx;
+        }
+
+        function startRumble() {
+            try {
+                const ac = getCtx();
+
+                // Looping noise buffer for the body of the rumble
+                const bufferSize = ac.sampleRate * 2;
+                const buffer = ac.createBuffer(1, bufferSize, ac.sampleRate);
+                const data = buffer.getChannelData(0);
+                for (let i = 0; i < bufferSize; i++) data[i] = Math.random() * 2 - 1;
+
+                const noise = ac.createBufferSource();
+                noise.buffer = buffer;
+                noise.loop = true;
+
+                // Low-pass filter to keep it deep and rumbly
+                const filter = ac.createBiquadFilter();
+                filter.type = 'lowpass';
+                filter.frequency.value = 90;
+                filter.Q.value = 0.7;
+
+                // Sub oscillator for extra body
+                const osc = ac.createOscillator();
+                osc.type = 'sine';
+                osc.frequency.value = 42;
+
+                const noiseGain = ac.createGain();
+                noiseGain.gain.setValueAtTime(0.001, ac.currentTime);
+                noiseGain.gain.linearRampToValueAtTime(0.6, ac.currentTime + 1.0);
+
+                const oscGain = ac.createGain();
+                oscGain.gain.setValueAtTime(0.001, ac.currentTime);
+                oscGain.gain.linearRampToValueAtTime(0.32, ac.currentTime + 1.0);
+
+                noise.connect(filter);
+                filter.connect(noiseGain);
+                noiseGain.connect(ac.destination);
+
+                osc.connect(oscGain);
+                oscGain.connect(ac.destination);
+
+                noise.start();
+                osc.start();
+
+                rumbleNodes = { noise, osc, noiseGain, oscGain };
+                rumbleActive = true;
+            } catch (e) {}
+        }
+
+        function stopRumble() {
+            if (!rumbleNodes || !rumbleActive) return;
+            try {
+                const ac = getCtx();
+                const { noise, osc, noiseGain, oscGain } = rumbleNodes;
+
+                const now = ac.currentTime;
+                noiseGain.gain.cancelScheduledValues(now);
+                noiseGain.gain.setValueAtTime(noiseGain.gain.value, now);
+                noiseGain.gain.linearRampToValueAtTime(0.001, now + 0.25);
+
+                oscGain.gain.cancelScheduledValues(now);
+                oscGain.gain.setValueAtTime(oscGain.gain.value, now);
+                oscGain.gain.linearRampToValueAtTime(0.001, now + 0.25);
+
+                setTimeout(function () {
+                    try { noise.stop(); } catch (e) {}
+                    try { osc.stop(); } catch (e) {}
+                }, 300);
+            } catch (e) {}
+            rumbleNodes = null;
+            rumbleActive = false;
+        }
+
+        function playCrunch() {
+            try {
+                const ac = getCtx();
+                const now = ac.currentTime;
+
+                // 7 quick micro-bursts staggered ~18ms apart — dry leaf crinkle texture
+                var burstCount = 7;
+                for (var b = 0; b < burstCount; b++) {
+                    (function (offset) {
+                        var burstLen = 0.022 + Math.random() * 0.018;
+                        var bufSize = Math.floor(ac.sampleRate * burstLen);
+                        var buf = ac.createBuffer(1, bufSize, ac.sampleRate);
+                        var d = buf.getChannelData(0);
+                        for (var j = 0; j < bufSize; j++) d[j] = Math.random() * 2 - 1;
+
+                        var src = ac.createBufferSource();
+                        src.buffer = buf;
+
+                        // Papery bandpass — 900–2400 Hz range feels like dry plant material
+                        var bp = ac.createBiquadFilter();
+                        bp.type = 'bandpass';
+                        bp.frequency.value = 900 + Math.random() * 1500;
+                        bp.Q.value = 0.6 + Math.random() * 0.8;
+
+                        // Slight high-shelf shimmer for the papery brightness
+                        var shelf = ac.createBiquadFilter();
+                        shelf.type = 'highshelf';
+                        shelf.frequency.value = 3500;
+                        shelf.gain.value = 6;
+
+                        var gain = ac.createGain();
+                        var vol = (b === 0 ? 0.5 : 0.3) * (1 - b * 0.08);
+                        gain.gain.setValueAtTime(vol, now + offset);
+                        gain.gain.exponentialRampToValueAtTime(0.001, now + offset + burstLen);
+
+                        src.connect(bp);
+                        bp.connect(shelf);
+                        shelf.connect(gain);
+                        gain.connect(ac.destination);
+
+                        src.start(now + offset);
+                        src.stop(now + offset + burstLen + 0.01);
+                    }(b * (0.016 + Math.random() * 0.008)));
+                }
+
+                // Soft low thud underneath — like pressing your palm into moss
+                var thudOsc = ac.createOscillator();
+                thudOsc.type = 'sine';
+                thudOsc.frequency.setValueAtTime(180, now);
+                thudOsc.frequency.exponentialRampToValueAtTime(55, now + 0.18);
+                var thudGain = ac.createGain();
+                thudGain.gain.setValueAtTime(0.22, now);
+                thudGain.gain.exponentialRampToValueAtTime(0.001, now + 0.2);
+                thudOsc.connect(thudGain);
+                thudGain.connect(ac.destination);
+                thudOsc.start(now);
+                thudOsc.stop(now + 0.22);
+            } catch (e) {}
+        }
+
+        document.addEventListener('DOMContentLoaded', function () {
+            const logo = document.querySelector('.landing-logo');
+            if (!logo) return;
+
+            logo.addEventListener('mouseenter', function () {
+                // After 1 second, begin slowly growing
+                hoverTimer = setTimeout(function () {
+                    logo.style.transition = 'transform 5s cubic-bezier(0.2, 0, 0.6, 1)';
+                    logo.style.transform = 'scale(1.2)';
+                    startRumble();
+                }, 1000);
+            });
+
+            logo.addEventListener('mouseleave', function () {
+                clearTimeout(hoverTimer);
+                hoverTimer = null;
+                // Snap back quickly
+                logo.style.transition = 'transform 0.3s ease-out';
+                logo.style.transform = 'scale(1)';
+                stopRumble();
+            });
+
+            logo.addEventListener('click', function (e) {
+                playCrunch();
+                spawnParticle(e.clientX, e.clientY);
+            });
+        });
+
+        // ---- Lichen particle physics ----
+        var particles = [];
+        var loopRunning = false;
+        var GRAVITY = 0.38;
+        var MAX_PARTICLES = 10;
+
+        function spawnParticle(clickX, clickY) {
+            // Evict oldest if at cap
+            if (particles.length >= MAX_PARTICLES) {
+                var evicted = particles.shift();
+                evicted.el.remove();
+            }
+
+            var el = document.createElement('img');
+            el.src = '/images/icons/lichen bullet point.png';
+            el.style.cssText = [
+                'position:fixed',
+                'width:80px',
+                'height:auto',
+                'pointer-events:none',
+                'z-index:9999',
+                'left:' + (clickX - 40) + 'px',
+                'top:' + (clickY - 40) + 'px',
+                'transform-origin:center center',
+                'will-change:transform'
+            ].join(';');
+            document.body.appendChild(el);
+
+            // Random outward burst — favour upward arc so it feels like it pops out
+            var angle = Math.random() * Math.PI * 2;
+            var speed = 5 + Math.random() * 7;
+
+            particles.push({
+                el: el,
+                x: clickX - 40,
+                y: clickY - 40,
+                vx: Math.cos(angle) * speed,
+                vy: Math.sin(angle) * speed - 2,   // slight upward bias
+                rot: Math.random() * 360,
+                spin: (Math.random() - 0.5) * 8     // deg/frame
+            });
+
+            if (!loopRunning) startLoop();
+        }
+
+        function startLoop() {
+            loopRunning = true;
+            function loop() {
+                for (var i = particles.length - 1; i >= 0; i--) {
+                    var p = particles[i];
+                    p.vy += GRAVITY;
+                    p.x  += p.vx;
+                    p.y  += p.vy;
+                    p.rot += p.spin;
+                    p.el.style.left = p.x + 'px';
+                    p.el.style.top  = p.y + 'px';
+                    p.el.style.transform = 'rotate(' + p.rot + 'deg)';
+
+                    // Remove once fully off the bottom of the viewport
+                    if (p.y > window.innerHeight + 100) {
+                        p.el.remove();
+                        particles.splice(i, 1);
+                    }
+                }
+                if (particles.length > 0) {
+                    requestAnimationFrame(loop);
+                } else {
+                    loopRunning = false;
+                }
+            }
+            requestAnimationFrame(loop);
+        }
+    })();
+</script>
