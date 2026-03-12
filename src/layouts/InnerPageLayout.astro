@@ -12,7 +12,7 @@ const {
     title = "Kawa Designs",
     description = "Kawa Designs — outdoor adventure blog and design",
     loadGallery = false,
-    loadRouteMap = false
+    loadRouteMap = false,
 } = Astro.props;
 ---
 
@@ -23,7 +23,7 @@ const {
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta name="description" content={description} />
     <title>{title}</title>
-    <link rel="icon" type="image/png" href="/images/logos/kawa_logo_darksandstone.png" />
+    <link rel="icon" type="image/png" href="/images/logos/kawa lichen square.png" />
     <link rel="stylesheet" href="/styles/map.css" />
 </head>
 <body class="inner-body">
@@ -44,10 +44,20 @@ const {
         margin: 0;
         padding: 0;
         min-height: 100vh;
+        background-color: transparent;
+    }
+
+    .inner-body::before {
+        content: '';
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
         background-image: url('/images/backgrounds/landing page sandstone background.png');
         background-size: cover;
         background-position: center;
-        background-attachment: fixed;
+        z-index: -1;
     }
 
     .inner-shell {

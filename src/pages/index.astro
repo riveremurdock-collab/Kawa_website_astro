@@ -45,7 +45,8 @@ import LandingLayout from '../layouts/LandingLayout.astro';
 <style is:global>
     .landing {
         width: 100%;
-        min-height: 100vh;
+        height: 100vh;
+        height: 100dvh;
         background-image: url('/images/backgrounds/landing page sandstone background.png');
         background-size: cover;
         background-position: center;
@@ -53,6 +54,7 @@ import LandingLayout from '../layouts/LandingLayout.astro';
         display: flex;
         align-items: center;
         justify-content: center;
+        overflow: hidden;
     }
 
     @media (max-width: 768px) {
@@ -116,12 +118,26 @@ import LandingLayout from '../layouts/LandingLayout.astro';
         transform: translateX(4px);
     }
 
+    @media (max-width: 768px) {
+        .landing-content {
+            gap: 20px;
+            padding: 24px 20px;
+        }
+    }
+
     @media (max-width: 480px) {
+        .landing-content {
+            gap: 14px;
+            padding: 16px 20px;
+        }
         .landing-logo {
-            max-width: 360px;
+            max-width: 300px;
+        }
+        .landing-nav ul {
+            gap: 8px;
         }
         .landing-nav a {
-            font-size: 1.2rem;
+            font-size: 1.1rem;
             letter-spacing: 2px;
         }
     }

@@ -21,21 +21,51 @@ import InnerPageLayout from '../layouts/InnerPageLayout.astro';
 
 <style>
     .guestbook-box {
-        gap: 16px;
+        gap: 8px;
+        padding-top: 24px;
+        overflow: hidden;
+    }
+
+    .guestbook-box h1 {
+        margin-bottom: 0;
     }
 
     .guestbook-intro {
         color: #717045;
         font-size: 1.05rem;
         flex-shrink: 0;
+        margin-bottom: 8px;
     }
 
+    /* Fills remaining height in the flex column, giving the iframe a defined container */
     .cusdis-wrapper {
         background: white;
         border-radius: 16px;
         padding: 20px;
         flex: 1;
         min-height: 0;
-        overflow-y: auto;
+        display: flex;
+        flex-direction: column;
+    }
+
+    /* Reset global #cusdis_thread styles and fill the wrapper */
+    .cusdis-wrapper :global(#cusdis_thread) {
+        background: transparent;
+        border: none;
+        padding: 0;
+        border-radius: 0;
+        min-height: 0;
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+    }
+
+    /* Lock the iframe to the container height — it scrolls its own content */
+    .cusdis-wrapper :global(#cusdis_thread iframe) {
+        width: 100% !important;
+        height: 100% !important;
+        flex: 1;
+        min-height: 0;
+        display: block;
     }
 </style>

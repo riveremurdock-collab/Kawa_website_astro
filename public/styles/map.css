@@ -366,26 +366,10 @@
 /* Map container */
 #overview-map-container {
     width: 100%;
-    height: calc(100vh - var(--header-height));
-    min-height: 300px;
-    border-radius: 8px;
+    height: 100vh;
+    height: 100dvh;
     overflow: hidden;
     background: var(--color-light-sage);
-}
-
-@media (max-width: 768px) {
-    #overview-map-container {
-        height: 55vh;
-        max-height: 450px;
-    }
-}
-
-@media (max-width: 480px) {
-    #overview-map-container {
-        height: 50vh;
-        max-height: 350px;
-        min-height: 250px;
-    }
 }
 
 #overview-map-container .leaflet-container {

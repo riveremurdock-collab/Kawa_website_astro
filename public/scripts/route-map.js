@@ -507,9 +507,15 @@ class RouteMap {
 }
 
 // Initialize all route maps when DOM is ready
-document.addEventListener('DOMContentLoaded', () => {
+function initRouteMaps() {
     const routeMaps = document.querySelectorAll('[data-route-map]');
     routeMaps.forEach(container => {
         new RouteMap(container);
     });
-});
+}
+
+if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initRouteMaps);
+} else {
+    initRouteMaps();
+}

@@ -6,34 +6,42 @@ import InnerPageLayout from '../layouts/InnerPageLayout.astro';
     <div class="page-content-box contact-box">
         <h1>Stay In Touch</h1>
 
-        <section class="contact-section">
-            <h2>Social Media</h2>
-            <p>Follow Kawa Designs for updates, behind-the-scenes content, and adventure inspiration.</p>
-            <div class="social-links">
-                <a href="https://www.instagram.com/kawa.designs" class="social-link" target="_blank" rel="noopener noreferrer">Instagram</a>
-                <a href="https://www.youtube.com/channel/UC30b-MFWLis865vGaivkwrQ" class="social-link" target="_blank" rel="noopener noreferrer">YouTube</a>
-                <a href="https://www.facebook.com/p/Kawa-Designs-61550865273634/" class="social-link" target="_blank" rel="noopener noreferrer">Facebook</a>
-            </div>
-        </section>
+        <div class="contact-columns">
+            <section class="contact-section">
+                <h2>Social Media</h2>
+                <p>Follow Kawa Designs for updates, behind-the-scenes content, and adventure inspiration.</p>
+                <div class="social-links">
+                    <a href="https://www.instagram.com/kawa.designs" class="social-link" target="_blank" rel="noopener noreferrer">Instagram</a>
+                    <a href="https://www.youtube.com/channel/UC30b-MFWLis865vGaivkwrQ" class="social-link" target="_blank" rel="noopener noreferrer">YouTube</a>
+                    <a href="https://www.facebook.com/p/Kawa-Designs-61550865273634/" class="social-link" target="_blank" rel="noopener noreferrer">Facebook</a>
+                </div>
+            </section>
 
-        <section class="contact-section">
-            <h2>Get In Touch</h2>
-            <p><strong>Email:</strong> <a href="mailto:kawa.outdoor.designs@gmail.com" class="contact-email">kawa.outdoor.designs@gmail.com</a></p>
-            <p><strong>Location:</strong> Salt Lake City, Utah</p>
-        </section>
+            <section class="contact-section">
+                <h2>Get In Touch</h2>
+                <p><strong>Email:</strong> <a href="mailto:kawa.outdoor.designs@gmail.com" class="contact-email">kawa.outdoor.designs@gmail.com</a></p>
+                <p><strong>Location:</strong> Salt Lake City, Utah</p>
+            </section>
+        </div>
     </div>
 </InnerPageLayout>
 
 <style>
     .contact-box {
-        gap: 0;
+        gap: 20px;
+    }
+
+    .contact-columns {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 20px;
+        align-items: start;
     }
 
     .contact-section {
         background: #d6e8bd;
         border-radius: 16px;
         padding: 24px;
-        margin-bottom: 20px;
     }
 
     .social-links {
@@ -67,5 +75,11 @@ import InnerPageLayout from '../layouts/InnerPageLayout.astro';
 
     .contact-email:hover {
         color: #f78f28;
+    }
+
+    @media (max-width: 600px) {
+        .contact-columns {
+            grid-template-columns: 1fr;
+        }
     }
 </style>
