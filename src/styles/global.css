@@ -55,10 +55,33 @@
 }
 
 @font-face {
-    font-family: 'SodaSans';
-    src: url('/fonts/soda-sans/SodaSansRegular.woff2') format('woff2'),
-         url('/fonts/soda-sans/SodaSansRegular.woff') format('woff');
+    font-family: 'AveriaLibre';
+    src: url('/fonts/Averia_Libre/AveriaLibre-Regular.ttf') format('truetype');
     font-weight: 400;
+    font-style: normal;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: 'AveriaLibre';
+    src: url('/fonts/Averia_Libre/AveriaLibre-Bold.ttf') format('truetype');
+    font-weight: 700;
+    font-style: normal;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: 'AveriaLibre';
+    src: url('/fonts/Averia_Libre/AveriaLibre-Italic.ttf') format('truetype');
+    font-weight: 400;
+    font-style: italic;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: 'AveriaLibre';
+    src: url('/fonts/Averia_Libre/AveriaLibre-Light.ttf') format('truetype');
+    font-weight: 300;
     font-style: normal;
     font-display: swap;
 }
@@ -79,7 +102,7 @@
 
     /* Typography */
     --font-main: 'Futura', 'Century Gothic', sans-serif;
-    --font-display: 'SodaSans', 'Futura', sans-serif;
+    --font-display: 'AveriaLibre', 'Futura', sans-serif;
 
     /* Layout */
     --header-height: 70px;
@@ -208,7 +231,7 @@ html::-webkit-scrollbar-thumb:hover { background-color: var(--color-olive); }
 .sidebar-heading {
     font-family: var(--font-display);
     font-size: 1.4rem;
-    font-weight: 400;
+    font-weight: 700;
     color: var(--color-black-grey);
     padding: 16px 16px 8px;
     letter-spacing: 2px;
@@ -394,7 +417,7 @@ html::-webkit-scrollbar-thumb:hover { background-color: var(--color-olive); }
 
 .article-header h1 {
     color: var(--color-black-grey);
-    font-family: var(--font-main);
+    font-family: var(--font-display);
     font-weight: 700;
     font-size: 2.2rem;
     line-height: 1.2;
@@ -483,17 +506,18 @@ html::-webkit-scrollbar-thumb:hover { background-color: var(--color-olive); }
 
 .article-body h2 {
     color: var(--color-dark-sandstone);
-    font-family: var(--font-main);
+    font-family: var(--font-display);
     font-weight: 700;
     font-size: 1.6rem;
     margin: 2em 0 0.8em;
 }
 
 .article-body h3 {
-    color: var(--color-olive);
+    color: var(--color-dark-sandstone);
+    font-family: var(--font-display);
     font-weight: 700;
-    font-size: 1.25rem;
-    margin: 1.5em 0 0.6em;
+    font-size: 1.6rem;
+    margin: 2em 0 0.8em;
 }
 
 .article-body ul,
@@ -557,7 +581,7 @@ html::-webkit-scrollbar-thumb:hover { background-color: var(--color-olive); }
 
 .comments-section h2 {
     color: var(--color-black-grey);
-    font-family: var(--font-main);
+    font-family: var(--font-display);
     font-weight: 700;
     font-size: 1.6rem;
     margin-bottom: 24px;
