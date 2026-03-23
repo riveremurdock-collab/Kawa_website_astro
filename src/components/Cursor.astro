@@ -1,0 +1,103 @@
+<style is:global>
+    *, *::before, *::after {
+        cursor: none !important;
+    }
+</style>
+
+<script is:inline>
+    (function () {
+        // Restore native cursor if anything fails
+        function restoreCursor() {
+            try {
+                var s = document.createElement('style');
+                s.textContent = '*, *::before, *::after { cursor: auto !important; }';
+                document.head.appendChild(s);
+            } catch (_) {}
+        }
+
+        try {
+
+        var DEFAULT_PATH = 'M276.81,183.73c6.6-2.26,28.41-4.52,18.06-14.73-8.39-6.18-54.66-5.82-45.4-20.78,2.64-10.19,38.88-25.08,30.31-35.98-6.63-4.2-11.36-4.75-17.64-.11-41.95,28.28-36.11-7.98-24.74-37.12-5.55-21.14-26.45,11.27-29.94,19.79-30.26,29.85-19.96-68.56-40.12-34.26-6.02,10.86-6.39,19.51-6.27,31.21-8.89,23.29-31.67-5.07-34.3-18.83-6.79-12.78-25.26-1.9-15.81,9.71,5.79,10.45,7.91,21.22,12.01,32.27-4.3,20.21-41.26-7.81-52.63-3.12-18.15,23.78,82.89,47.27-5.01,55.65-6.75-.54-16.75,3.82-12.87,12.01,11.58,12.23,58.11,2.7,44.97,27.87-11.64,5.6-46.85,31.5-16.77,33.93,21.51-8.6,52.07-29.91,38.85,12.97-6.92,9.39-16.89,36.99,5.2,27.58,12.45-7.78,12.64-31.31,28.43-30.04,22.48,2.03.65,42.8,23.14,46.89,21.31-9.53-3.53-77.59,41.16-33.86,4.3,7.99,8.64,20.57,20.21,14.03,13.5-14.8-19.24-40.5-4.97-51.84,10.35-3.53,20,9.73,30.93,8.5,12.9,7.45,25.63-7.1,13.81-13.59-26.55-13.67-42.36-36.28-.64-38.19ZM197.84,178.44c-5.12,1.9-9.79,4.01-14.06,7.45-4.41,3.22-4.88,24.74-12.11,16.02-5.22-15.45-4.92-17.25-20.5-23.91-8.19-7.83,10.4-9.24,13.78-14.06,4.41-3.14,5.18-24.58,12.08-15.81,6.15,29.15,30.6,18.27,20.81,30.31Z';
+
+        var wrap = document.createElement('div');
+        wrap.style.cssText = 'position:fixed;top:0;left:0;width:40px;height:40px;pointer-events:none;z-index:9999;will-change:transform;opacity:0;';
+        var ns = 'http://www.w3.org/2000/svg';
+        var svg = document.createElementNS(ns, 'svg');
+        svg.setAttribute('viewBox', '0 0 350 350');
+        svg.setAttribute('width', '40');
+        svg.setAttribute('height', '40');
+        var pathEl = document.createElementNS(ns, 'path');
+        pathEl.setAttribute('fill', '#1c1c1c');
+        pathEl.setAttribute('d', DEFAULT_PATH);
+        svg.appendChild(pathEl);
+        wrap.appendChild(svg);
+        document.body.appendChild(wrap);
+
+        var mx = -200, my = -200, lx = -200, ly = -200;
+        var overClickable = false;
+        var squish = 1, squishV = 0;   // velocity squish spring
+        var burst  = 1, burstV  = 0;   // click burst spring
+        var hover  = 1, hoverV  = 0;   // hover scale spring → grows when over clickable
+        var spin   = 0, spinV   = 0;   // spin decays to 0
+        var velAng = 0;
+
+        document.addEventListener('mousemove', function (e) {
+            mx = e.clientX; my = e.clientY;
+            wrap.style.opacity = '1';
+            var clickable = !!e.target.closest('a,button,[role=button],label,select');
+            if (clickable && !overClickable) {
+                spinV += (Math.random() < 0.5 ? 1 : -1) * (2 + Math.random() * 3);
+            }
+            overClickable = clickable;
+        });
+
+        document.addEventListener('mouseleave', function () { wrap.style.opacity = '0'; });
+        document.addEventListener('mouseenter', function () { wrap.style.opacity = '1'; });
+        document.addEventListener('mousedown', function () {
+            burstV += 0.20;
+            spinV  += (Math.random() < 0.5 ? 1 : -1) * (4 + Math.random() * 6);
+        });
+
+        function tick() {
+            var dx = mx - lx, dy = my - ly;
+            var spd = Math.sqrt(dx*dx + dy*dy);
+            if (spd > 0.8) velAng = Math.atan2(dy, dx);
+            lx = mx; ly = my;
+
+            squishV = squishV * 0.74 - 0.20 * (squish - (1 + Math.min(spd * 0.030, 0.45)));
+            squish  = Math.max(0.6, Math.min(squish + squishV, 1.9));
+
+            burstV  = burstV  * 0.68 - 0.26 * (burst - 1);
+            burst   = Math.max(0.5, Math.min(burst + burstV, 2.4));
+
+            hoverV  = hoverV  * 0.74 - 0.20 * (hover - (overClickable ? 1.25 : 1.0));
+            hover   = Math.max(0.8, Math.min(hover + hoverV, 1.6));
+
+            spinV  *= 0.91;
+            spin   += spinV;
+
+            var sx = (burst * squish) * hover, sy = (burst / squish) * hover;
+
+            // Squish is fixed to velocity direction in world space.
+            // Spin rotates the blob shape independently.
+            // Formula: R(velAng) · S(sx,sy) · R(spin° - velAng)
+            var β  = spin * Math.PI / 180;
+            var cP = Math.cos(velAng), sP = Math.sin(velAng);
+            var cQ = Math.cos(β - velAng), sQ = Math.sin(β - velAng);
+            var tx = mx - 20, ty = my - 20;
+
+            wrap.style.transform = 'matrix(' +
+                ( sx*cP*cQ - sy*sP*sQ) + ',' +
+                ( sx*sP*cQ + sy*cP*sQ) + ',' +
+                (-sx*cP*sQ - sy*sP*cQ) + ',' +
+                (-sx*sP*sQ + sy*cP*cQ) + ',' +
+                tx + ',' + ty + ')';
+
+            requestAnimationFrame(tick);
+        }
+
+        tick();
+
+        } catch (e) { restoreCursor(); }
+    })();
+</script>

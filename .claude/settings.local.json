@@ -9,7 +9,8 @@
       "Bash(powershell.exe -Command \"Get-ChildItem 'C:\\\\Users\\\\Rivers XPS\\\\Documents\\\\KAWA\\\\Website design\\\\Kawa website 3-10-26\\\\kawa_website\\\\public\\\\images\\\\backgrounds' | Select-Object Name, @{N='Size KB';E={[math]::Round\\(\\\\$_.Length/1KB,1\\)}}\")",
       "Bash(powershell.exe -Command \"Get-ChildItem 'C:\\\\Users\\\\Rivers XPS\\\\Documents\\\\KAWA\\\\Website design\\\\Kawa website 3-10-26\\\\kawa_website\\\\public\\\\images\\\\logos' | Select-Object Name, @{N='Size KB';E={[math]::Round\\(\\\\$_.Length/1KB,1\\)}}\")",
       "Bash(powershell.exe -Command \"Get-ChildItem -Recurse 'C:\\\\Users\\\\Rivers XPS\\\\Documents\\\\KAWA\\\\Website design\\\\Kawa website 3-10-26\\\\kawa_website\\\\public' | Where-Object { \\\\$_.LastWriteTime -gt \\(Get-Date\\).AddMinutes\\(-60\\) } | Select-Object FullName, @{N='Size KB';E={[math]::Round\\(\\\\$_.Length/1KB,1\\)}}\")",
-      "Bash(powershell.exe -Command \"Get-ChildItem -Recurse 'C:\\\\Users\\\\Rivers XPS\\\\Documents\\\\KAWA\\\\Website design\\\\Kawa website 3-10-26\\\\kawa_website' -Include '*.png','*.jpg','*.ico','*.webp','*.svg' | Where-Object { \\\\$_.LastWriteTime -gt \\(Get-Date\\).AddHours\\(-2\\) } | Select-Object FullName, @{N='Size KB';E={[math]::Round\\(\\\\$_.Length/1KB,1\\)}}\")"
+      "Bash(powershell.exe -Command \"Get-ChildItem -Recurse 'C:\\\\Users\\\\Rivers XPS\\\\Documents\\\\KAWA\\\\Website design\\\\Kawa website 3-10-26\\\\kawa_website' -Include '*.png','*.jpg','*.ico','*.webp','*.svg' | Where-Object { \\\\$_.LastWriteTime -gt \\(Get-Date\\).AddHours\\(-2\\) } | Select-Object FullName, @{N='Size KB';E={[math]::Round\\(\\\\$_.Length/1KB,1\\)}}\")",
+      "Bash(find:*)"
     ]
   }
 }

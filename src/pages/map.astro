@@ -1,5 +1,6 @@
 ---
 import '../styles/global.css';
+import Cursor from '../components/Cursor.astro';
 ---
 
 <!DOCTYPE html>
@@ -53,7 +54,7 @@ import '../styles/global.css';
         <img src="/images/logos/kawa lichen landing page logo.png" alt="KAWA" class="map-logo" />
     </a>
 
-    <div id="overview-map-container"></div>
+    <div id="overview-map-container" role="application" aria-label="Interactive route map"></div>
 
     <script is:inline src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" crossorigin=""></script>
     <script is:inline src="/scripts/overview-map.js"></script>
@@ -69,5 +70,6 @@ import '../styles/global.css';
             initMap();
         }
     </script>
+    <Cursor />
 </body>
 </html>

@@ -1,5 +1,6 @@
 ---
 import '../styles/global.css';
+import Cursor from '../components/Cursor.astro';
 
 interface Props {
     title?: string;
@@ -36,6 +37,7 @@ const {
         <slot />
     </div>
     {loadGallery && <script is:inline src="/scripts/gallery.js"></script>}
+    <Cursor />
 </body>
 </html>
 

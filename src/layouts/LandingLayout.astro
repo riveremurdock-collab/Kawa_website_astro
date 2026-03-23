@@ -1,4 +1,6 @@
 ---
+import Cursor from '../components/Cursor.astro';
+
 interface Props {
     title?: string;
     description?: string;
@@ -30,5 +32,6 @@ const { title = "Kawa Designs", description = "Kawa Designs — outdoor adventur
 </head>
 <body>
     <slot />
+    <Cursor />
 </body>
 </html>
