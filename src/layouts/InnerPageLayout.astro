@@ -1,19 +1,24 @@
 ---
 import '../styles/global.css';
+import { getImage } from 'astro:assets';
 import Cursor from '../components/Cursor.astro';
+import Header from '../components/Header.astro';
+import sandstoneRaw from '../assets/backgrounds/landing page sandstone background.png';
+import sandstoneMobileRaw from '../assets/backgrounds/landing page sandstone background mobille.jpg';
+
+const desktopBg = await getImage({ src: sandstoneRaw, format: 'webp', width: 2400 });
+const mobileBg  = await getImage({ src: sandstoneMobileRaw, format: 'webp', width: 1200 });
 
 interface Props {
     title?: string;
     description?: string;
-    loadGallery?: boolean;
-    loadRouteMap?: boolean;
+    fullScroll?: boolean;
 }
 
 const {
     title = "Kawa Designs",
     description = "Kawa Designs — outdoor adventure blog and design",
-    loadGallery = false,
-    loadRouteMap = false,
+    fullScroll = false,
 } = Astro.props;
 ---
 
@@ -26,17 +31,18 @@ const {
     <title>{title}</title>
     <link rel="icon" type="image/png" href="/images/logos/kawa favicon.png" />
     <link rel="stylesheet" href="/styles/map.css" />
+    <style define:vars={{ bgDesktop: `url(${desktopBg.src})`, bgMobile: `url(${mobileBg.src})` }}>
+        :root {
+            --bg-desktop: var(--bgDesktop);
+            --bg-mobile: var(--bgMobile);
+        }
+    </style>
 </head>
 <body class="inner-body">
-    <div class="inner-shell">
-        <header class="inner-topbar">
-            <a href="/" class="inner-logo-link">
-                <img src="/images/logos/kawa lichen landing page logo.png" alt="KAWA" class="inner-logo" />
-            </a>
-        </header>
+    <div class:list={['inner-shell', { 'inner-shell--scroll': fullScroll }]}>
+        <Header />
         <slot />
     </div>
-    {loadGallery && <script is:inline src="/scripts/gallery.js"></script>}
     <Cursor />
 </body>
 </html>
@@ -56,10 +62,16 @@ const {
         left: 0;
         width: 100%;
         height: 100%;
-        background-image: url('/images/backgrounds/landing page sandstone background.png');
+        background-image: var(--bg-desktop);
         background-size: cover;
         background-position: center;
         z-index: -1;
+    }
+
+    @media (max-width: 768px) {
+        .inner-body::before {
+            background-image: var(--bg-mobile);
+        }
     }
 
     .inner-shell {
@@ -76,19 +88,12 @@ const {
         flex-shrink: 0;
     }
 
-    .inner-logo-link {
-        display: inline-block;
-        line-height: 0;
-    }
-
-    .inner-logo {
-        height: 80px;
-        width: auto;
-        transition: transform 0.3s ease;
-    }
-
-    .inner-logo-link:hover .inner-logo {
-        transform: scale(1.06);
+    /* Full-scroll variant for portfolio pages */
+    .inner-shell--scroll {
+        height: auto;
+        min-height: 100vh;
+        overflow: visible;
+        padding-bottom: 40px;
     }
 
     /* Shared content box used by all inner pages */

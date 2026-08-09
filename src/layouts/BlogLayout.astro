@@ -1,7 +1,14 @@
 ---
 import '../styles/global.css';
+import { getImage } from 'astro:assets';
 import PostsSidebar from '../components/PostsSidebar.astro';
 import Cursor from '../components/Cursor.astro';
+import Header from '../components/Header.astro';
+import sandstoneRaw from '../assets/backgrounds/landing page sandstone background.png';
+import sandstoneMobileRaw from '../assets/backgrounds/landing page sandstone background mobille.jpg';
+
+const desktopBg = await getImage({ src: sandstoneRaw, format: 'webp', width: 2400 });
+const mobileBg  = await getImage({ src: sandstoneMobileRaw, format: 'webp', width: 1200 });
 
 interface Props {
     title?: string;
@@ -11,7 +18,6 @@ interface Props {
         data: { title: string; date: Date; tags: string[] };
     }>;
     currentSlug?: string;
-    loadGallery?: boolean;
 }
 
 const {
@@ -19,7 +25,6 @@ const {
     description = 'Kawa Designs — outdoor adventure blog and design',
     articles,
     currentSlug,
-    loadGallery = false,
 } = Astro.props;
 ---
 
@@ -32,29 +37,35 @@ const {
     <title>{title}</title>
     <link rel="icon" type="image/png" href="/images/logos/kawa favicon.png" />
     <link rel="stylesheet" href="/styles/map.css" />
+    <style define:vars={{ bgDesktop: `url(${desktopBg.src})`, bgMobile: `url(${mobileBg.src})` }}>
+        :root {
+            --bg-desktop: var(--bgDesktop);
+            --bg-mobile: var(--bgMobile);
+        }
+    </style>
 </head>
 <body class="blog-body">
-    <div class="blog-page">
+    <div class="blog-wrapper">
+        <Header />
 
-        <!-- Left column: logo + sidebar -->
-        <div class="blog-left-col">
-            <a href="/" class="blog-logo-link">
-                <img src="/images/logos/kawa lichen landing page logo.png" alt="KAWA" class="blog-logo-img" />
-            </a>
-            <div class="blog-sidebar-box">
-                <PostsSidebar articles={articles} currentSlug={currentSlug} />
+        <div class="blog-page">
+
+            <!-- Left column: sidebar -->
+            <div class="blog-left-col">
+                <div class="blog-sidebar-box">
+                    <PostsSidebar articles={articles} currentSlug={currentSlug} />
+                </div>
             </div>
-        </div>
 
-        <!-- Right column: article content -->
-        <div class="blog-right-col">
-            <div class="blog-article-box">
-                <slot />
+            <!-- Right column: article content -->
+            <div class="blog-right-col">
+                <div class="blog-article-box">
+                    <slot />
+                </div>
             </div>
-        </div>
 
+        </div>
     </div>
-    {loadGallery && <script is:inline src="/scripts/gallery.js"></script>}
     <Cursor />
 </body>
 </html>
@@ -75,19 +86,32 @@ const {
         left: 0;
         width: 100%;
         height: 100%;
-        background-image: url('/images/backgrounds/landing page sandstone background.png');
+        background-image: var(--bg-desktop);
         background-size: cover;
         background-position: center;
         z-index: -1;
+    }
+
+    @media (max-width: 768px) {
+        .blog-body::before {
+            background-image: var(--bg-mobile);
+        }
+    }
+
+    .blog-wrapper {
+        display: flex;
+        flex-direction: column;
+        padding: 28px;
+        gap: 20px;
+        min-height: 100vh;
+        box-sizing: border-box;
     }
 
     .blog-page {
         display: flex;
         align-items: flex-start;
         gap: 20px;
-        padding: 28px 28px 48px;
-        min-height: 100vh;
-        box-sizing: border-box;
+        flex: 1;
     }
 
     /* ---- Left column ---- */
@@ -99,21 +123,6 @@ const {
         gap: 16px;
         position: sticky;
         top: 28px;
-    }
-
-    .blog-logo-link {
-        display: block;
-        line-height: 0;
-    }
-
-    .blog-logo-img {
-        width: 100%;
-        height: auto;
-        transition: transform 0.3s ease;
-    }
-
-    .blog-logo-link:hover .blog-logo-img {
-        transform: scale(1.06);
     }
 
     /* Olive sidebar box */
@@ -308,8 +317,7 @@ const {
         margin-bottom: 2rem;
     }
 
-    .blog-article-box .article-gallery-container .gallery-item {
-        border: none;
+    .blog-article-box .gallery-item img {
         border-radius: 12px;
     }
 
@@ -325,9 +333,13 @@ const {
 
     /* ---- Responsive ---- */
     @media (max-width: 900px) {
+        .blog-wrapper {
+            padding: 16px;
+            gap: 14px;
+        }
+
         .blog-page {
             flex-direction: column;
-            padding: 16px;
             gap: 16px;
             align-items: stretch;
         }
@@ -339,16 +351,6 @@ const {
             flex-direction: column;
             align-items: stretch;
             gap: 12px;
-        }
-
-        .blog-logo-link {
-            display: block;
-            text-align: center;
-        }
-
-        .blog-logo-img {
-            width: 220px;
-            height: auto;
         }
 
         .blog-sidebar-box {
@@ -394,12 +396,8 @@ const {
     }
 
     @media (max-width: 480px) {
-        .blog-page {
+        .blog-wrapper {
             padding: 12px;
-        }
-
-        .blog-logo-img {
-            width: 180px;
         }
 
         .blog-article-box {

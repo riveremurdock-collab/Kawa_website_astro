@@ -1,6 +1,7 @@
 ---
 import '../styles/global.css';
 import Cursor from '../components/Cursor.astro';
+import Header from '../components/Header.astro';
 ---
 
 <!DOCTYPE html>
@@ -22,37 +23,29 @@ import Cursor from '../components/Cursor.astro';
             overflow: hidden;
         }
 
+        /* Header floats above the map — padding matches .inner-shell */
+        .map-header-wrap {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 1001;
+            padding: 28px;
+        }
+
         #overview-map-container {
+            position: absolute;
+            top: 0;
+            left: 0;
             width: 100%;
-            height: 100vh;
-            height: 100dvh;
-        }
-
-        .map-logo-link {
-            position: fixed;
-            top: 20px;
-            left: 24px;
-            z-index: 1000;
-            line-height: 0;
-            display: inline-block;
-        }
-
-        .map-logo {
-            height: 80px;
-            width: auto;
-            transition: transform 0.3s ease;
-            filter: drop-shadow(0 2px 8px rgba(0,0,0,0.35));
-        }
-
-        .map-logo-link:hover .map-logo {
-            transform: scale(1.06);
+            height: 100%;
         }
     </style>
 </head>
 <body>
-    <a href="/" class="map-logo-link">
-        <img src="/images/logos/kawa lichen landing page logo.png" alt="KAWA" class="map-logo" />
-    </a>
+    <div class="map-header-wrap">
+        <Header />
+    </div>
 
     <div id="overview-map-container" role="application" aria-label="Interactive route map"></div>
 

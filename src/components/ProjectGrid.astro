@@ -1,0 +1,310 @@
+---
+import { Image } from 'astro:assets';
+import type { ImageMetadata } from 'astro';
+
+export interface GridItem {
+  href: string;
+  title: string;
+  image: ImageMetadata;
+  tags?: string[];
+}
+
+interface Props {
+  items: GridItem[];
+  emptyMessage?: string;
+}
+
+const { items, emptyMessage = 'Nothing here yet.' } = Astro.props;
+---
+
+<div class="project-grid">
+  {items.length === 0 ? (
+    <p class="project-grid-empty">{emptyMessage}</p>
+  ) : (
+    items.map(item => (
+      <a
+        href={item.href}
+        class="tile"
+        aria-label={item.title}
+        data-tags={JSON.stringify(item.tags ?? [])}
+      >
+        <Image
+          src={item.image}
+          width={800}
+          height={800}
+          format="webp"
+          densities={[1, 2]}
+          alt={item.title}
+          class="tile-image"
+          loading="lazy"
+          decoding="async"
+        />
+        <span class="tile-title">{item.title}</span>
+      </a>
+    ))
+  )}
+</div>
+
+<style>
+  /* ---- Grid layout ---- */
+  .project-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1.25rem;
+    width: 100%;
+  }
+
+  @media (max-width: 900px) {
+    .project-grid {
+      grid-template-columns: repeat(2, 1fr);
+    }
+  }
+
+  @media (max-width: 600px) {
+    .project-grid {
+      grid-template-columns: 1fr;
+    }
+  }
+
+  .project-grid-empty {
+    color: var(--color-dark-grey);
+    font-style: italic;
+    padding: 40px 0;
+  }
+
+  /* ---- Tile ---- */
+  .tile {
+    display: block;
+    position: relative;
+    overflow: hidden;
+    border-radius: 16px;
+    aspect-ratio: 1;
+    text-decoration: none;
+    --active: 0;
+    transition: opacity 0.25s ease, transform 0.25s ease;
+  }
+
+  /* Fade out first — the fade must finish before layout collapse (below)
+     removes the tile from the grid, or there's nothing to animate. */
+  .tile.is-filtered-out {
+    opacity: 0;
+    transform: scale(0.95);
+    pointer-events: none;
+  }
+
+  /* display: none is what actually removes a tile from CSS Grid's layout
+     so remaining tiles reflow with no gaps. Applied by script.js only
+     after the fade above has had time to finish. */
+  .tile.is-collapsed {
+    display: none;
+  }
+
+  .tile::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: rgb(0 0 0 / calc(0.55 * var(--active)));
+    transition: background 0.25s ease;
+    pointer-events: none;
+    z-index: 1;
+  }
+
+  .tile-image {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  .tile-title {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    padding: 20px 16px 16px;
+    color: #fff;
+    font-family: var(--font-display);
+    font-weight: 700;
+    font-size: 1.05rem;
+    letter-spacing: 1.5px;
+    text-align: center;
+    background: linear-gradient(to top, rgb(0 0 0 / 0.5) 0%, transparent 100%);
+    opacity: var(--active);
+    transition: opacity 0.25s ease;
+    z-index: 2;
+  }
+
+  .tile.is-active {
+    --active: 1;
+  }
+
+  .tile:focus-visible {
+    --active: 1;
+    outline: 2px solid var(--color-dark-sandstone);
+    outline-offset: 3px;
+  }
+
+  @media (hover: hover) {
+    .tile:hover {
+      --active: 1;
+    }
+  }
+</style>
+
+<script>
+  (function () {
+    const REDUCE_MOTION = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    const FADE_MS = 260;
+
+    function setupGrid(grid: HTMLElement) {
+      const tiles = Array.from(grid.querySelectorAll<HTMLElement>('.tile'));
+      if (!tiles.length) return;
+
+      const pendingTimers = new WeakMap<HTMLElement, ReturnType<typeof setTimeout>>();
+
+      function clearPending(tile: HTMLElement) {
+        const t = pendingTimers.get(tile);
+        if (t) {
+          clearTimeout(t);
+          pendingTimers.delete(tile);
+        }
+      }
+
+      function hideTile(tile: HTMLElement) {
+        clearPending(tile);
+        tile.classList.add('is-filtered-out');
+        if (REDUCE_MOTION) {
+          tile.classList.add('is-collapsed');
+          return;
+        }
+        const timer = setTimeout(() => {
+          pendingTimers.delete(tile);
+          // Re-check: the tile may have been shown again since this timer was set.
+          if (tile.classList.contains('is-filtered-out')) {
+            tile.classList.add('is-collapsed');
+          }
+        }, FADE_MS);
+        pendingTimers.set(tile, timer);
+      }
+
+      function showTile(tile: HTMLElement) {
+        clearPending(tile);
+        if (tile.classList.contains('is-collapsed')) {
+          tile.classList.remove('is-collapsed');
+          // Force a reflow so the browser has a starting value (opacity: 0,
+          // now back in layout) to animate from, rather than batching both
+          // class changes into one recalc and skipping the fade-in.
+          void tile.offsetWidth;
+        }
+        tile.classList.remove('is-filtered-out');
+      }
+
+      function applyFilter(tag: string | null | undefined) {
+        const normalized = tag ? tag.toLowerCase() : null;
+        tiles.forEach(tile => {
+          let tileTags: string[] = [];
+          try {
+            tileTags = JSON.parse(tile.dataset.tags || '[]').map((t: string) => t.toLowerCase());
+          } catch (e) {}
+          const matches = !normalized || tileTags.includes(normalized);
+          if (matches) {
+            showTile(tile);
+          } else {
+            hideTile(tile);
+          }
+        });
+        grid.dispatchEvent(new CustomEvent('grid:filtered'));
+      }
+
+      grid.addEventListener('grid:filter', ((e: CustomEvent<{ tag?: string | null }>) => {
+        applyFilter(e.detail && e.detail.tag);
+      }) as EventListener);
+
+      /* ---- Mobile: IntersectionObserver drives .is-active as user scrolls ---- */
+      if (!window.matchMedia('(hover: none)').matches) return;
+
+      const intersecting = new Set<HTMLElement>();
+
+      function visibleTiles() {
+        return tiles.filter(t => !t.classList.contains('is-collapsed'));
+      }
+
+      function setActive(target: HTMLElement | null) {
+        tiles.forEach(t => t.classList.remove('is-active'));
+        if (target) target.classList.add('is-active');
+      }
+
+      function pickClosestToCenter() {
+        const candidates = Array.from(intersecting).filter(t => !t.classList.contains('is-collapsed'));
+        if (!candidates.length) return;
+        const mid = window.innerHeight / 2;
+        let best: HTMLElement | null = null;
+        let bestDist = Infinity;
+        candidates.forEach(tile => {
+          const rect = tile.getBoundingClientRect();
+          const dist = Math.abs((rect.top + rect.bottom) / 2 - mid);
+          if (dist < bestDist) {
+            bestDist = dist;
+            best = tile;
+          }
+        });
+        setActive(best);
+      }
+
+      function computeInitialActive() {
+        const mid = window.innerHeight / 2;
+        const candidates = visibleTiles();
+        let best: HTMLElement | null = candidates[0] ?? null;
+        let bestDist = Infinity;
+        candidates.forEach(tile => {
+          const rect = tile.getBoundingClientRect();
+          const dist = Math.abs((rect.top + rect.bottom) / 2 - mid);
+          if (dist < bestDist) {
+            bestDist = dist;
+            best = tile;
+          }
+        });
+        setActive(best);
+      }
+
+      const observer = new IntersectionObserver(
+        entries => {
+          entries.forEach(entry => {
+            if (entry.isIntersecting) {
+              intersecting.add(entry.target as HTMLElement);
+            } else {
+              intersecting.delete(entry.target as HTMLElement);
+            }
+          });
+          pickClosestToCenter();
+        },
+        { rootMargin: '-50% 0px -50% 0px', threshold: 0 }
+      );
+
+      tiles.forEach(tile => observer.observe(tile));
+
+      window.addEventListener(
+        'scroll',
+        () => {
+          const atBottom =
+            window.scrollY + window.innerHeight >= document.documentElement.scrollHeight - 10;
+          if (atBottom) {
+            const vis = visibleTiles();
+            if (vis.length) setActive(vis[vis.length - 1]);
+          }
+        },
+        { passive: true }
+      );
+
+      grid.addEventListener('grid:filtered', computeInitialActive);
+
+      if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', computeInitialActive);
+      } else {
+        computeInitialActive();
+      }
+    }
+
+    document.querySelectorAll<HTMLElement>('.project-grid').forEach(setupGrid);
+  })();
+</script>

@@ -1,0 +1,67 @@
+---
+interface Props {
+    gpxFile: string;
+    title?: string;
+    showElevation?: boolean;
+    height?: string;
+}
+
+const {
+    gpxFile,
+    title = "Route Map",
+    showElevation = true,
+    height = "450px"
+} = Astro.props;
+
+// Generate unique ID for multiple maps on same page
+const mapId = `route-map-${Math.random().toString(36).substring(2, 11)}`;
+---
+
+<div class="route-map-wrapper" data-route-map data-gpx-file={gpxFile} data-map-id={mapId}>
+    <div class="route-map-header">
+        <h3 class="route-map-title">{title}</h3>
+        <a href={gpxFile} download class="route-download-btn">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                <polyline points="7 10 12 15 17 10"></polyline>
+                <line x1="12" y1="15" x2="12" y2="3"></line>
+            </svg>
+            Download GPX
+        </a>
+    </div>
+
+    <div class="route-map-container" id={mapId} style={`height: ${height};`}>
+        <div class="route-map-loading">
+            <div class="route-map-loading-spinner"></div>
+            <span>Loading route...</span>
+        </div>
+    </div>
+
+    {showElevation && (
+        <div class="route-elevation-wrapper">
+            <div class="route-elevation-chart">
+                <canvas id={`${mapId}-elevation`}></canvas>
+            </div>
+        </div>
+    )}
+
+    <div class="route-stats-text" id={`${mapId}-stats`}>
+        <p class="route-stat-line"><strong>Total Distance:</strong> <span data-stat="distance">--</span></p>
+        <p class="route-stat-line"><strong>Total Elevation Gain:</strong> <span data-stat="elevation-gain">--</span></p>
+    </div>
+</div>
+
+<!--
+  Self-contained: this block loads everything it needs to render, so no
+  calling page has to remember Leaflet/Chart.js. Known limitation — if two
+  RouteMap blocks land on the same page, these tags are duplicated (harmless
+  for the CSS/CDN scripts, which browsers dedupe by URL; route-map.js would
+  re-run initRouteMaps() twice, which is idempotent since it re-queries
+  [data-route-map] each time). Not guarded further since no current or
+  near-term post needs two maps on one page.
+-->
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" crossorigin="" />
+<script is:inline src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" crossorigin=""></script>
+<script is:inline src="https://cdnjs.cloudflare.com/ajax/libs/leaflet-gpx/1.7.0/gpx.min.js"></script>
+<script is:inline src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+<script is:inline src="/scripts/route-map.js"></script>

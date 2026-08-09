@@ -1,0 +1,42 @@
+---
+// Shared content-rendering layout for both articles and portfolio projects.
+// Deliberately NOT a page shell: each collection's page keeps its own outer
+// chrome (BlogLayout's sidebar, InnerPageLayout's box) and renders this
+// inside it. What's shared is title/date/Content/Lightbox rendering — the
+// one place blog and portfolio genuinely differ (tags vs. client) is a
+// named slot, so this component stays ignorant of which collection it's in.
+import { render } from 'astro:content';
+import type { CollectionEntry } from 'astro:content';
+import { blockRegistry } from '../components/blocks/registry';
+import Lightbox from '../components/Lightbox.astro';
+
+interface Props {
+  entry: CollectionEntry<'articles'> | CollectionEntry<'portfolio'>;
+}
+
+const { entry } = Astro.props;
+const { Content } = await render(entry);
+
+const formattedDate = entry.data.date.toLocaleDateString('en-US', {
+  year: 'numeric',
+  month: 'long',
+  day: 'numeric',
+  timeZone: 'UTC',
+});
+---
+
+<article>
+  <header class="article-header">
+    <h1>{entry.data.title}</h1>
+    <div class="article-meta">
+      <time datetime={entry.data.date.toISOString()}>{formattedDate}</time>
+      <slot name="meta" />
+    </div>
+  </header>
+
+  <div class="article-body">
+    <Content components={blockRegistry} />
+  </div>
+</article>
+
+<Lightbox />

@@ -1,0 +1,140 @@
+---
+import { getCollection } from 'astro:content';
+import InnerPageLayout from '../../layouts/InnerPageLayout.astro';
+import PostLayout from '../../layouts/PostLayout.astro';
+import PrevNext from '../../components/PrevNext.astro';
+
+const getSlug = (id: string): string =>
+  id.replace(/\/index\.mdx$/, '').replace(/\.mdx$/, '');
+
+export async function getStaticPaths() {
+  const toSlug = (id: string) => id.replace(/\/index\.mdx$/, '').replace(/\.mdx$/, '');
+  const allEntries = await getCollection('portfolio');
+  return allEntries.map(entry => ({
+    params: { slug: toSlug(entry.id) },
+    props: { entry },
+  }));
+}
+
+const { entry } = Astro.props;
+
+const published = await getCollection('portfolio', ({ data }) => !data.draft);
+published.sort((a, b) => b.data.date.getTime() - a.data.date.getTime());
+
+const currentIndex = published.findIndex(e => e.id === entry.id);
+
+const prevEntry = currentIndex !== -1
+  ? published[(currentIndex + 1) % published.length]
+  : null;
+const nextEntry = currentIndex !== -1
+  ? published[(currentIndex - 1 + published.length) % published.length]
+  : null;
+
+const showPrevNext = published.length > 1 && currentIndex !== -1;
+
+const prev = (showPrevNext && prevEntry)
+  ? { slug: getSlug(prevEntry.id), title: prevEntry.data.title }
+  : null;
+const next = (showPrevNext && nextEntry)
+  ? { slug: getSlug(nextEntry.id), title: nextEntry.data.title }
+  : null;
+---
+
+<InnerPageLayout title={`${entry.data.title} — Kawa Designs`} fullScroll={true}>
+  <div class="page-content-box portfolio-detail-box">
+    <PostLayout entry={entry}>
+      <span class="detail-client" slot="meta">· {entry.data.client}</span>
+    </PostLayout>
+
+    <PrevNext prev={prev} next={next} />
+  </div>
+</InnerPageLayout>
+
+<style>
+  .portfolio-detail-box {
+    max-width: var(--portfolio-detail-max-width);
+    width: 100%;
+    margin: 0 auto;
+  }
+
+  /* ---- Portfolio's own header/meta/body theme, layered on PostLayout's
+     shared .article-header/.article-meta/.article-body structure ---- */
+  .portfolio-detail-box :global(.article-header) {
+    margin-bottom: 36px;
+  }
+
+  .portfolio-detail-box :global(.article-header h1) {
+    font-family: var(--font-display);
+    font-weight: 700;
+    font-size: 2.2rem;
+    color: var(--color-olive);
+    letter-spacing: 1px;
+    margin-bottom: 8px;
+    line-height: 1.2;
+  }
+
+  .portfolio-detail-box :global(.article-meta) {
+    display: block;
+    font-family: var(--font-main);
+    font-size: 0.9rem;
+    color: var(--color-sage);
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+  }
+
+  .portfolio-detail-box :global(.article-body p) {
+    line-height: 1.85;
+    margin-bottom: 1.2rem;
+    color: var(--color-black-grey);
+  }
+
+  .portfolio-detail-box :global(.article-body h2) {
+    font-family: var(--font-main);
+    font-weight: 700;
+    font-size: 1.4rem;
+    color: var(--color-olive);
+    margin: 2.5rem 0 0.8rem;
+    letter-spacing: 0.5px;
+  }
+
+  .portfolio-detail-box :global(.article-body h3) {
+    font-family: var(--font-main);
+    font-weight: 700;
+    font-size: 1.15rem;
+    color: var(--color-olive);
+    margin: 2rem 0 0.6rem;
+  }
+
+  .portfolio-detail-box :global(.article-body a) {
+    color: var(--color-dark-sandstone);
+    text-decoration: underline;
+    text-decoration-color: transparent;
+    transition: text-decoration-color 0.2s ease;
+  }
+
+  .portfolio-detail-box :global(.article-body a:hover) {
+    text-decoration-color: currentColor;
+  }
+
+  /* Plain inline Markdown images (as opposed to block-rendered ones) */
+  .portfolio-detail-box :global(.article-body > img) {
+    display: block;
+    width: 100%;
+    height: auto;
+    border-radius: 10px;
+    margin: 1.5rem auto;
+  }
+
+  /* ---- Responsive ---- */
+  @media (max-width: 768px) {
+    .portfolio-detail-box :global(.article-header h1) {
+      font-size: 1.7rem;
+    }
+  }
+
+  @media (max-width: 480px) {
+    .portfolio-detail-box :global(.article-header h1) {
+      font-size: 1.4rem;
+    }
+  }
+</style>

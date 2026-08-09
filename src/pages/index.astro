@@ -1,46 +1,10 @@
 ---
 import LandingLayout from '../layouts/LandingLayout.astro';
+import Header from '../components/Header.astro';
 ---
 
 <LandingLayout title="Kawa Designs" description="Kawa Designs — outdoor adventure, route maps, and design">
-    <main class="landing">
-        <div class="landing-content">
-            <img
-                src="/images/logos/kawa lichen landing page logo.png"
-                alt="KAWA"
-                class="landing-logo"
-                fetchpriority="high"
-            />
-            <nav class="landing-nav">
-                <ul>
-                    <li>
-                        <img src="/images/icons/lichen bullet point.png" class="nav-bullet" alt="" />
-                        <a href="/blog">KAWA BLOG</a>
-                    </li>
-                    <li>
-                        <img src="/images/icons/lichen bullet point.png" class="nav-bullet" alt="" />
-                        <a href="/map">ROUTE MAPS</a>
-                    </li>
-                    <li>
-                        <img src="/images/icons/lichen bullet point.png" class="nav-bullet" alt="" />
-                        <a href="https://kawadesign.bigcartel.com" target="_blank" rel="noopener noreferrer">STORE</a>
-                    </li>
-                    <li>
-                        <img src="/images/icons/lichen bullet point.png" class="nav-bullet" alt="" />
-                        <a href="/events">EVENTS</a>
-                    </li>
-                    <li>
-                        <img src="/images/icons/lichen bullet point.png" class="nav-bullet" alt="" />
-                        <a href="/guestbook">GUEST BOOK</a>
-                    </li>
-                    <li>
-                        <img src="/images/icons/lichen bullet point.png" class="nav-bullet" alt="" />
-                        <a href="/contact">STAY IN TOUCH</a>
-                    </li>
-                </ul>
-            </nav>
-        </div>
-    </main>
+    <Header variant="landing" />
 </LandingLayout>
 
 <style is:global>
@@ -48,7 +12,7 @@ import LandingLayout from '../layouts/LandingLayout.astro';
         width: 100%;
         height: 100vh;
         height: 100dvh;
-        background-image: url('/images/backgrounds/landing page sandstone background.png');
+        background-image: var(--landing-bg-desktop);
         background-size: cover;
         background-position: center;
         background-repeat: no-repeat;
@@ -60,7 +24,7 @@ import LandingLayout from '../layouts/LandingLayout.astro';
 
     @media (max-width: 768px) {
         .landing {
-            background-image: url('/images/backgrounds/landing page sandstone background mobille.jpg');
+            background-image: var(--landing-bg-mobile);
         }
     }
 
@@ -144,68 +108,3 @@ import LandingLayout from '../layouts/LandingLayout.astro';
         }
     }
 </style>
-
-<script is:inline>
-    (function () {
-        let ctx = null;
-
-        function getCtx() {
-            if (!ctx) ctx = new (window.AudioContext || window.webkitAudioContext)();
-            return ctx;
-        }
-
-        // Soft, airy blip on hover — short sine wave with fast decay
-        function playHover() {
-            try {
-                const ac = getCtx();
-                const osc = ac.createOscillator();
-                const gain = ac.createGain();
-
-                osc.connect(gain);
-                gain.connect(ac.destination);
-
-                osc.type = 'sine';
-                osc.frequency.setValueAtTime(880, ac.currentTime);
-                osc.frequency.exponentialRampToValueAtTime(660, ac.currentTime + 0.08);
-
-                gain.gain.setValueAtTime(0.12, ac.currentTime);
-                gain.gain.exponentialRampToValueAtTime(0.001, ac.currentTime + 0.1);
-
-                osc.start(ac.currentTime);
-                osc.stop(ac.currentTime + 0.1);
-            } catch (e) {}
-        }
-
-        // Punchy click — quick thump with a low frequency drop
-        function playClick() {
-            try {
-                const ac = getCtx();
-                const osc = ac.createOscillator();
-                const gain = ac.createGain();
-
-                osc.connect(gain);
-                gain.connect(ac.destination);
-
-                osc.type = 'sine';
-                osc.frequency.setValueAtTime(400, ac.currentTime);
-                osc.frequency.exponentialRampToValueAtTime(80, ac.currentTime + 0.12);
-
-                gain.gain.setValueAtTime(0.25, ac.currentTime);
-                gain.gain.exponentialRampToValueAtTime(0.001, ac.currentTime + 0.15);
-
-                osc.start(ac.currentTime);
-                osc.stop(ac.currentTime + 0.15);
-            } catch (e) {}
-        }
-
-        document.addEventListener('DOMContentLoaded', function () {
-            const items = document.querySelectorAll('.landing-nav li');
-            items.forEach(function (li) {
-                li.addEventListener('mouseenter', playHover);
-                const link = li.querySelector('a');
-                if (link) link.addEventListener('click', playClick);
-            });
-        });
-    })();
-</script>
-

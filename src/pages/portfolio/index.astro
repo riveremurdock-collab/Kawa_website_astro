@@ -1,0 +1,225 @@
+---
+import { getCollection } from 'astro:content';
+import { Image } from 'astro:assets';
+import InnerPageLayout from '../../layouts/InnerPageLayout.astro';
+import ProjectGrid from '../../components/ProjectGrid.astro';
+import headshot from '../../assets/river-headshot.jpg';
+
+const allEntries = await getCollection('portfolio', ({ data }) => !data.draft);
+allEntries.sort((a, b) => b.data.date.getTime() - a.data.date.getTime());
+
+function getSlug(id: string): string {
+  return id.replace(/\/index\.mdx$/, '').replace(/\.mdx$/, '');
+}
+
+function toTitleCase(s: string): string {
+  return s.trim().replace(/\w\S*/g, w => w.charAt(0).toUpperCase() + w.slice(1).toLowerCase());
+}
+
+// Derive unique tags from published projects, normalized to title case and sorted A–Z
+const allTags = [...new Set(
+  allEntries.flatMap(e => e.data.tags.map(t => toTitleCase(t)))
+)].sort();
+
+const gridItems = allEntries.map(entry => ({
+  href: `/portfolio/${getSlug(entry.id)}`,
+  title: entry.data.title,
+  image: entry.data.cover,
+  tags: entry.data.tags.map(t => toTitleCase(t)),
+}));
+---
+
+<InnerPageLayout title="Portfolio — Kawa Designs" description="Design portfolio — Kawa Designs" fullScroll={true}>
+
+  <div class="portfolio-overview">
+    <div class="overview-top">
+      <div class="overview-headshot-col">
+        <Image
+          src={headshot}
+          alt="River Murdock"
+          width={640}
+          format="webp"
+          densities={[1, 2]}
+          class="overview-headshot"
+          loading="eager"
+        />
+      </div>
+      <div class="overview-bio">
+        <!-- BIO TEXT — edit the paragraph below to update the bio -->
+        <p>Hi! I'm River Murdock. I am a creative professional who loves to explore the natural world. I have experience with physical design, graphic design, and photography, and love to combine my skills to solve interesting problems. I am currently creating products, media, and advertising for my personal brand Kawa Designs, where I am designing outdoor and lifestyle softgoods.</p>
+        <!-- END BIO TEXT -->
+
+        {allTags.length > 0 && (
+          <div class="overview-filters">
+            {allTags.map(tag => (
+              <button class="filter-btn" data-tag={tag}>{tag}</button>
+            ))}
+          </div>
+        )}
+      </div>
+    </div>
+  </div>
+
+  <ProjectGrid items={gridItems} emptyMessage="No projects yet." />
+</InnerPageLayout>
+
+<style>
+  /* ---- Overview section ---- */
+  .portfolio-overview {
+    background: var(--color-light-sage);
+    border-radius: 24px;
+    padding: 32px 36px;
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+    margin-bottom: 1.25rem;
+  }
+
+  .overview-top {
+    display: flex;
+    gap: 2rem;
+    align-items: stretch;
+  }
+
+  .overview-headshot-col {
+    /* Slightly-wider-than-square frame on desktop (mobile switches to a
+       wider 4/3 crop below). Scales with the box width, within bounds. */
+    flex: 0 0 clamp(260px, 34%, 380px);
+    aspect-ratio: 5 / 4;
+    align-self: flex-start;
+    position: relative;
+    border-radius: 16px;
+    overflow: hidden;
+  }
+
+  .overview-headshot {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    /* Horizontally centered; vertically the crop window sits near the top
+       but shifted down from the edge, so more of the lower part of the
+       photo is visible. 0% = flush to top, 100% = flush to bottom. */
+    object-position: center 25%;
+    display: block;
+  }
+
+  .overview-bio {
+    display: flex;
+    flex-direction: column;
+    /* Centers bio + filters against the taller headshot, so any leftover
+       height is split evenly above and below instead of pooling at the
+       bottom. No-op on mobile, where this column is only as tall as its
+       own content. */
+    justify-content: center;
+    gap: 1.5rem;
+    min-width: 0;
+  }
+
+  .overview-bio p {
+    font-family: var(--font-main);
+    font-size: 1.25rem;
+    line-height: 1.75;
+    color: var(--color-black-grey);
+    margin: 0;
+  }
+
+  /* ---- Filter buttons ---- */
+  .overview-filters {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 0.5rem;
+  }
+
+  .filter-btn {
+    padding: 11px 26px;
+    background: transparent;
+    border: 1px solid var(--color-olive);
+    border-radius: 28px;
+    font-family: var(--font-main);
+    font-size: 1.05rem;
+    letter-spacing: 2px;
+    color: var(--color-olive);
+    cursor: pointer;
+    text-transform: uppercase;
+    transition: background 0.2s ease, color 0.2s ease, border-color 0.2s ease;
+  }
+
+  .filter-btn.is-active {
+    background: var(--color-dark-sandstone);
+    border-color: var(--color-dark-sandstone);
+    color: #ffffff;
+  }
+
+  .filter-btn:hover:not(.is-active) {
+    border-color: var(--color-dark-sandstone);
+    color: var(--color-dark-sandstone);
+  }
+
+  /* ---- Mobile responsive ---- */
+  @media (max-width: 600px) {
+    .portfolio-overview {
+      padding: 24px 20px;
+    }
+
+    .overview-top {
+      flex-direction: column;
+      align-items: center;
+    }
+
+    .overview-headshot-col {
+      flex: 0 0 auto;
+      /* Must override the base align-self: stretch — with an explicit width,
+         stretch pins the item to the start of the cross axis (left) and the
+         parent's align-items: center never takes effect. */
+      align-self: center;
+      /* Wider-than-square frame so the photo fills the box width on phones
+         rather than leaving gaps either side. Crops vertically, centered. */
+      width: 100%;
+      max-width: 360px;
+      aspect-ratio: 4 / 3;
+      height: auto;
+    }
+
+    /* Keep the centered crop mobile already had — the top-anchored crop is
+       a desktop-only change. */
+    .overview-headshot {
+      object-position: center;
+    }
+
+    .overview-filters {
+      flex-direction: column;
+    }
+
+    .filter-btn {
+      text-align: center;
+    }
+  }
+</style>
+
+<script>
+  /* ---- Tag filter: dispatches grid:filter, ProjectGrid owns the collapse ---- */
+  (function () {
+    const filterBtns = Array.from(document.querySelectorAll<HTMLButtonElement>('.filter-btn'));
+    const grid = document.querySelector<HTMLElement>('.project-grid');
+    if (!filterBtns.length || !grid) return;
+
+    filterBtns.forEach(btn => {
+      btn.addEventListener('click', () => {
+        const tag = btn.dataset.tag ?? '';
+        const isActive = btn.classList.contains('is-active');
+
+        filterBtns.forEach(b => b.classList.remove('is-active'));
+
+        if (isActive) {
+          grid.dispatchEvent(new CustomEvent('grid:filter', { detail: { tag: null } }));
+        } else {
+          btn.classList.add('is-active');
+          grid.dispatchEvent(new CustomEvent('grid:filter', { detail: { tag } }));
+        }
+      });
+    });
+  })();
+</script>

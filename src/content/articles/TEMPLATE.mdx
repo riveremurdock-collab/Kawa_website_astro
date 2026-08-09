@@ -1,0 +1,46 @@
+---
+# The post title. Appears at the top of the post and in the sidebar list.
+title: Your Post Title Here
+
+# The date used for sorting. Newer posts appear first.
+# Format: YYYY-MM-DD
+date: 2026-01-01
+
+# One or two sentences. Used as the page's search-result/link-preview
+# description — write it like a summary someone would read before clicking.
+excerpt: A short summary of the post, shown in search results and link previews.
+
+# Tags shown on the post and used for the sidebar tag filter.
+# Must be one of the values already registered in src/content/config.ts —
+# currently: about, cool-bikes, trip-report, utah, biking. A post can carry
+# more than one. Adding a genuinely new tag means adding it to that list in
+# config.ts first — see BLOCKS.md if you're unsure why.
+tags:
+  - trip-report
+
+# Set to true to hide this post while you're still working on it.
+# Set to false (or delete this line) when you're ready to publish.
+draft: true
+---
+
+import myPhoto from './01.jpg';
+
+Write the post here in plain paragraphs, same as always. Leave a blank
+line between paragraphs.
+
+For a plain photo inside the writing, standard Markdown still works, no
+import needed, and it's part of the clickable lightbox automatically (see
+src/content/BLOCKS.md for the one thing it won't have — a caption in the
+lightbox viewer):
+
+![A description of the photo](./02.jpg "Optional caption")
+
+To use a block instead — for a photo paired with text, a grid of several
+photos, a route map, or an Instagram embed — see src/content/BLOCKS.md for
+the full list and copy-paste examples. A quick one:
+
+<PhotoInline
+  src={myPhoto}
+  alt="Brief factual description of what this image shows"
+  text="The paragraph shown next to the photo."
+/>

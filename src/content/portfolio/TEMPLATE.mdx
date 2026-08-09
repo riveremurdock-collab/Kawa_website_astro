@@ -1,0 +1,44 @@
+---
+# The project name that appears on the grid tile and the detail page.
+title: Your Project Name Here
+
+# The date used for sorting. Newer projects appear first on the grid.
+# Format: YYYY-MM-DD — if only the year is known, use January 1.
+date: 2025-01-01
+
+# Who the project was made for. Shown on the detail page.
+client: Client Name Here
+
+# Tags used for the filter buttons on the portfolio index page.
+# Must be one of the values already registered in src/content/config.ts —
+# currently: Product Design, Graphic Design. A project can carry more than
+# one. Adding a genuinely new tag means adding it to that list in
+# config.ts first — see BLOCKS.md if you're unsure why.
+tags:
+  - Product Design
+
+# The square thumbnail image on the portfolio grid. Must be a file in the
+# same folder as this index.mdx, with a ./ prefix.
+cover: ./01.jpg
+
+# Set to true to hide this project while you're still working on it.
+# Set to false (or delete this line) when you're ready to publish.
+draft: true
+---
+
+import img01 from './01.jpg';
+import img02 from './02.jpg';
+
+Write the project description here. Plain paragraphs, same as before.
+Leave a blank line between paragraphs.
+
+Images now go down here in the body, not in the frontmatter — see
+src/content/BLOCKS.md for the full reference and copy-paste examples.
+The usual pattern for a project: one full-width lead image, then the rest
+in a grid.
+
+<LeadImage src={img01} alt="Brief factual description of what this image shows" />
+
+<Gallery images={[
+  { src: img02, alt: "Brief factual description of what this image shows" },
+]} />
