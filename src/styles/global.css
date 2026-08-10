@@ -422,7 +422,6 @@ html::-webkit-scrollbar-thumb:hover { background-color: var(--color-olive); }
    because it's a picture frame rather than prose and must not take the
    reading measure. */
 .article-body > img[data-lightbox-group],
-.article-body > .lead-image,
 .article-body > .gallery-grid,
 .article-body > .route-map-wrapper,
 .article-body > figure,
@@ -441,8 +440,7 @@ html::-webkit-scrollbar-thumb:hover { background-color: var(--color-olive); }
     justify-content: center;
 }
 
-.article-body > img[data-lightbox-group],
-.article-body > .lead-image {
+.article-body > img[data-lightbox-group] {
     justify-self: center;
 }
 

@@ -3,18 +3,12 @@
 // one place means the numbers can only drift from the actual layout, never
 // from each other.
 //
-// Reference point: --content-max-width in global.css caps the content
-// column at 1400px; PhotoInline splits that column in half.
+// Reference point: --content-width in global.css is the media width, 1240px.
 
-// Full-width images (LeadImage, plain Markdown images): up to the content
-// column's full width, with headroom for high-DPI screens.
+// Full-width images (Photo, plain Markdown images): up to the media width,
+// with headroom for high-DPI screens.
 export const FULL_WIDTH_IMAGE_WIDTHS = [640, 960, 1280, 1600, 2000];
-export const FULL_WIDTH_IMAGE_SIZES = '(max-width: 900px) 100vw, 1400px';
-
-// PhotoInline: image sits in one half of a two-column row above 700px,
-// full width below it (the layout's own stacking breakpoint).
-export const INLINE_IMAGE_WIDTHS = [400, 600, 800, 1100];
-export const INLINE_IMAGE_SIZES = '(max-width: 700px) 100vw, 700px';
+export const FULL_WIDTH_IMAGE_SIZES = '(max-width: 900px) 100vw, 1240px';
 
 // Gallery: tiles keep their natural proportions in a grid of at most three
 // columns, so the widest a tile gets is a third of the content column (~420px)

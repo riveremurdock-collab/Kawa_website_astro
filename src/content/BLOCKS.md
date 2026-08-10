@@ -21,7 +21,7 @@ This tells the page "the word `img01` means this exact file, right here in
 this folder." You then use `img01` inside a block later in the same file:
 
 ```
-<LeadImage src={img01} alt="Vest pack technical mockup in Adobe Illustrator" />
+<Photo src={img01} alt="Vest pack technical mockup in Adobe Illustrator" />
 ```
 
 **Why this exists instead of just writing a filename in quotes:** if you
@@ -69,14 +69,13 @@ This is fully optimized automatically, same as everything else, **and it's
 part of the fullscreen lightbox automatically too** — no import line, no
 block, no extra step. Every image written as plain Markdown takes its place
 in the lightbox sequence in the order it appears on the page, mixed in
-correctly with any block images (`LeadImage`, `Gallery`, `PhotoInline`) on
-the same page.
+correctly with any block images (`Photo`, `Gallery`) on the same page.
 
 One thing plain Markdown images don't get: a caption in the lightbox
 viewer. That comes from a `<figcaption>`, which only blocks produce — the
 text after the filename in `![alt](src "this part")` is a native browser
 tooltip on hover, not a lightbox caption. If you want a caption to show up
-in the lightbox, use `<Gallery>` (which accepts one) instead.
+in the lightbox, use `<Photo>` or `<Gallery>` instead; both accept one.
 
 **If you want one specific image to *not* be part of the lightbox** — a
 small decorative photo, say — write it as an `<Image>` component instead of
@@ -97,26 +96,47 @@ genuine opt-out, not the default — reach for it rarely.
 
 ## Available blocks
 
-### `LeadImage` — one full-width image
+### `Photo` — one photo on its own
 
-For a single hero-style image, like the main image at the top of a project.
-Part of the lightbox.
+The way to place a single image in the flow, anywhere on the page. Part of
+the lightbox.
 
 ```mdx
 import mainShot from './01.jpg';
 
-<LeadImage src={mainShot} alt="Waxed canvas touring panniers mounted on bike" />
+<Photo src={mainShot} alt="Waxed canvas touring panniers mounted on bike" />
+```
+
+With a caption, and set to load immediately because it's the first thing on
+the page:
+
+```mdx
+<Photo
+  src={mainShot}
+  alt="Waxed canvas touring panniers mounted on bike"
+  caption="The finished panniers, mounted"
+  eager
+/>
 ```
 
 | Prop | Type | Required | Notes |
 |---|---|---|---|
 | `src` | imported image | yes | |
 | `alt` | text | yes | |
+| `caption` | text | no | Shown under the photo, and in the lightbox viewer |
+| `eager` | true/false | no | Defaults to `false`. Add it for the photo at the very top of a page, so it loads immediately instead of waiting to be scrolled to. Leave it off everywhere else — otherwise a page with six photos downloads all six before the reader has seen any of them |
 
 ### `Gallery` — a grid of images
 
-For a set of photos shown together in a responsive grid. Every image is
-part of the lightbox, in the order listed.
+For a set of photos shown together in a grid. Every image is part of the
+lightbox, in the order listed.
+
+The number of columns comes from how many images you give it, up to three —
+two images make two columns, three make three, four go to a 2×2, and
+anything more stays three across. There's never an empty cell, and a short
+last row centres itself. Photos keep their own proportions and are never
+cropped to fit, so a grid looks tidiest when its photos are roughly the same
+shape; a panorama or a very tall photo is better on its own as a `<Photo>`.
 
 ```mdx
 import detail from './02.jpg';
@@ -131,43 +151,6 @@ import mounted from './03.jpg';
 | Prop | Type | Required | Notes |
 |---|---|---|---|
 | `images` | array of `{ src, alt, caption? }` | yes | `caption` is optional |
-
-### `PhotoInline` — one image beside a paragraph
-
-Pairs a photo with a block of text side-by-side (stacks on mobile). Part of
-the lightbox.
-
-```mdx
-import framebagShot from './piolet-09.jpg';
-
-<PhotoInline
-  src={framebagShot}
-  alt="Close-up of the custom leather framebag"
-  text="For the framebag I decided to go with leather, a first for me..."
-/>
-```
-
-A tall photo next to one short paragraph leaves a lot of empty space under
-the text. When that happens, write the paragraphs *inside* the tag instead
-of using `text=`, and the whole run of them fills the column:
-
-```mdx
-<PhotoInline src={framebagShot} alt="Close-up of the custom leather framebag">
-  For the framebag I decided to go with leather, a first for me...
-
-  After sewing it I waxed it to condition it...
-</PhotoInline>
-```
-
-Blank lines between paragraphs, same as normal Markdown. Use one form or the
-other — `text=` for a single paragraph, children for several.
-
-| Prop | Type | Required | Notes |
-|---|---|---|---|
-| `src` | imported image | yes | |
-| `alt` | text | yes | |
-| `text` | text | no | A single paragraph beside the image. Leave it out if you're writing the paragraphs inside the tag instead |
-| `caption` | text | no | Small caption under the image itself |
 
 ### `RouteMap` — an interactive GPX route map
 
@@ -201,7 +184,7 @@ referenced by an absolute site path (`/gpx/...`), not an import.
 
 ### `InstagramInline` — an Instagram post beside a paragraph
 
-Same idea as `PhotoInline`, but embeds an Instagram post instead of a photo.
+Puts an Instagram post beside a paragraph of text.
 
 ```mdx
 <InstagramInline url="https://www.instagram.com/p/XXXXXXXXXXX/" text="Some context about the post." />

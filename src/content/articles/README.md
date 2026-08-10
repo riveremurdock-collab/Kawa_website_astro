@@ -108,7 +108,7 @@ draft: false
 Below the frontmatter, write plain paragraphs — leave a blank line between them. Use `###` for a subheading. Drop in images and blocks wherever they make sense in the writing; there's no fixed template to follow. See [`BLOCKS.md`](../BLOCKS.md) for the full list of blocks and copy-paste examples, including:
 
 - A plain photo inside the text (standard Markdown, optimized automatically, and part of the clickable lightbox automatically too — no import line needed just to get that)
-- `<PhotoInline>` — a photo next to a paragraph, part of the lightbox
+- `<Photo>` — one photo on its own, with an optional caption, part of the lightbox
 - `<Gallery>` — a grid of several photos, part of the lightbox
 - `<RouteMap>` — an interactive map + elevation chart for a GPX route. Put the `.gpx` file in `public/gpx/` and reference it by path — see BLOCKS.md.
 - `<InstagramEmbed>` / `<InstagramInline>` — an embedded Instagram post

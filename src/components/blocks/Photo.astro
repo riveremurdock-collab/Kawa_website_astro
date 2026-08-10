@@ -1,0 +1,70 @@
+---
+// One photo on its own. With Gallery and plain body text, this is the whole
+// layout vocabulary — there is no block that puts text beside an image.
+//
+// Always a <figure>, so an optional caption has somewhere semantic to sit.
+// That's also where the lightbox reads its caption from: gallery.js walks up
+// from the image with closest('figure') and takes the <figcaption> text.
+import { Image } from 'astro:assets';
+import type { ImageMetadata } from 'astro';
+import { FULL_WIDTH_IMAGE_WIDTHS, FULL_WIDTH_IMAGE_SIZES } from '../../lib/content-image-sizes';
+
+interface Props {
+  src: ImageMetadata;
+  alt: string;
+  caption?: string;
+  /** Load immediately rather than lazily. For a hero at the top of a page;
+   *  anything further down the page should stay lazy. */
+  eager?: boolean;
+}
+
+const { src, alt, caption, eager = false } = Astro.props;
+---
+
+<figure class="photo-figure">
+  <Image
+    src={src}
+    alt={alt}
+    loading={eager ? 'eager' : 'lazy'}
+    data-lightbox-group="page"
+    width={FULL_WIDTH_IMAGE_WIDTHS.at(-1)}
+    widths={FULL_WIDTH_IMAGE_WIDTHS}
+    sizes={FULL_WIDTH_IMAGE_SIZES}
+  />
+  {caption && <figcaption>{caption}</figcaption>}
+</figure>
+
+<style>
+  .photo-figure {
+    margin: 1.5rem 0;
+    text-align: center;
+  }
+
+  /* The height cap is what keeps a tall portrait from filling the whole
+     screen. Width stays auto so nothing is ever squashed to meet it — the
+     image just gets narrower and stays centred. */
+  .photo-figure img {
+    display: block;
+    width: auto;
+    max-width: 100%;
+    height: auto;
+    max-height: var(--content-image-max-height);
+    margin-inline: auto;
+    border-radius: 10px;
+    cursor: pointer;
+    transition: opacity 0.2s ease;
+  }
+
+  .photo-figure img:hover {
+    opacity: 0.9;
+  }
+
+  .photo-figure figcaption {
+    font-family: var(--font-main);
+    font-size: 11px;
+    text-align: center;
+    margin-top: 6px;
+    color: var(--color-sage);
+    padding: 4px;
+  }
+</style>

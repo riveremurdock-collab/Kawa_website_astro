@@ -111,9 +111,9 @@ draft: false
 
 Unlike before, a project page is **not locked to a fixed template**. Below the frontmatter, you write the description as plain paragraphs and then place images and blocks in whatever order makes sense for that project — full reference and copy-paste examples are in [`BLOCKS.md`](../BLOCKS.md).
 
-The pattern used by every current project, and a reasonable default for a new one: one full-width `<LeadImage>` right after the description, then the remaining photos in a `<Gallery>`. But nothing requires that shape anymore — you could put a `<Gallery>` first, break up the description with images in between, or anything else that reads well for that project.
+The pattern used by every current project, and a reasonable default for a new one: one full-width `<Photo>` right after the description, then the remaining photos in a `<Gallery>`. But nothing requires that shape anymore — you could put a `<Gallery>` first, break up the description with images in between, or anything else that reads well for that project.
 
-To use an image with `<LeadImage>` or `<Gallery>`, it needs an `import` line first — see BLOCKS.md for exactly what that means and why. A plain image can still be dropped in with standard Markdown (`![alt text](./01.jpg)`), no import needed, and it's part of the clickable fullscreen lightbox automatically — the one thing it won't have is a caption in the lightbox viewer (that needs `<Gallery>`, which accepts one).
+To use an image with `<Photo>` or `<Gallery>`, it needs an `import` line first — see BLOCKS.md for exactly what that means and why. A plain image can still be dropped in with standard Markdown (`![alt text](./01.jpg)`), no import needed, and it's part of the clickable fullscreen lightbox automatically — the one thing it won't have is a caption in the lightbox viewer (that needs `<Photo>` or `<Gallery>`, both of which accept one).
 
 ---
 
@@ -197,7 +197,7 @@ Copy the error message and look for a filename near the top — that's usually t
 - [ ] Fill in all required frontmatter fields: `title`, `date`, `client`, `tags`, `cover`
 - [ ] Add image files to the folder
 - [ ] Add an `import` line for each image you'll use in the body
-- [ ] Write the description, then place `<LeadImage>` / `<Gallery>` (or other blocks) in the body
+- [ ] Write the description, then place `<Photo>` / `<Gallery>` (or other blocks) in the body
 - [ ] Write alt text for every image
 - [ ] Set `draft: false` when ready to publish
 - [ ] Run the build and check for errors
