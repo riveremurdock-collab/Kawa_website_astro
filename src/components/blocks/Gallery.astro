@@ -79,11 +79,13 @@ const ratioOf = (image: GalleryImage) => image.src.width / image.src.height;
      container, so the space between rows and the space between cells come
      from the same declaration and cannot drift apart. */
   .gallery-grid {
-    --gallery-gap: 16px;
+    --gallery-gap: var(--media-gap);
     display: flex;
     flex-direction: column;
     gap: var(--gallery-gap);
-    margin: 2rem 0;
+    /* Half the gap, so a gallery stacked against another media block adds up
+       to exactly one --media-gap between them. */
+    margin-block: calc(var(--media-gap) / 2);
   }
 
   .gallery-row {

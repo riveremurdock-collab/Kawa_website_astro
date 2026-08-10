@@ -134,6 +134,14 @@
        that true on a narrow viewport. */
     --content-width: 1360px;
     --measure: min(65ch, var(--content-width));
+
+    /* One spacing value for every gap between photos — between the columns of
+       a gallery row, between its rows, and between one media block and the
+       next. Photo and Gallery each carry half of it as a block margin, so two
+       stacked blocks add up to exactly this and match the gap inside a row.
+       (Half-margins rather than a single margin because .article-body is a
+       grid, where adjacent margins sit end to end instead of collapsing.) */
+    --media-gap: 16px;
 }
 
 /* -----------------------------------------

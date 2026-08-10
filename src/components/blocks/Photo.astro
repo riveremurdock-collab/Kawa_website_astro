@@ -46,7 +46,9 @@ const ratio = src.width / src.height;
 
 <style>
   .photo-figure {
-    margin: 1.5rem 0;
+    /* Half of --media-gap, so two stacked photos sit exactly one gap apart —
+       the same distance as the columns inside a gallery row. */
+    margin-block: calc(var(--media-gap) / 2);
     text-align: center;
   }
 
