@@ -142,6 +142,12 @@
        (Half-margins rather than a single margin because .article-body is a
        grid, where adjacent margins sit end to end instead of collapsing.) */
     --media-gap: 16px;
+
+    /* Space where prose meets a photo. Bigger than --media-gap on purpose:
+       photos in a run should read as one group, while text needs room to
+       separate from them. Only applies at the boundary — two photos next to
+       each other keep --media-gap however much this grows. */
+    --prose-media-gap: 44px;
 }
 
 /* -----------------------------------------
@@ -469,6 +475,32 @@ html::-webkit-scrollbar-thumb:hover { background-color: var(--color-olive); }
 
 .article-body > img[data-lightbox-group] {
     justify-self: center;
+}
+
+/* Space at the prose/photo boundary.
+   ------------------------------------------------------------------
+   Media blocks carry only half of --media-gap, which is what keeps a run of
+   photos tight. That's too close to text, so the boundary gets its own,
+   larger value — applied here rather than on the blocks, so it can only ever
+   affect where prose actually meets a photo.
+
+   Both directions land on --prose-media-gap by subtracting whatever the
+   neighbour already contributes: a paragraph's own bottom margin above, the
+   photo's half-gap below. Headings are left out — they carry their own
+   section spacing, which is larger still, and shouldn't be cut down to this.
+
+   Written as sibling selectors on the element that follows, never with :has,
+   so nothing here depends on a selector the minifier might rewrite. */
+.article-body > :is(p, ul, ol, dl, blockquote)
+    + :is(.photo-figure, .gallery-grid, .route-map-wrapper) {
+    /* 1.15rem is what a paragraph contributes below itself. The two
+       collections differ by 0.05rem, which is under a pixel. */
+    margin-top: calc(var(--prose-media-gap) - 1.15rem);
+}
+
+.article-body > :is(.photo-figure, .gallery-grid, .route-map-wrapper)
+    + :is(p, ul, ol, dl, blockquote) {
+    margin-top: calc(var(--prose-media-gap) - var(--media-gap) / 2);
 }
 
 /* The title block sits outside .article-body, so it takes the measure
