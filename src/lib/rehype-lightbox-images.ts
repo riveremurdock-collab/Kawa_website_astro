@@ -24,12 +24,31 @@ import { FULL_WIDTH_IMAGE_WIDTHS, FULL_WIDTH_IMAGE_SIZES } from './content-image
  */
 export function rehypeLightboxImages() {
   return (tree: Root) => {
-    visit(tree, 'element', (node: Element) => {
+    visit(tree, 'element', (node: Element, _index, parent) => {
       if (node.tagName !== 'img') return;
       node.properties['data-lightbox-group'] = 'page';
       node.properties['width'] = String(FULL_WIDTH_IMAGE_WIDTHS.at(-1));
       node.properties['widths'] = FULL_WIDTH_IMAGE_WIDTHS.join(' ');
       node.properties['sizes'] = FULL_WIDTH_IMAGE_SIZES;
+
+      // Markdown wraps a lone image in a paragraph. That paragraph is a
+      // picture frame, not prose, and the stylesheet has to tell the two
+      // apart to give it the full content width instead of the reading
+      // measure. Tagging it here is what makes that distinction explicit —
+      // the alternative, matching `p:has(> img)` in CSS, is a selector the
+      // minifier is free to rewrite, and did.
+      if (
+        parent?.type === 'element' &&
+        parent.tagName === 'p' &&
+        parent.children.every(
+          child =>
+            child === node ||
+            (child.type === 'text' && child.value.trim() === '')
+        )
+      ) {
+        parent.properties ??= {};
+        parent.properties['class'] = 'content-image-block';
+      }
     });
   };
 }

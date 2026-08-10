@@ -418,17 +418,32 @@ html::-webkit-scrollbar-thumb:hover { background-color: var(--color-olive); }
     grid-column: 2;
 }
 
-/* Full-bleed: the photography, and the map. A lone Markdown image comes
-   wrapped in its own <p> by Markdown itself, which is what :has matches —
-   that <p> is a picture frame, not a paragraph. */
+/* Full-bleed: the photography, and the map. `.content-image-block` is the
+   <p> Markdown wraps a lone image in — tagged as such by the rehype plugin,
+   because it's a picture frame rather than prose and must not take the
+   reading measure. */
 .article-body > img[data-lightbox-group],
 .article-body > .lead-image,
 .article-body > .gallery-grid,
 .article-body > .route-map-wrapper,
 .article-body > figure,
-.article-body > p:has(> img[data-lightbox-group]) {
+.article-body > p.content-image-block {
     grid-column: 1 / -1;
+}
+
+/* Centre the media in that full-bleed area. The image's own width is settled
+   by its proportions and the height cap, so it's usually narrower than the
+   area it sits in; flex on the wrapper centres it whatever it lands on,
+   without depending on auto margins resolving against a shrunk width. */
+.article-body > p.content-image-block {
     max-width: none;
+    display: flex;
+    justify-content: center;
+}
+
+.article-body > img[data-lightbox-group],
+.article-body > .lead-image {
+    justify-self: center;
 }
 
 /* Reading measure, inside the text column. These sit at the start of the
