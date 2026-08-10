@@ -1,0 +1,180 @@
+---
+// Occupies grid position 1 in the blog index's ProjectGrid (via the
+// `leading` slot). Deliberately not a .tile — no hover/active dimming,
+// not clickable as a whole, and excluded from the grid's collapse logic
+// by virtue of having a different class entirely.
+interface Props {
+  tags: string[];
+  posts: { title: string; href: string; tags: string[] }[];
+}
+
+const { tags, posts } = Astro.props;
+---
+
+<div class="filter-tile">
+  <input
+    type="text"
+    id="posts-search"
+    class="filter-search"
+    placeholder="Search posts…"
+    aria-label="Search posts"
+  />
+  {tags.length > 0 && (
+    <div class="filter-tags">
+      {tags.map(tag => (
+        <label class="filter-tag" data-tag={tag}>
+          <input type="checkbox" value={tag} />
+          {tag}
+        </label>
+      ))}
+    </div>
+  )}
+  <ul class="filter-list">
+    {posts.map(post => (
+      <li
+        data-list-item
+        data-title={post.title.toLowerCase()}
+        data-tags={JSON.stringify(post.tags)}
+      >
+        <a href={post.href}>{post.title}</a>
+      </li>
+    ))}
+  </ul>
+</div>
+
+<style>
+  .filter-tile {
+    aspect-ratio: 1;
+    border-radius: 16px;
+    background: var(--color-dark-grey);
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    overflow: hidden;
+  }
+
+  .filter-search {
+    flex-shrink: 0;
+    width: 100%;
+    padding: 10px 16px;
+    background: rgba(237, 242, 233, 0.12);
+    border: none;
+    border-radius: 20px;
+    color: var(--color-light-sage);
+    font-family: var(--font-main);
+    font-size: 0.85rem;
+  }
+
+  .filter-search::placeholder {
+    color: rgba(237, 242, 233, 0.55);
+  }
+
+  .filter-search:focus-visible {
+    outline: 2px solid var(--color-orange);
+    outline-offset: 1px;
+    background: rgba(237, 242, 233, 0.2);
+  }
+
+  .filter-tags {
+    flex-shrink: 0;
+    display: flex;
+    flex-wrap: wrap;
+    align-content: flex-start;
+    gap: 6px;
+    max-height: 72px;
+    overflow-y: auto;
+  }
+
+  .filter-tag {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 4px 10px;
+    background: rgba(237, 242, 233, 0.12);
+    border-radius: 12px;
+    color: var(--color-light-sage);
+    font-family: var(--font-main);
+    font-size: 0.75rem;
+    cursor: pointer;
+    transition: background 0.15s ease;
+  }
+
+  .filter-tag:hover,
+  .filter-tag.active {
+    background: rgba(237, 242, 233, 0.3);
+  }
+
+  .filter-tag input {
+    width: 11px;
+    height: 11px;
+    accent-color: var(--color-orange);
+  }
+
+  .filter-tag input:focus-visible {
+    outline: 2px solid var(--color-orange);
+    outline-offset: 2px;
+  }
+
+  .filter-list {
+    flex: 1;
+    min-height: 0;
+    overflow-y: auto;
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    padding-top: 10px;
+    border-top: 1px solid rgba(237, 242, 233, 0.15);
+  }
+
+  .filter-list a {
+    display: block;
+    padding: 6px 8px;
+    border-radius: 6px;
+    color: var(--color-light-sage);
+    font-family: var(--font-main);
+    font-size: 0.78rem;
+    line-height: 1.3;
+    text-decoration: none;
+    transition: background 0.15s ease;
+  }
+
+  .filter-list a:hover,
+  .filter-list a:focus-visible {
+    background: rgba(237, 242, 233, 0.15);
+  }
+
+  .filter-list a:focus-visible {
+    outline: 2px solid var(--color-orange);
+    outline-offset: -2px;
+  }
+</style>
+
+<script>
+  (function () {
+    document.querySelectorAll<HTMLElement>('.filter-tile').forEach(tile => {
+      const grid = tile.closest<HTMLElement>('.project-grid');
+      if (!grid) return;
+
+      const searchInput = tile.querySelector<HTMLInputElement>('.filter-search');
+      const tagInputs = Array.from(tile.querySelectorAll<HTMLInputElement>('.filter-tag input'));
+
+      function dispatch() {
+        const tags = tagInputs.filter(i => i.checked).map(i => i.value);
+        const search = searchInput?.value ?? '';
+        grid!.dispatchEvent(new CustomEvent('grid:filter', { detail: { tags, search } }));
+      }
+
+      searchInput?.addEventListener('input', dispatch);
+
+      tagInputs.forEach(input => {
+        input.addEventListener('change', () => {
+          const label = input.closest('.filter-tag');
+          label?.classList.toggle('active', input.checked);
+          dispatch();
+        });
+      });
+    });
+  })();
+</script>

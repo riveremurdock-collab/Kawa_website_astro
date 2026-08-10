@@ -18,9 +18,10 @@ function basePageFields<T extends readonly [string, ...string[]]>(tagValues: T) 
 
 const articles = defineCollection({
   loader: glob({ pattern: '**/index.mdx', base: './src/content/articles' }),
-  schema: () => z.object({
+  schema: ({ image }) => z.object({
     ...basePageFields(ARTICLE_TAGS),
     excerpt: z.string(),
+    cover: image(),
   }),
 });
 

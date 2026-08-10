@@ -46,13 +46,13 @@ const next = (showPrevNext && nextEntry)
       <span class="detail-client" slot="meta">· {entry.data.client}</span>
     </PostLayout>
 
-    <PrevNext prev={prev} next={next} />
+    <PrevNext prev={prev} next={next} basePath="/portfolio" gridHref="/portfolio" />
   </div>
 </InnerPageLayout>
 
 <style>
   .portfolio-detail-box {
-    max-width: var(--portfolio-detail-max-width);
+    max-width: var(--content-max-width);
     width: 100%;
     margin: 0 auto;
   }
@@ -119,8 +119,10 @@ const next = (showPrevNext && nextEntry)
   /* Plain inline Markdown images (as opposed to block-rendered ones) */
   .portfolio-detail-box :global(.article-body > img) {
     display: block;
-    width: 100%;
+    width: auto;
+    max-width: 100%;
     height: auto;
+    max-height: var(--content-image-max-height);
     border-radius: 10px;
     margin: 1.5rem auto;
   }

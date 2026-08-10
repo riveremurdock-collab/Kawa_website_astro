@@ -7,15 +7,21 @@ interface ProjectLink {
 interface Props {
   prev: ProjectLink | null;
   next: ProjectLink | null;
+  // e.g. "/portfolio" or "/articles" — prefix for the prev/next links.
+  basePath: string;
+  // e.g. "/portfolio" or "/blog" — "Return to grid" destination. Kept
+  // separate from basePath rather than derived from it: portfolio's index
+  // and detail pages share one segment, blog's don't (/blog vs /articles).
+  gridHref: string;
 }
 
-const { prev, next } = Astro.props;
+const { prev, next, basePath, gridHref } = Astro.props;
 ---
 
-<nav class="prevnext" aria-label="Project navigation">
+<nav class="prevnext" aria-label="Page navigation">
   <div class="prevnext-prev">
     {prev ? (
-      <a href={`/portfolio/${prev.slug}`} class="prevnext-link">
+      <a href={`${basePath}/${prev.slug}`} class="prevnext-link">
         <span class="prevnext-arrow">←</span>
         <span class="prevnext-label">Previous</span>
         <span class="prevnext-title">{prev.title}</span>
@@ -23,13 +29,13 @@ const { prev, next } = Astro.props;
     ) : <span />}
   </div>
 
-  <a href="/portfolio" class="prevnext-grid-link">
+  <a href={gridHref} class="prevnext-grid-link">
     Return to grid
   </a>
 
   <div class="prevnext-next">
     {next ? (
-      <a href={`/portfolio/${next.slug}`} class="prevnext-link prevnext-link--right">
+      <a href={`${basePath}/${next.slug}`} class="prevnext-link prevnext-link--right">
         <span class="prevnext-arrow">→</span>
         <span class="prevnext-label">Next</span>
         <span class="prevnext-title">{next.title}</span>

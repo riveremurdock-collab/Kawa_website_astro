@@ -14,6 +14,8 @@ class RouteMap {
         this.elevationData = [];
         this.distanceData = [];
         this.highlightMarker = null;
+        this.resizeObserver = null;
+        this.routeBounds = null;
 
         // Color scheme matching website
         this.colors = {
@@ -50,11 +52,16 @@ class RouteMap {
 
         // Initialize Leaflet map
         this.map = L.map(this.mapId, {
-            zoomControl: true,
+            zoomControl: false,
             scrollWheelZoom: true,
             minZoom: 4,
             maxZoom: 16,
         });
+
+        // Zoom control in the top-right corner (Leaflet defaults to top-left).
+        L.control.zoom({
+            position: 'topright'
+        }).addTo(this.map);
 
         // Add Esri NatGeo World Map tiles
         L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/NatGeo_World_Map/MapServer/tile/{z}/{y}/{x}', {
@@ -68,6 +75,23 @@ class RouteMap {
             imperial: true,
             position: 'bottomleft'
         }).addTo(this.map);
+
+        // Leaflet measures its container once, at construction. If that
+        // measurement happens before the surrounding layout has settled
+        // (flex/grid not yet resolved, container still mid-transition),
+        // the map bakes in the wrong pixel grid and nothing corrects it on
+        // its own — this is what causes the map to overflow or misrender.
+        // Watching the wrapper's actual box size and re-measuring on every
+        // change covers first paint, window resizes, and layout shifts
+        // alike, not just one of them.
+        this.resizeObserver = new ResizeObserver(() => {
+            if (!this.map) return;
+            this.map.invalidateSize();
+            if (this.routeBounds) {
+                this.map.fitBounds(this.routeBounds, { padding: [30, 30] });
+            }
+        });
+        this.resizeObserver.observe(this.container);
     }
 
     async loadGPX() {
@@ -99,8 +123,12 @@ class RouteMap {
         this.gpxLayer.on('loaded', (e) => {
             const gpx = e.target;
 
+            // Kept so the resize observer can re-fit the route whenever the
+            // container's size changes later, not just at this first fit.
+            this.routeBounds = gpx.getBounds();
+
             // Fit map to route bounds
-            this.map.fitBounds(gpx.getBounds(), {
+            this.map.fitBounds(this.routeBounds, {
                 padding: [30, 30]
             });
 

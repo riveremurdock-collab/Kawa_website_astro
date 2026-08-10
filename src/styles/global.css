@@ -104,8 +104,15 @@
     --font-main: 'Futura', 'Century Gothic', sans-serif;
     --font-display: 'AveriaLibre', 'Futura', sans-serif;
 
-    /* Layout */
-    --portfolio-detail-max-width: 1400px;
+    /* Layout — single source of truth for content width, shared by the
+       header (Header.astro) and every page's content container, so they
+       can never drift apart. */
+    --content-max-width: 1400px;
+
+    /* A single wide or portrait content image should never force scrolling
+       to see the whole thing. Doesn't apply to the lightbox, which sizes
+       itself independently (see Lightbox.astro). */
+    --content-image-max-height: 80vh;
 }
 
 /* -----------------------------------------
@@ -152,6 +159,15 @@ input, select, textarea {
 img {
     max-width: 100%;
     height: auto;
+}
+
+/* Shared width cap — anything that should line up with the header's logo
+   (left edge) and nav pill (right edge) uses this instead of its own
+   max-width, so the two can never drift apart. */
+.content-width {
+    max-width: var(--content-max-width);
+    width: 100%;
+    margin-inline: auto;
 }
 
 /* -----------------------------------------
@@ -400,19 +416,21 @@ html::-webkit-scrollbar-thumb:hover { background-color: var(--color-olive); }
     color: var(--color-olive);
 }
 
-.article-body img {
+/* Scoped to actual content images (marked for the lightbox), not a blanket
+   `img` descendant selector — anything nested in the body that isn't a
+   content image (Leaflet map tiles, third-party embeds) never opts into
+   this styling because it never carries the marker. */
+.article-body img[data-lightbox-group] {
     max-width: 100%;
     height: auto;
     margin: 1.5em 0;
-    border: 2px solid var(--color-mint);
     border-radius: 6px;
     cursor: pointer;
-    transition: transform 0.2s ease, border-color 0.2s ease;
+    transition: transform 0.2s ease;
 }
 
-.article-body img:hover {
+.article-body img[data-lightbox-group]:hover {
     transform: scale(1.02);
-    border-color: var(--color-orange);
 }
 
 .article-body figure {

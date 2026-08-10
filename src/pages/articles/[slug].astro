@@ -1,55 +1,185 @@
 ---
-import BlogLayout from '../../layouts/BlogLayout.astro';
-import PostLayout from '../../layouts/PostLayout.astro';
 import { getCollection } from 'astro:content';
+import InnerPageLayout from '../../layouts/InnerPageLayout.astro';
+import PostLayout from '../../layouts/PostLayout.astro';
+import PrevNext from '../../components/PrevNext.astro';
 
-// Derive URL slug from glob loader entry.id (e.g. "piolet-bike-check/index.mdx" → "piolet-bike-check")
-const toSlug = (id: string) => id.replace(/\/index\.mdx$/, '').replace(/\.mdx$/, '');
+const getSlug = (id: string): string =>
+  id.replace(/\/index\.mdx$/, '').replace(/\.mdx$/, '');
 
 export async function getStaticPaths() {
-    const toSlug = (id: string) => id.replace(/\/index\.mdx$/, '').replace(/\.mdx$/, '');
-    // Every article gets a page, including drafts — same as portfolio.
-    // Drafts are just excluded from the sidebar list below.
-    const allEntries = await getCollection('articles');
-    return allEntries.map(entry => ({
-        params: { slug: toSlug(entry.id) },
-        props: { entry },
-    }));
+  const toSlug = (id: string) => id.replace(/\/index\.mdx$/, '').replace(/\.mdx$/, '');
+  // Every article gets a page, including drafts — same as portfolio.
+  // Drafts are just excluded from the grid and prev/next below.
+  const allEntries = await getCollection('articles');
+  return allEntries.map(entry => ({
+    params: { slug: toSlug(entry.id) },
+    props: { entry },
+  }));
 }
 
 const { entry } = Astro.props;
 
-const publishedEntries = await getCollection('articles', ({ data }) => !data.draft);
-const sortedArticles = publishedEntries
-    .map(e => ({ slug: toSlug(e.id), data: e.data }))
-    .sort((a, b) => b.data.date.getTime() - a.data.date.getTime());
+const published = await getCollection('articles', ({ data }) => !data.draft);
+published.sort((a, b) => b.data.date.getTime() - a.data.date.getTime());
 
-const currentSlug = toSlug(entry.id);
+const currentIndex = published.findIndex(e => e.id === entry.id);
+
+const prevEntry = currentIndex !== -1
+  ? published[(currentIndex + 1) % published.length]
+  : null;
+const nextEntry = currentIndex !== -1
+  ? published[(currentIndex - 1 + published.length) % published.length]
+  : null;
+
+const showPrevNext = published.length > 1 && currentIndex !== -1;
+
+const prev = (showPrevNext && prevEntry)
+  ? { slug: getSlug(prevEntry.id), title: prevEntry.data.title }
+  : null;
+const next = (showPrevNext && nextEntry)
+  ? { slug: getSlug(nextEntry.id), title: nextEntry.data.title }
+  : null;
+
+const currentSlug = getSlug(entry.id);
 ---
 
-<BlogLayout
-    title={`${entry.data.title} | Kawa Designs`}
-    description={entry.data.excerpt}
-    articles={sortedArticles}
-    currentSlug={currentSlug}
+<InnerPageLayout
+  title={`${entry.data.title} | Kawa Designs`}
+  description={entry.data.excerpt}
+  fullScroll={true}
 >
+  <div class="page-content-box article-detail-box">
     <PostLayout entry={entry}>
-        <div class="article-tags" slot="meta">
-            {entry.data.tags.map(tag => (
-                <span class="tag">{tag}</span>
-            ))}
-        </div>
+      <div class="article-tags" slot="meta">
+        {entry.data.tags.map(tag => (
+          <span class="tag">{tag}</span>
+        ))}
+      </div>
     </PostLayout>
 
+    <PrevNext prev={prev} next={next} basePath="/articles" gridHref="/blog" />
+
     <div class="comments-section">
-        <h2>Comments</h2>
-        <div id="cusdis_thread"
-            data-host="https://cusdis.com"
-            data-app-id="e5efd1f2-ea0a-4da1-b432-df5979658893"
-            data-page-id={currentSlug}
-            data-page-url={Astro.url.href}
-            data-page-title={entry.data.title}
-        ></div>
-        <script async defer src="https://cusdis.com/js/cusdis.es.js"></script>
+      <h2>Comments</h2>
+      <div id="cusdis_thread"
+        data-host="https://cusdis.com"
+        data-app-id="e5efd1f2-ea0a-4da1-b432-df5979658893"
+        data-page-id={currentSlug}
+        data-page-url={Astro.url.href}
+        data-page-title={entry.data.title}
+      ></div>
+      <script async defer src="https://cusdis.com/js/cusdis.es.js"></script>
     </div>
-</BlogLayout>
+  </div>
+</InnerPageLayout>
+
+<style>
+  .article-detail-box {
+    max-width: var(--content-max-width);
+    width: 100%;
+    margin: 0 auto;
+  }
+
+  /* ---- Blog's existing visual theme, layered on PostLayout's shared
+     .article-header/.article-meta/.article-body structure — ported from
+     the old BlogLayout.astro .blog-article-box rules, structure only
+     changed (no sidebar), colors unchanged. ---- */
+  .article-detail-box :global(.article-header h1) {
+    color: #717045;
+    font-weight: 700;
+    font-size: 2.4rem;
+  }
+
+  .article-detail-box :global(.article-meta time) {
+    color: #717045;
+    font-style: italic;
+    font-size: 1rem;
+  }
+
+  .article-detail-box :global(.tag) {
+    background: #717045;
+    color: #edf2e9;
+    border-radius: 20px;
+    font-size: 13px;
+    padding: 4px 14px;
+  }
+
+  .article-detail-box :global(.article-body) {
+    color: #1c1c1c;
+  }
+
+  .article-detail-box :global(.article-body h2),
+  .article-detail-box :global(.article-body h3) {
+    color: #717045;
+  }
+
+  .article-detail-box :global(.article-body h3) {
+    margin-top: 2.8rem;
+    padding-top: 1.6rem;
+    border-top: 1px solid rgba(113, 112, 69, 0.18);
+  }
+
+  .article-detail-box :global(.article-body h3:first-of-type) {
+    border-top: none;
+    padding-top: 0;
+    margin-top: 1.5rem;
+  }
+
+  .article-detail-box :global(.article-body a) {
+    color: #9b5108;
+  }
+
+  .article-detail-box :global(.article-body a:hover) {
+    color: #f78f28;
+  }
+
+  .article-detail-box :global(.article-body p) {
+    line-height: 1.85;
+    margin-bottom: 1.15rem;
+  }
+
+  .article-detail-box :global(.article-body > img) {
+    border: none;
+    border-radius: 12px;
+    margin-top: 1.6rem;
+    margin-bottom: 2rem;
+    margin-inline: auto;
+    width: auto;
+    max-width: 100%;
+    height: auto;
+    max-height: var(--content-image-max-height);
+    display: block;
+  }
+
+  .article-detail-box :global(.photo-inline-wrapper) {
+    margin-top: 1.8rem;
+    margin-bottom: 2rem;
+  }
+
+  .article-detail-box :global(.gallery-item img) {
+    border-radius: 12px;
+  }
+
+  .comments-section {
+    border-top: none;
+    padding-top: 32px;
+    margin-top: 48px;
+  }
+
+  .comments-section h2 {
+    color: #717045;
+  }
+
+  @media (max-width: 900px) {
+    .article-detail-box :global(.article-header h1) {
+      font-size: 1.8rem;
+    }
+  }
+
+  @media (max-width: 480px) {
+    .article-detail-box :global(.article-header h1) {
+      font-size: 1.4rem;
+    }
+  }
+</style>

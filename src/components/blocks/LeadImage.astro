@@ -3,6 +3,7 @@
 // or post. Marked for the lightbox like every other content image.
 import { Image } from 'astro:assets';
 import type { ImageMetadata } from 'astro';
+import { FULL_WIDTH_IMAGE_WIDTHS, FULL_WIDTH_IMAGE_SIZES } from '../../lib/content-image-sizes';
 
 interface Props {
   src: ImageMetadata;
@@ -18,16 +19,21 @@ const { src, alt } = Astro.props;
   loading="eager"
   class="lead-image"
   data-lightbox-group="page"
+  width={FULL_WIDTH_IMAGE_WIDTHS.at(-1)}
+  widths={FULL_WIDTH_IMAGE_WIDTHS}
+  sizes={FULL_WIDTH_IMAGE_SIZES}
 />
 
 <style>
   .lead-image {
     display: block;
-    width: 100%;
+    width: auto;
+    max-width: 100%;
     height: auto;
+    max-height: var(--content-image-max-height);
     border-radius: 10px;
     cursor: pointer;
-    margin: 1.5rem 0;
+    margin: 1.5rem auto;
     transition: opacity 0.2s ease;
   }
 

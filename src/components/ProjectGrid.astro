@@ -12,12 +12,18 @@ export interface GridItem {
 interface Props {
   items: GridItem[];
   emptyMessage?: string;
+  // Shown/hidden client-side when a filter or search narrows the visible
+  // tiles to zero. Distinct from emptyMessage, which is a build-time,
+  // permanent "the collection itself is empty" case. Omit this prop to get
+  // the old behavior back (no element rendered, no client-side check).
+  noResultsMessage?: string;
 }
 
-const { items, emptyMessage = 'Nothing here yet.' } = Astro.props;
+const { items, emptyMessage = 'Nothing here yet.', noResultsMessage } = Astro.props;
 ---
 
 <div class="project-grid">
+  <slot name="leading" />
   {items.length === 0 ? (
     <p class="project-grid-empty">{emptyMessage}</p>
   ) : (
@@ -26,6 +32,7 @@ const { items, emptyMessage = 'Nothing here yet.' } = Astro.props;
         href={item.href}
         class="tile"
         aria-label={item.title}
+        data-title={item.title.toLowerCase()}
         data-tags={JSON.stringify(item.tags ?? [])}
       >
         <Image
@@ -42,6 +49,9 @@ const { items, emptyMessage = 'Nothing here yet.' } = Astro.props;
         <span class="tile-title">{item.title}</span>
       </a>
     ))
+  )}
+  {items.length > 0 && noResultsMessage && (
+    <p class="project-grid-no-results" hidden>{noResultsMessage}</p>
   )}
 </div>
 
@@ -70,6 +80,16 @@ const { items, emptyMessage = 'Nothing here yet.' } = Astro.props;
     color: var(--color-dark-grey);
     font-style: italic;
     padding: 40px 0;
+  }
+
+  /* Client-toggled — spans every column so it doesn't look like a stray
+     tile when the grid is down to one visible column on mobile. */
+  .project-grid-no-results {
+    grid-column: 1 / -1;
+    color: var(--color-dark-grey);
+    font-style: italic;
+    padding: 40px 0;
+    text-align: center;
   }
 
   /* ---- Tile ---- */
@@ -156,9 +176,25 @@ const { items, emptyMessage = 'Nothing here yet.' } = Astro.props;
     const REDUCE_MOTION = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
     const FADE_MS = 260;
 
+    // Shared by tiles and the optional [data-list-item] rows (e.g. the blog
+    // nav box's post list) — one predicate, so both element sets narrow
+    // together under the same rules instead of two parallel filters.
+    function matchesFilter(el: HTMLElement, normalizedTags: string[], normalizedSearch: string) {
+      let elTags: string[] = [];
+      try {
+        elTags = JSON.parse(el.dataset.tags || '[]').map((t: string) => t.toLowerCase());
+      } catch (e) {}
+      const matchesTags = normalizedTags.length === 0 || normalizedTags.some(t => elTags.includes(t));
+      const matchesSearch = normalizedSearch === '' || (el.dataset.title || '').includes(normalizedSearch);
+      return matchesTags && matchesSearch;
+    }
+
     function setupGrid(grid: HTMLElement) {
       const tiles = Array.from(grid.querySelectorAll<HTMLElement>('.tile'));
       if (!tiles.length) return;
+
+      const listItems = Array.from(grid.querySelectorAll<HTMLElement>('[data-list-item]'));
+      const noResultsEl = grid.querySelector<HTMLElement>('.project-grid-no-results');
 
       const pendingTimers = new WeakMap<HTMLElement, ReturnType<typeof setTimeout>>();
 
@@ -199,25 +235,36 @@ const { items, emptyMessage = 'Nothing here yet.' } = Astro.props;
         tile.classList.remove('is-filtered-out');
       }
 
-      function applyFilter(tag: string | null | undefined) {
-        const normalized = tag ? tag.toLowerCase() : null;
+      function updateNoResultsMessage() {
+        if (!noResultsEl) return;
+        const anyVisible = tiles.some(t => !t.classList.contains('is-collapsed'));
+        noResultsEl.hidden = anyVisible;
+      }
+
+      function applyFilter(tags: string[], search: string) {
+        const normalizedTags = (tags || []).map(t => t.toLowerCase()).filter(Boolean);
+        const normalizedSearch = (search || '').trim().toLowerCase();
+
         tiles.forEach(tile => {
-          let tileTags: string[] = [];
-          try {
-            tileTags = JSON.parse(tile.dataset.tags || '[]').map((t: string) => t.toLowerCase());
-          } catch (e) {}
-          const matches = !normalized || tileTags.includes(normalized);
-          if (matches) {
+          if (matchesFilter(tile, normalizedTags, normalizedSearch)) {
             showTile(tile);
           } else {
             hideTile(tile);
           }
         });
+
+        // Plain rows, not animated tiles — an instant hidden toggle is all
+        // a list row needs.
+        listItems.forEach(item => {
+          item.hidden = !matchesFilter(item, normalizedTags, normalizedSearch);
+        });
+
+        updateNoResultsMessage();
         grid.dispatchEvent(new CustomEvent('grid:filtered'));
       }
 
-      grid.addEventListener('grid:filter', ((e: CustomEvent<{ tag?: string | null }>) => {
-        applyFilter(e.detail && e.detail.tag);
+      grid.addEventListener('grid:filter', ((e: CustomEvent<{ tags?: string[]; search?: string }>) => {
+        applyFilter(e.detail?.tags ?? [], e.detail?.search ?? '');
       }) as EventListener);
 
       /* ---- Mobile: IntersectionObserver drives .is-active as user scrolls ---- */

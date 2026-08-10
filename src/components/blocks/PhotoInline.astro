@@ -1,6 +1,7 @@
 ---
 import { Image } from 'astro:assets';
 import type { ImageMetadata } from 'astro';
+import { INLINE_IMAGE_WIDTHS, INLINE_IMAGE_SIZES } from '../../lib/content-image-sizes';
 
 interface Props {
   src: ImageMetadata;
@@ -17,7 +18,15 @@ const { src, alt, caption, text } = Astro.props;
         <p>{text}</p>
     </div>
     <figure class="photo-inline-figure">
-        <Image src={src} alt={alt} loading="lazy" data-lightbox-group="page" />
+        <Image
+          src={src}
+          alt={alt}
+          loading="lazy"
+          data-lightbox-group="page"
+          width={INLINE_IMAGE_WIDTHS.at(-1)}
+          widths={INLINE_IMAGE_WIDTHS}
+          sizes={INLINE_IMAGE_SIZES}
+        />
         {caption && <figcaption>{caption}</figcaption>}
     </figure>
 </div>
@@ -40,10 +49,13 @@ const { src, alt, caption, text } = Astro.props;
     }
 
     .photo-inline-figure img {
-        width: 100%;
-        height: auto;
-        border-radius: 4px;
         display: block;
+        width: auto;
+        max-width: 100%;
+        height: auto;
+        max-height: var(--content-image-max-height);
+        border-radius: 4px;
+        margin-inline: auto;
         transition: transform 0.2s ease;
     }
 

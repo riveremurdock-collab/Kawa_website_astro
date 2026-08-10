@@ -13,50 +13,83 @@
     overflow: hidden;
 }
 
-.route-map-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 12px 16px;
-    background: var(--color-mint);
-    border: none;
-}
-
+/* Typography here matches what `.article-body h3` used to give this title
+   before it became a div — AveriaLibre at 1.6rem — so the block looks
+   unchanged; only the unwanted prose-heading spacing is gone. */
 .route-map-title {
-    font-family: var(--font-main);
+    font-family: var(--font-display);
     font-weight: 700;
-    font-size: 1.3rem;
+    font-size: 1.6rem;
+    line-height: 1.15;
     color: var(--color-olive);
     margin: 0;
     letter-spacing: 0.5px;
+    min-width: 0;
+    overflow-wrap: break-word;
 }
 
 .route-download-btn {
     display: inline-flex;
     align-items: center;
+    justify-content: center;
     gap: 6px;
-    padding: 8px 14px;
+    align-self: stretch;
+    padding: 10px 14px;
     background: var(--color-sage);
     border: none;
-    border-radius: 6px;
-    color: var(--color-light-sage);
+    border-radius: 999px;
     font-family: var(--font-main);
     font-size: 14px;
     font-weight: 500;
     cursor: pointer;
     transition: background 0.2s ease, transform 0.2s ease;
-    text-decoration: none;
 }
 
 .route-download-btn:hover {
     background: var(--color-olive);
-    color: var(--color-light-sage);
     transform: translateY(-1px);
+}
+
+/* Same root cause as .route-map-title: the page templates style
+   `.article-body a` through Astro-scoped selectors that reach (0,3,1), and
+   `a:hover` (0,4,1) — enough to recolor this pill and, on portfolio pages,
+   underline it. Unlike the title this must stay an <a> to carry `download`,
+   so the chain below is deliberately specific enough to win in every
+   template. Keep color/text-decoration here, not in the rules above. */
+.route-map-wrapper .route-map-info .route-map-info-bottom a.route-download-btn,
+.route-map-wrapper .route-map-info .route-map-info-bottom a.route-download-btn:hover {
+    color: #fff;
+    text-decoration: none;
 }
 
 .route-download-btn svg {
     width: 16px;
     height: 16px;
+    flex-shrink: 0;
+}
+
+/* -----------------------------------------
+   Map body — info panel + map, side by side
+   ----------------------------------------- */
+.route-map-body {
+    display: grid;
+    grid-template-columns: minmax(200px, 260px) 1fr;
+    align-items: stretch;
+}
+
+.route-map-info {
+    display: flex;
+    flex-direction: column;
+    padding: 20px;
+    background: var(--color-mint);
+    min-width: 0;
+}
+
+.route-map-info-bottom {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    margin-top: auto;
 }
 
 /* -----------------------------------------
@@ -64,10 +97,27 @@
    ----------------------------------------- */
 .route-map-container {
     width: 100%;
-    height: 450px;
+    height: 100%;
+    min-width: 0;
     background: var(--color-light-sage);
     position: relative;
     z-index: 1;
+}
+
+/* Backstop: Leaflet renders its map as a grid of <img> tiles, so any broad
+   content-image rule (border, radius, margin, cursor, hover) would apply to
+   every tile and show as visible seams. This reset guarantees tiles stay
+   plain regardless of what a future global image rule does. */
+.route-map-container img {
+    border: none;
+    border-radius: 0;
+    margin: 0;
+    cursor: inherit;
+    transition: none;
+}
+
+.route-map-container img:hover {
+    transform: none;
 }
 
 /* Override Leaflet default styles */
@@ -220,7 +270,6 @@
    Elevation Chart
    ----------------------------------------- */
 .route-elevation-wrapper {
-    padding-top: 12px;
     background: transparent;
     border-top: none;
 }
@@ -236,29 +285,37 @@
 }
 
 /* -----------------------------------------
-   Route Statistics (Text Style)
+   Route Statistics (Title / Value Style)
    ----------------------------------------- */
 .route-stats-text {
-    padding: 12px 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
     background: var(--color-mint);
     border-top: none;
 }
 
-.route-stat-line {
-    margin: 0;
-    padding: 4px 0;
+.route-stat-block {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+
+.route-stat-label {
     font-family: var(--font-main);
-    font-size: 0.95rem;
-    color: var(--color-olive);
-    line-height: 1.5;
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: var(--color-sage);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
 }
 
-.route-stat-line strong {
+.route-stat-value {
+    font-family: var(--font-main);
+    font-size: 1.1rem;
+    font-weight: 700;
     color: var(--color-olive);
-}
-
-.route-stat-line span {
-    color: var(--color-olive);
+    line-height: 1.3;
 }
 
 /* -----------------------------------------
@@ -312,20 +369,20 @@
    Responsive Styles
    ----------------------------------------- */
 @media (max-width: 768px) {
-    .route-map-header {
-        flex-direction: column;
-        gap: 10px;
-        padding: 12px;
-    }
-
     .route-map-title {
         font-size: 1.1rem;
-        text-align: center;
     }
 
-    .route-download-btn {
-        width: 100%;
-        justify-content: center;
+    .route-map-info {
+        padding: 16px;
+    }
+
+    .route-map-info-bottom {
+        gap: 12px;
+    }
+
+    .route-map-body {
+        grid-template-columns: 1fr;
     }
 
     .route-map-container {
@@ -336,12 +393,8 @@
         height: 100px;
     }
 
-    .route-stats-text {
-        padding: 10px 12px;
-    }
-
-    .route-stat-line {
-        font-size: 0.9rem;
+    .route-stat-value {
+        font-size: 1rem;
     }
 }
 
@@ -354,8 +407,8 @@
         height: 80px;
     }
 
-    .route-stat-line {
-        font-size: 0.85rem;
+    .route-stat-value {
+        font-size: 0.95rem;
     }
 }
 
@@ -375,6 +428,15 @@
 #overview-map-container .leaflet-container {
     font-family: var(--font-main);
     background: var(--color-light-sage);
+}
+
+/* Same backstop as .route-map-container — see comment there. */
+#overview-map-container img {
+    border: none;
+    border-radius: 0;
+    margin: 0;
+    cursor: inherit;
+    transition: none;
 }
 
 /* Custom marker style */

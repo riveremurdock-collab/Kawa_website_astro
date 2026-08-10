@@ -10,13 +10,20 @@ date: 2026-01-01
 # description — write it like a summary someone would read before clicking.
 excerpt: A short summary of the post, shown in search results and link previews.
 
-# Tags shown on the post and used for the sidebar tag filter.
+# Tags shown on the post and used for the blog index filter box and the
+# sidebar tag filter on other posts' pages.
 # Must be one of the values already registered in src/content/config.ts —
 # currently: about, cool-bikes, trip-report, utah, biking. A post can carry
 # more than one. Adding a genuinely new tag means adding it to that list in
 # config.ts first — see BLOCKS.md if you're unsure why.
 tags:
   - trip-report
+
+# The square thumbnail shown on this post's tile on the blog index.
+# Must be a file in the same folder as this index.mdx, with a ./ prefix.
+# Same convention as portfolio's cover field — cropped to a square
+# automatically, using the center of the image.
+cover: ./01.jpg
 
 # Set to true to hide this post while you're still working on it.
 # Set to false (or delete this line) when you're ready to publish.

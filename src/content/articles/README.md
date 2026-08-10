@@ -49,7 +49,7 @@ Do not use HEIC files (the default format from iPhone when set to "High Efficien
 At the top of every `index.mdx` is a block between two lines of `---`. This is called the frontmatter.
 
 **`title`**
-The post title. Appears at the top of the post and in the sidebar list.
+The post title. Appears at the top of the post, on its grid tile on the blog index, and in the sidebar list on other posts' pages.
 ```
 title: My Winter Bikepacking Trip
 ```
@@ -67,13 +67,19 @@ excerpt: A three-day winter bikepacking trip through the desert, and everything 
 ```
 
 **`tags`**
-One or more tags describing the post. Drives the sidebar tag filter. Restricted to a known list — this catches typos before they turn into a broken filter. The current list lives in `src/content/config.ts` and is currently: `about`, `cool-bikes`, `trip-report`, `utah`, `biking`.
+One or more tags describing the post. Drives both the filter box on the blog index grid and the sidebar tag filter shown on other posts' pages. Restricted to a known list — this catches typos before they turn into a broken filter. The current list lives in `src/content/config.ts` and is currently: `about`, `cool-bikes`, `trip-report`, `utah`, `biking`.
 ```
 tags:
   - trip-report
   - utah
 ```
 If you need a genuinely new tag, it has to be added to `config.ts` first. Writing a tag that isn't on the list fails the build with an error naming the field and the file.
+
+**`cover`**
+The square thumbnail image shown on the post's tile on the blog index. Must be a file in the same folder as `index.mdx`, referenced with a `./` prefix — same convention as portfolio's `cover` field. The site crops it to a square automatically, using the center of the image.
+```
+cover: ./01.jpg
+```
 
 **`draft`**
 Set to `true` to hide the post from the blog while you're still working on it. Set to `false` (or leave it out — it defaults to `false`) when ready to publish. The post's page still exists at its URL either way, useful for previewing.
@@ -90,6 +96,7 @@ excerpt: A three-day winter bikepacking trip through the desert, and everything 
 tags:
   - trip-report
   - utah
+cover: ./01.jpg
 draft: false
 ---
 ```
@@ -126,7 +133,7 @@ Write alt text as a short, factual description of what the image actually shows.
 A filename in an `import` line doesn't match any file in that post's folder — see BLOCKS.md for a real example of what this looks like. Check the spelling exactly, including the file extension.
 
 **"Required field missing" or a Zod error naming a file**
-A required frontmatter field (`title`, `date`, `excerpt`) is missing or blank. Open that `index.mdx` and add it.
+A required frontmatter field (`title`, `date`, `excerpt`, `cover`) is missing or blank. Open that `index.mdx` and add it.
 
 **An error about `tags` and "invalid enum value"**
 A tag isn't on the approved list. Check the spelling against `src/content/config.ts`.
@@ -143,7 +150,7 @@ Copy the error message and look for a filename near the top — that's usually t
 
 - [ ] Create a new folder in `src/content/articles/` with a lowercase, hyphenated name
 - [ ] Copy `TEMPLATE.mdx` into it and rename to `index.mdx`
-- [ ] Fill in all required frontmatter fields: `title`, `date`, `excerpt`, `tags`
+- [ ] Fill in all required frontmatter fields: `title`, `date`, `excerpt`, `tags`, `cover`
 - [ ] Add image files to the folder
 - [ ] Add an `import` line for each image you'll use with a block
 - [ ] Write the post, placing images/blocks where they read best

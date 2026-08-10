@@ -1,47 +1,38 @@
 ---
-import BlogLayout from '../../layouts/BlogLayout.astro';
-import PostLayout from '../../layouts/PostLayout.astro';
 import { getCollection } from 'astro:content';
+import InnerPageLayout from '../../layouts/InnerPageLayout.astro';
+import ProjectGrid from '../../components/ProjectGrid.astro';
+import PostsFilterTile from '../../components/PostsFilterTile.astro';
 
 const toSlug = (id: string) => id.replace(/\/index\.mdx$/, '').replace(/\.mdx$/, '');
 
 const publishedEntries = await getCollection('articles', ({ data }) => !data.draft);
-const sortedEntries = [...publishedEntries].sort((a, b) => b.data.date.getTime() - a.data.date.getTime());
+publishedEntries.sort((a, b) => b.data.date.getTime() - a.data.date.getTime());
 
-const featuredEntry = sortedEntries[0];
-const featuredSlug = featuredEntry ? toSlug(featuredEntry.id) : undefined;
-const sortedArticles = sortedEntries.map(e => ({ slug: toSlug(e.id), data: e.data }));
+// Already enum-consistent casing (config.ts), unlike portfolio's original
+// free-text tags — no normalization needed here.
+const allTags = [...new Set(publishedEntries.flatMap(e => e.data.tags))].sort();
+
+const gridItems = publishedEntries.map(entry => ({
+  href: `/articles/${toSlug(entry.id)}`,
+  title: entry.data.title,
+  image: entry.data.cover,
+  tags: entry.data.tags,
+}));
 ---
 
-<BlogLayout
-    title="Kawa Blog"
-    description={featuredEntry?.data.excerpt ?? "Kawa Designs blog — adventure stories and route reports"}
-    articles={sortedArticles}
-    currentSlug={featuredSlug}
+<InnerPageLayout
+  title="Kawa Blog"
+  description="Kawa Designs blog — adventure stories and route reports"
+  fullScroll={true}
 >
-    {featuredEntry ? (
-        <Fragment>
-            <PostLayout entry={featuredEntry}>
-                <div class="article-tags" slot="meta">
-                    {featuredEntry.data.tags.map(tag => (
-                        <span class="tag">{tag}</span>
-                    ))}
-                </div>
-            </PostLayout>
-
-            <div class="comments-section">
-                <h2>Comments</h2>
-                <div id="cusdis_thread"
-                    data-host="https://cusdis.com"
-                    data-app-id="e5efd1f2-ea0a-4da1-b432-df5979658893"
-                    data-page-id={featuredSlug}
-                    data-page-url={Astro.url.href}
-                    data-page-title={featuredEntry.data.title}
-                ></div>
-                <script async defer src="https://cusdis.com/js/cusdis.es.js"></script>
-            </div>
-        </Fragment>
-    ) : (
-        <div class="loading-message">No articles found.</div>
-    )}
-</BlogLayout>
+  <div class="content-width">
+    <ProjectGrid
+      items={gridItems}
+      emptyMessage="No posts yet."
+      noResultsMessage="No posts match your search."
+    >
+      <PostsFilterTile tags={allTags} posts={gridItems} slot="leading" />
+    </ProjectGrid>
+  </div>
+</InnerPageLayout>
