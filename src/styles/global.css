@@ -515,10 +515,13 @@ html::-webkit-scrollbar-thumb:hover { background-color: var(--color-olive); }
    `img` descendant selector — anything nested in the body that isn't a
    content image (Leaflet map tiles, third-party embeds) never opts into
    this styling because it never carries the marker. */
+/* No margin here on purpose. Every content image now sits inside a Photo or a
+   Gallery, and those space themselves from --media-gap; a margin at this level
+   would land inside the block, adding to the gap between gallery rows while
+   leaving the gap between columns alone. */
 .article-body img[data-lightbox-group] {
     max-width: 100%;
     height: auto;
-    margin: 1.5em 0;
     border-radius: 6px;
     cursor: pointer;
     transition: transform 0.2s ease;
