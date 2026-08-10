@@ -147,11 +147,26 @@ import framebagShot from './piolet-09.jpg';
 />
 ```
 
+A tall photo next to one short paragraph leaves a lot of empty space under
+the text. When that happens, write the paragraphs *inside* the tag instead
+of using `text=`, and the whole run of them fills the column:
+
+```mdx
+<PhotoInline src={framebagShot} alt="Close-up of the custom leather framebag">
+  For the framebag I decided to go with leather, a first for me...
+
+  After sewing it I waxed it to condition it...
+</PhotoInline>
+```
+
+Blank lines between paragraphs, same as normal Markdown. Use one form or the
+other — `text=` for a single paragraph, children for several.
+
 | Prop | Type | Required | Notes |
 |---|---|---|---|
 | `src` | imported image | yes | |
 | `alt` | text | yes | |
-| `text` | text | yes | The paragraph shown next to the image |
+| `text` | text | no | A single paragraph beside the image. Leave it out if you're writing the paragraphs inside the tag instead |
 | `caption` | text | no | Small caption under the image itself |
 
 ### `RouteMap` — an interactive GPX route map

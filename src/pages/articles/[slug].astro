@@ -139,7 +139,9 @@ const currentSlug = getSlug(entry.id);
     margin-bottom: 1.15rem;
   }
 
-  .article-detail-box :global(.article-body > img) {
+  /* Markdown wraps a lone image in its own <p>, so the image is a grandchild
+     of the body, not a child — matching on `> img` alone never applied. */
+  .article-detail-box :global(.article-body > p > img[data-lightbox-group]) {
     border: none;
     border-radius: 12px;
     margin-top: 1.6rem;

@@ -116,8 +116,10 @@ const next = (showPrevNext && nextEntry)
     text-decoration-color: currentColor;
   }
 
-  /* Plain inline Markdown images (as opposed to block-rendered ones) */
-  .portfolio-detail-box :global(.article-body > img) {
+  /* Plain inline Markdown images (as opposed to block-rendered ones).
+     Markdown wraps a lone image in its own <p>, so the image is a grandchild
+     of the body, not a child — matching on `> img` alone never applied. */
+  .portfolio-detail-box :global(.article-body > p > img[data-lightbox-group]) {
     display: block;
     width: auto;
     max-width: 100%;

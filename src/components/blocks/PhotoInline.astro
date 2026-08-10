@@ -7,7 +7,9 @@ interface Props {
   src: ImageMetadata;
   alt: string;
   caption?: string;
-  text: string;
+  /** A single paragraph beside the image. For more than one, write the
+   *  paragraphs as Markdown children instead — see BLOCKS.md. */
+  text?: string;
 }
 
 const { src, alt, caption, text } = Astro.props;
@@ -15,7 +17,8 @@ const { src, alt, caption, text } = Astro.props;
 
 <div class="photo-inline-wrapper">
     <div class="photo-inline-text">
-        <p>{text}</p>
+        {text && <p>{text}</p>}
+        <slot />
     </div>
     <figure class="photo-inline-figure">
         <Image
@@ -42,6 +45,18 @@ const { src, alt, caption, text } = Astro.props;
 
     .photo-inline-text {
         line-height: 1.8;
+    }
+
+    /* :global because paragraphs passed as Markdown children are rendered in
+       the content's scope, not this component's, so a plain descendant
+       selector would never match them. Covers the `text` prop's own <p> too,
+       so both ways of filling the column space the same. */
+    .photo-inline-text :global(p) {
+        margin-bottom: 1.1rem;
+    }
+
+    .photo-inline-text :global(p:last-child) {
+        margin-bottom: 0;
     }
 
     .photo-inline-figure {

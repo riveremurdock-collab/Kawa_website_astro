@@ -113,6 +113,16 @@
        to see the whole thing. Doesn't apply to the lightbox, which sizes
        itself independently (see Lightbox.astro). */
     --content-image-max-height: 80vh;
+
+    /* The text edge. Titles, body prose and the inline photo block all line
+       up on this width, centred in the content column; photography breaks
+       out past it to the full width above. One value moves all of them. */
+    --content-text-width: 900px;
+
+    /* Reading measure for running prose, inside that text column. The content
+       column is 1400px wide so images have room, and text set across all of
+       it runs ~150 characters a line — roughly double what's comfortable. */
+    --content-measure: 70ch;
 }
 
 /* -----------------------------------------
@@ -383,6 +393,72 @@ html::-webkit-scrollbar-thumb:hover { background-color: var(--color-olive); }
     margin-bottom: 1.5em;
 }
 
+/* Layout spine for the article body.
+   ------------------------------------------------------------------
+   Three tracks: a centred text column at --content-text-width, with a
+   flexible gutter either side. Everything lands in the middle track by
+   default, so the title, the prose and the inline photo block all share one
+   left and right edge. Photography opts out into `1 / -1` and spans the whole
+   content column, gutters included.
+
+   Done as a grid rather than a max-width on each element because the media
+   has to be *wider* than its container's text column — which a plain block
+   layout can only fake with negative margins. Here "break out" is one
+   declaration, and a block added later gets the text edge automatically by
+   simply not asking for anything. */
+.article-body {
+    display: grid;
+    grid-template-columns:
+        minmax(0, 1fr)
+        min(var(--content-text-width), 100%)
+        minmax(0, 1fr);
+}
+
+.article-body > * {
+    grid-column: 2;
+}
+
+/* Full-bleed: the photography, and the map. A lone Markdown image comes
+   wrapped in its own <p> by Markdown itself, which is what :has matches —
+   that <p> is a picture frame, not a paragraph. */
+.article-body > img[data-lightbox-group],
+.article-body > .lead-image,
+.article-body > .gallery-grid,
+.article-body > .route-map-wrapper,
+.article-body > figure,
+.article-body > p:has(> img[data-lightbox-group]) {
+    grid-column: 1 / -1;
+    max-width: none;
+}
+
+/* Reading measure, inside the text column. These sit at the start of the
+   track, so prose keeps a comfortable line length while still beginning on
+   the same edge as the title above it.
+
+   The child combinator does the scoping: it only ever matches prose sitting
+   directly in the article body, never a <p> inside a block like PhotoInline
+   (which sizes its own text column) or a figcaption. */
+.article-body > p,
+.article-body > ul,
+.article-body > ol,
+.article-body > dl,
+.article-body > blockquote,
+.article-body > h1,
+.article-body > h2,
+.article-body > h3,
+.article-body > h4,
+.article-body > h5,
+.article-body > h6 {
+    max-width: var(--content-measure);
+}
+
+/* The title block sits outside .article-body, so it takes the same width
+   directly to land on the same edges as the text column. */
+.article-header {
+    max-width: var(--content-text-width);
+    margin-inline: auto;
+}
+
 .article-body h2 {
     color: var(--color-dark-sandstone);
     font-family: var(--font-display);
@@ -454,6 +530,9 @@ html::-webkit-scrollbar-thumb:hover { background-color: var(--color-olive); }
 /* -----------------------------------------
    Comments Section
    ----------------------------------------- */
+/* Spans the full content width rather than the text column — a comment
+   thread is its own section of the page, not a continuation of the article's
+   prose, and it reads cramped at the measure. */
 .comments-section {
     margin-top: 60px;
     padding-top: 40px;

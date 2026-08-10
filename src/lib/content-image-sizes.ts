@@ -16,7 +16,9 @@ export const FULL_WIDTH_IMAGE_SIZES = '(max-width: 900px) 100vw, 1400px';
 export const INLINE_IMAGE_WIDTHS = [400, 600, 800, 1100];
 export const INLINE_IMAGE_SIZES = '(max-width: 700px) 100vw, 700px';
 
-// Gallery: square grid tiles, typically 240–420px depending on column
-// count. Sized generously enough to stay sharp at 2 columns on mobile.
+// Gallery: tiles keep their natural proportions in a grid of at most three
+// columns, so the widest a tile gets is a third of the content column (~420px)
+// — or the full column when a narrow screen drops it to one across. The
+// breakpoints here mirror Gallery.astro's own.
 export const GALLERY_IMAGE_WIDTHS = [300, 450, 600, 900];
-export const GALLERY_IMAGE_SIZES = '(max-width: 600px) 45vw, (max-width: 1000px) 30vw, 400px';
+export const GALLERY_IMAGE_SIZES = '(max-width: 560px) 100vw, (max-width: 900px) 46vw, 420px';

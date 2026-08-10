@@ -14,10 +14,24 @@ interface Props {
 }
 
 const { images } = Astro.props;
+
+// Column count comes from how many images there actually are, so a grid can
+// never render more tracks than it has children and leave a dead cell.
+// Three across is the cap. Four goes to 2x2 rather than 3+1, since a row of
+// one reads as a mistake; past six, three across always wins over the extra
+// rows two would cost. Counts that can't divide evenly (5, 7) leave a short
+// final row, which the flex layout below centres instead of leaving a hole.
+function columnsFor(count: number): number {
+  if (count <= 3) return count;
+  if (count > 6) return 3;
+  return count % 3 === 0 ? 3 : count % 2 === 0 ? 2 : 3;
+}
+
+const columns = columnsFor(images.length);
 ---
 
 {images.length > 0 && (
-  <div class="gallery-grid">
+  <div class="gallery-grid" style={`--gallery-columns: ${columns};`}>
     {images.map(image => (
       <figure class="gallery-item">
         <Image
@@ -36,23 +50,40 @@ const { images } = Astro.props;
 )}
 
 <style>
+  /* Flex rather than grid: a short final row centres itself for free, where
+     grid would leave the empty tracks sitting at the end of the row. */
   .gallery-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
-    gap: 1.25rem;
+    --gallery-gap: 1.25rem;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    align-items: flex-start;
+    gap: var(--gallery-gap);
     margin: 2rem 0;
   }
 
   .gallery-item {
     margin: 0;
+    flex: 0 1 calc(
+      (100% - (var(--gallery-columns) - 1) * var(--gallery-gap))
+      / var(--gallery-columns)
+    );
+    min-width: 0;
   }
 
+  /* No forced aspect-ratio and no object-fit: every image keeps its own
+     proportions and nothing is cropped. Uniform galleries (the common case)
+     still line up exactly, because identical ratios at identical widths give
+     identical heights. The max-height only catches extreme outliers — a very
+     tall panel scales down and centres in its column rather than towering
+     over its neighbours, still uncropped. */
   .gallery-item img {
     display: block;
-    width: 100%;
+    width: auto;
+    max-width: 100%;
     height: auto;
-    aspect-ratio: 1;
-    object-fit: cover;
+    max-height: var(--content-image-max-height);
+    margin-inline: auto;
     border-radius: 8px;
     cursor: pointer;
     transition: opacity 0.2s ease, transform 0.2s ease;
@@ -70,5 +101,25 @@ const { images } = Astro.props;
     margin-top: 6px;
     color: var(--color-sage);
     padding: 4px;
+  }
+
+  /* Step down rather than reflow freely, so the column count stays a
+     deliberate number at every width instead of whatever happens to fit. */
+  @media (max-width: 900px) {
+    .gallery-item {
+      /* min() so a one- or two-image gallery isn't widened into a column
+         count it doesn't have. */
+      --gallery-columns-narrow: min(var(--gallery-columns), 2);
+      flex-basis: calc(
+        (100% - (var(--gallery-columns-narrow) - 1) * var(--gallery-gap))
+        / var(--gallery-columns-narrow)
+      );
+    }
+  }
+
+  @media (max-width: 560px) {
+    .gallery-item {
+      flex-basis: 100%;
+    }
   }
 </style>
