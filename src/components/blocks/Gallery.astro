@@ -97,10 +97,18 @@ const ratioOf = (image: GalleryImage) => image.src.width / image.src.height;
     width: 100%;
   }
 
-  /* grow by ratio, shrink allowed, and no base width — so the row's whole
-     width is distributed in proportion to the ratios. */
+  /* Grow by ratio, shrink allowed, no base width — so the row's whole width
+     is distributed in proportion to the ratios.
+
+     Longhands rather than the `flex` shorthand on purpose. A var() inside a
+     shorthand is substituted after parsing, so if --cell-ratio were ever
+     missing or malformed the entire shorthand would fall back to its initial
+     `0 1 auto` and the row would silently lose its proportions. Set
+     separately, a bad ratio can only affect flex-grow. */
   .gallery-item {
-    flex: var(--cell-ratio) 1 0;
+    flex-grow: var(--cell-ratio);
+    flex-shrink: 1;
+    flex-basis: 0;
     min-width: 0;
     margin: 0;
   }
@@ -138,7 +146,9 @@ const ratioOf = (image: GalleryImage) => image.src.width / image.src.height;
     }
 
     .gallery-item {
-      flex: none;
+      flex-grow: 0;
+      flex-shrink: 0;
+      flex-basis: auto;
     }
   }
 </style>
