@@ -20,6 +20,8 @@ import ragslod8 from './ragslod-8.jpg';
 import ragslod7 from './ragslod-7.jpg';
 import ragslod4 from './ragslod-4.jpg';
 import ragslod2 from './ragslod-2.jpg';
+import ragslod5 from './ragslod-5.jpg';
+import ragslod1 from './ragslod-1.jpg';
 
 <RouteMap gpxFile="/gpx/ragslod-attempt.gpx" title="RAGSLOD Attempt" showElevation={true} height="450px" />
 
@@ -43,7 +45,7 @@ This ride was tricky to choose a bike for. It has long distances of pavement, bu
 
 For my bag setup I sewed a new mini framebag to carry tools and snacks, and used one of my micro panniers as a saddlebag to carry jackets and extra food. On my bars I had a small bar bag with accessories like gloves, sunglasses, sunscreen, and some more snacks.
 
-<Photo src={ragslod8} alt="Rivers Crosscheck loaded up for the ride" caption="Rivers Crosscheck" />
+<Photo src={ragslod8} alt="Rivers Crosscheck loaded up for the ride" />
 
 ### The morning of the ride
 
@@ -51,7 +53,7 @@ After an anxious night of sleep I woke up at 4 AM ready for the ride. I hopped o
 
 After a couple hours of riding on frontage roads, the sky started lighting up, and the mists started to evaporate. The morning mists still clung to the hills and rock formations as we passed, creating fantastical looking environments that looked like something from the Lord of the Rings. Even though we had just left the city it was starting to feel like we were leaving civilization. Eventually we reached our last resupply point, the Delle gas station. This was 60 miles into our ride, and was the start of the dirt roads. We stopped here for a while to warm up, dry off, and eat a delicious breakfast of gas station coffee, candy bars, and cold tamales. After finishing breakfast, and getting some funny stares from some of the Delle locals, we got back on the bikes and started down a sandy road.
 
-<Photo src={ragslod7} alt="Thomas biking on a dirt road outside Delle" caption="Thomas biking on a dirt road" />
+<Photo src={ragslod7} alt="Thomas biking on a dirt road outside Delle" />
 
 ### Into the desert
 
@@ -61,17 +63,18 @@ After 30 miles of biking straight north we finally came to the foothills of the 
 
 Looking to the west I got the first glimpse of the hardest section of our route, the rail causeway. The causeway is a section of raised railway bed that crosses the now mostly dry lakebed and was the only way to cross the lakebed to get to the Hogup Mountains. We rode down the hill to the edge of the lakebed, where we would be hopping onto the causeway. The causeway is constructed of large crushed stones, creating a sharp uneven surface. On the left side was the railway tracks, and on the right was the small service road that we would be riding on. On each side of the causeway muddy salt flats and occasional pools of lake water stretched into the distance. On the horizon I could see our exit point in the mountains.
 
-![The causeway — 15 miles of sharp crushed rock](./ragslod-5.jpg "The causeway")
+<Photo src={ragslod5} alt="The causeway — 15 miles of sharp crushed rock" title="The causeway" />
 
 We both took a second to prepare ourselves to be shaken up for the next 15 miles, then started along the stretch of road. About halfway through the bumpy ride I finally started to feel fatigue setting in, joints were stiffening up, and muscles were starting to ache. I kept bottoming out my tires to the rim on the sharp stones but miraculously I never got a flat. The end was in sight so I kept pushing on.
 
 The landscape around me kept getting more and more alien as we neared the other side of the causeway. Pure white salt flats were cut by blood red pools and streams of water, in the far distance mountain tops rose over the lake. The landscape was like looking at an ancient dying animal, majestic and somber. Finally we reached the other side, rising up to meet us at the end was the West Desert Pumping Station. This giant now abandoned pump station was built in the 80s — at this time record rainfall caused lake levels to grow beyond normal levels, flooding towns like Farmington on the lake edge. As an emergency project the government built the giant pump station to empty the lake into the next basin, reducing flooding. It has not been used since, and now sits miles from the lakeshore, looking out of place in the middle of a mostly dry desert landscape.
 
-<Photo src={ragslod3} alt="Blood-red pools and white salt flats on the lakebed seen from the causeway" />
+<Gallery images={[
+  { src: ragslod3, alt: "Blood-red pools and white salt flats on the lakebed seen from the causeway" },
+  { src: ragslod4, alt: "Resting at the far end of the causeway" },
+]} />
 
 I was relieved to finally leave the rocky surface of the causeway and get onto some smooth dirt roads. We rode up onto a hill overlooking the tracks and sat down for a much needed stretch and food break. As I ate my packet of tuna and some bars I felt much better, but I also had the realization that there was no turning back now. We were as far away from civilization as we could get, and the only way out was to keep going.
-
-<Photo src={ragslod4} alt="Resting at the far end of the causeway" caption="Far side of the causeway" />
 
 ### Into the night
 
@@ -79,7 +82,7 @@ Now that we were on the far side of the lake we were really in the middle of now
 
 Since noon it had been a pleasant warm temperature, probably in the mid 50s, but after dropping down the pass the temperature started to quickly drop. After riding for a while longer along shore, the light started to dim as the sun went down. The sky made a beautiful gradient above the sagebrush desert as it transitioned into night. At this point we were at around mile 140, still with over 100 miles to go if we were going to finish the loop.
 
-<Photo src={ragslod2} alt="The Hogup Mountains at dusk" caption="The Hogup Mountains" />
+<Photo src={ragslod2} alt="The Hogup Mountains at dusk" />
 
 ### Failed attempt and ride home
 
@@ -89,7 +92,7 @@ The farther north we biked around the lake the colder it got. Our feet and hands
 
 As we were limping along in the dark, I turned off all my lights and looked up into the dark sky. The stars were perfect, a glowing carpet above the expanse of the desert and the lake. I was glad to have one last good view of the lake.
 
-![Last light over the Great Salt Lake](./ragslod-1.jpg "Sunset over the lake")
+<Photo src={ragslod1} alt="Last light over the Great Salt Lake" title="Sunset over the lake" />
 
 I eventually saw lights on the horizon as Doug's truck sped towards us and I felt a huge wave of relief and gratitude for being able to stop riding. Big shoutout to Doug for spending his evening rescuing us, hopefully I can return the favor someday.
 

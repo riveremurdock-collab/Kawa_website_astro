@@ -32,10 +32,17 @@ import img02 from './02.jpg';
 Write the project description here. Plain paragraphs, same as before.
 Leave a blank line between paragraphs.
 
-Images now go down here in the body, not in the frontmatter — see
-src/content/BLOCKS.md for the full reference and copy-paste examples.
-The usual pattern for a project: one full-width lead image, then the rest
-in a grid.
+Images go down here in the body, not in the frontmatter. Each one needs an
+`import` line up top, like the two above; the blocks themselves are always
+available and are never imported. See src/content/BLOCKS.md for the full
+reference.
+
+The usual pattern for a project: one lead photo, then the rest in a
+gallery. `eager` on the lead makes it load immediately — leave it off
+everything further down the page.
+
+Leave a blank line above and below every block, and note that `src` takes
+the imported name in curly braces, not a filename in quotes:
 
 <Photo src={img01} alt="Brief factual description of what this image shows" eager />
 

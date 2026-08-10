@@ -31,23 +31,25 @@ draft: true
 ---
 
 import myPhoto from './01.jpg';
+import secondPhoto from './02.jpg';
 
 Write the post here in plain paragraphs, same as always. Leave a blank
 line between paragraphs.
 
-For a plain photo inside the writing, standard Markdown still works, no
-import needed, and it's part of the clickable lightbox automatically (see
-src/content/BLOCKS.md for the one thing it won't have — a caption in the
-lightbox viewer):
+Every photo needs one `import` line up top, like the two above. The blocks
+themselves (Photo, Gallery, RouteMap, the Instagram ones) don't need
+importing — they're always available. See src/content/BLOCKS.md for the
+full list.
 
-![A description of the photo](./02.jpg "Optional caption")
+Leave a blank line above and below every block, and note that `src` takes
+the imported name in curly braces, not a filename in quotes:
 
-To use a block instead — for a photo with a caption, a grid of several
-photos, a route map, or an Instagram embed — see src/content/BLOCKS.md for
-the full list and copy-paste examples. A quick one:
+<Photo src={myPhoto} alt="Brief factual description of what this image shows" />
 
-<Photo
-  src={myPhoto}
-  alt="Brief factual description of what this image shows"
-  caption="Optional caption, shown under the photo and in the lightbox"
-/>
+Two or more photos together go in a Gallery, which scales them to a shared
+height and fills the width. Any mix of orientations is fine:
+
+<Gallery images={[
+  { src: myPhoto, alt: "Brief factual description of what this image shows" },
+  { src: secondPhoto, alt: "Brief factual description of what this image shows" },
+]} />

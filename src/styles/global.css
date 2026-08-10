@@ -109,19 +109,30 @@
        can never drift apart. */
     --content-max-width: 1400px;
 
-    /* A single wide or portrait content image should never force scrolling
-       to see the whole thing. Doesn't apply to the lightbox, which sizes
-       itself independently (see Lightbox.astro). */
-    --content-image-max-height: 80vh;
+    /* Height cap for photos. Deliberately a little over one screen: a tall
+       image should run just past the fold, so it reads as continuing rather
+       than as the end of the page.
+
+       dvh, not vh — on mobile, vh is measured against the viewport with
+       browser chrome retracted, so a vh-based cap is wrong by the height of
+       the address bar for as long as it's showing.
+
+       Applied as a max-width scaled by each image's own ratio (see
+       Photo.astro), never as a max-height, so meeting the cap narrows an
+       image instead of squashing it. Doesn't apply to the lightbox, which
+       sizes itself independently, or to the route map, which is not a photo. */
+    --content-image-max-height: 115dvh;
 
     /* The page has exactly two content widths, and this is the wider one:
-       photos and photo grids. Matches the content box's inner width
-       (--content-max-width minus its 80px side padding), so photography fills
-       the box and its margins are the box's own padding.
+       photos and photo grids. Matches the inner width of the article and
+       portfolio content boxes (--content-max-width minus their 20px side
+       padding), so photography fills the box exactly.
 
        Text is derived from it rather than set independently, so it can never
-       come out wider than the media at any font size or viewport. */
-    --content-width: 1240px;
+       come out wider than the media at any font size or viewport. In practice
+       the 65ch term always wins; --content-width is the backstop that keeps
+       that true on a narrow viewport. */
+    --content-width: 1360px;
     --measure: min(65ch, var(--content-width));
 }
 
@@ -338,11 +349,6 @@ html::-webkit-scrollbar-thumb:hover { background-color: var(--color-olive); }
     color: var(--color-sage);
 }
 
-/* Article Styling */
-.article {
-    max-width: 800px;
-}
-
 .article-header {
     margin-bottom: 30px;
 }
@@ -423,12 +429,25 @@ html::-webkit-scrollbar-thumb:hover { background-color: var(--color-olive); }
    reading measure. */
 .article-body > img[data-lightbox-group],
 .article-body > .gallery-grid,
-.article-body > .route-map-wrapper,
 .article-body > figure,
 .article-body > p.content-image-block {
     grid-column: 1 / -1;
     max-width: min(var(--content-width), 100%);
     margin-inline: auto;
+}
+
+/* The route map takes the full width like the photography, but nothing else
+   the photo rules do. It is not an image: it sizes itself from its own
+   min-height and its internal two-column layout, and a height cap or a
+   ratio-derived max-width — both of which assume an intrinsic aspect ratio —
+   would collapse it into a strip. Kept as a separate rule rather than another
+   selector in the list above, so a later change to the photo sizing can't
+   reach it by accident. */
+.article-body > .route-map-wrapper {
+    grid-column: 1 / -1;
+    width: 100%;
+    max-width: none;
+    max-height: none;
 }
 
 /* Centre the image inside that area. Its own width is settled by its
@@ -504,12 +523,6 @@ html::-webkit-scrollbar-thumb:hover { background-color: var(--color-olive); }
 .article-body figure {
     margin: 30px 0;
     text-align: center;
-}
-
-.article-body figure img {
-    max-width: 700px;
-    margin: 0 auto;
-    display: block;
 }
 
 .article-body figcaption {

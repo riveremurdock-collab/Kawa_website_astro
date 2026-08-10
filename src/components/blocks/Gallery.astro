@@ -7,6 +7,7 @@ interface GalleryImage {
   src: ImageMetadata;
   alt: string;
   caption?: string;
+  title?: string;
 }
 
 interface Props {
@@ -15,75 +16,99 @@ interface Props {
 
 const { images } = Astro.props;
 
-// Column count comes from how many images there actually are, so a grid can
-// never render more tracks than it has children and leave a dead cell.
-// Three across is the cap. Four goes to 2x2 rather than 3+1, since a row of
-// one reads as a mistake; past six, three across always wins over the extra
-// rows two would cost. Counts that can't divide evenly (5, 7) leave a short
-// final row, which the flex layout below centres instead of leaving a hole.
-function columnsFor(count: number): number {
+// Rows are justified: within a row every image is scaled to one shared
+// height, and the row fills the media zone edge to edge. That works because
+// at a common height h, an image's width is h * ratio — so giving each cell
+// `flex-grow: ratio` over `flex-basis: 0` distributes the row's free width in
+// exactly that proportion. Flex subtracts the gaps before distributing, so
+// the widths always sum to the full zone and the heights always match.
+//
+// Nothing is cropped, letterboxed or distorted at any point, which is why
+// orientation no longer constrains what can share a row.
+function rowSizeFor(count: number): number {
   if (count <= 3) return count;
   if (count > 6) return 3;
   return count % 3 === 0 ? 3 : count % 2 === 0 ? 2 : 3;
 }
 
-const columns = columnsFor(images.length);
+const perRow = rowSizeFor(images.length);
+const rows: GalleryImage[][] = [];
+for (let i = 0; i < images.length; i += perRow) {
+  rows.push(images.slice(i, i + perRow));
+}
+
+const ratioOf = (image: GalleryImage) => image.src.width / image.src.height;
 ---
 
 {images.length > 0 && (
-  <div class="gallery-grid" style={`--gallery-columns: ${columns};`}>
-    {images.map(image => (
-      <figure class="gallery-item">
-        <Image
-          src={image.src}
-          alt={image.alt}
-          loading="lazy"
-          data-lightbox-group="page"
-          width={GALLERY_IMAGE_WIDTHS.at(-1)}
-          widths={GALLERY_IMAGE_WIDTHS}
-          sizes={GALLERY_IMAGE_SIZES}
-        />
-        {image.caption && <figcaption>{image.caption}</figcaption>}
-      </figure>
-    ))}
+  <div class="gallery-grid">
+    {rows.map(row => {
+      // The height cap has to bind on the row, not the cell — capping cells
+      // individually would break the shared height the row depends on. A row
+      // of ratios summing to R is `available / R` tall, so the width at which
+      // the row hits the cap is `cap * R`, plus its gaps.
+      const ratioSum = row.reduce((sum, image) => sum + ratioOf(image), 0);
+      return (
+        <div
+          class="gallery-row"
+          style={`--row-ratio-sum: ${ratioSum.toFixed(4)}; --row-gaps: ${row.length - 1};`}
+        >
+          {row.map(image => (
+            <figure class="gallery-item" style={`--cell-ratio: ${ratioOf(image).toFixed(4)};`}>
+              <Image
+                src={image.src}
+                alt={image.alt}
+                title={image.title}
+                loading="lazy"
+                data-lightbox-group="page"
+                width={GALLERY_IMAGE_WIDTHS.at(-1)}
+                widths={GALLERY_IMAGE_WIDTHS}
+                sizes={GALLERY_IMAGE_SIZES}
+              />
+              {image.caption && <figcaption>{image.caption}</figcaption>}
+            </figure>
+          ))}
+        </div>
+      );
+    })}
   </div>
 )}
 
 <style>
-  /* Flex rather than grid: a short final row centres itself for free, where
-     grid would leave the empty tracks sitting at the end of the row. */
+  /* One gap value for both axes. The rows are laid out by this column flex
+     container, so the space between rows and the space between cells come
+     from the same declaration and cannot drift apart. */
   .gallery-grid {
-    --gallery-gap: 1.25rem;
+    --gallery-gap: 16px;
     display: flex;
-    flex-wrap: wrap;
-    justify-content: center;
-    align-items: flex-start;
+    flex-direction: column;
     gap: var(--gallery-gap);
     margin: 2rem 0;
   }
 
-  .gallery-item {
-    margin: 0;
-    flex: 0 1 calc(
-      (100% - (var(--gallery-columns) - 1) * var(--gallery-gap))
-      / var(--gallery-columns)
+  .gallery-row {
+    display: flex;
+    gap: var(--gallery-gap);
+    max-width: calc(
+      var(--content-image-max-height) * var(--row-ratio-sum)
+      + var(--gallery-gap) * var(--row-gaps)
     );
-    min-width: 0;
+    margin-inline: auto;
+    width: 100%;
   }
 
-  /* No forced aspect-ratio and no object-fit: every image keeps its own
-     proportions and nothing is cropped. Uniform galleries (the common case)
-     still line up exactly, because identical ratios at identical widths give
-     identical heights. The max-height only catches extreme outliers — a very
-     tall panel scales down and centres in its column rather than towering
-     over its neighbours, still uncropped. */
+  /* grow by ratio, shrink allowed, and no base width — so the row's whole
+     width is distributed in proportion to the ratios. */
+  .gallery-item {
+    flex: var(--cell-ratio) 1 0;
+    min-width: 0;
+    margin: 0;
+  }
+
   .gallery-item img {
     display: block;
-    width: auto;
-    max-width: 100%;
+    width: 100%;
     height: auto;
-    max-height: var(--content-image-max-height);
-    margin-inline: auto;
     border-radius: 8px;
     cursor: pointer;
     transition: opacity 0.2s ease, transform 0.2s ease;
@@ -103,23 +128,17 @@ const columns = columnsFor(images.length);
     padding: 4px;
   }
 
-  /* Step down rather than reflow freely, so the column count stays a
-     deliberate number at every width instead of whatever happens to fit. */
-  @media (max-width: 900px) {
-    .gallery-item {
-      /* min() so a one- or two-image gallery isn't widened into a column
-         count it doesn't have. */
-      --gallery-columns-narrow: min(var(--gallery-columns), 2);
-      flex-basis: calc(
-        (100% - (var(--gallery-columns-narrow) - 1) * var(--gallery-gap))
-        / var(--gallery-columns-narrow)
-      );
+  /* A justified row of three on a phone is three slivers, so rows stack.
+     The cap comes off with them: each image is then bounded by the zone
+     width like any single photo. */
+  @media (max-width: 700px) {
+    .gallery-row {
+      flex-direction: column;
+      max-width: 100%;
     }
-  }
 
-  @media (max-width: 560px) {
     .gallery-item {
-      flex-basis: 100%;
+      flex: none;
     }
   }
 </style>

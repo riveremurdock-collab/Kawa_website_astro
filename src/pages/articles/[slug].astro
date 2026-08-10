@@ -79,6 +79,11 @@ const currentSlug = getSlug(entry.id);
     max-width: var(--content-max-width);
     width: 100%;
     margin: 0 auto;
+    /* Narrow side padding so the box's inner width is exactly
+       --content-width (1400 - 2*20 = 1360) and photography fills it. Text
+       is unaffected: it sits at its own measure, centred, with wide gutters
+       either side regardless of what the box padding is. */
+    padding-inline: 20px;
   }
 
   /* ---- Blog's existing visual theme, layered on PostLayout's shared

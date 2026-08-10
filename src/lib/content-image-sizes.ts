@@ -3,16 +3,19 @@
 // one place means the numbers can only drift from the actual layout, never
 // from each other.
 //
-// Reference point: --content-width in global.css is the media width, 1240px.
+// Reference point: --content-width in global.css is the media width, 1360px.
+// These are hints for picking a source from the srcset — they never constrain
+// the rendered size, which comes from the layout alone.
 
-// Full-width images (Photo, plain Markdown images): up to the media width,
-// with headroom for high-DPI screens.
+// A single Photo fills the media zone, whatever the source file's own pixel
+// dimensions are, so the candidates run up to it with high-DPI headroom.
 export const FULL_WIDTH_IMAGE_WIDTHS = [640, 960, 1280, 1600, 2000];
-export const FULL_WIDTH_IMAGE_SIZES = '(max-width: 900px) 100vw, 1240px';
+export const FULL_WIDTH_IMAGE_SIZES = '(max-width: 900px) 100vw, 1360px';
 
-// Gallery: tiles keep their natural proportions in a grid of at most three
-// columns, so the widest a tile gets is a third of the content column (~420px)
-// — or the full column when a narrow screen drops it to one across. The
-// breakpoints here mirror Gallery.astro's own.
-export const GALLERY_IMAGE_WIDTHS = [300, 450, 600, 900];
-export const GALLERY_IMAGE_SIZES = '(max-width: 560px) 100vw, (max-width: 900px) 46vw, 420px';
+// Gallery rows are justified, so a cell's width depends on its own ratio
+// relative to the rest of its row rather than on a fixed column count. A wide
+// image beside a narrow one can take most of the row, so the candidates have
+// to reach the full zone width; below the stacking breakpoint every cell is
+// full width.
+export const GALLERY_IMAGE_WIDTHS = [400, 640, 960, 1280, 1600];
+export const GALLERY_IMAGE_SIZES = '(max-width: 700px) 100vw, (max-width: 1100px) 70vw, 900px';

@@ -354,15 +354,15 @@
     "shape": "portrait"
   },
   "portfolio/vest-pack/03.jpg": {
-    "width": 4032,
-    "height": 3024,
-    "ratio": 1.333,
-    "shape": "landscape"
+    "width": 3024,
+    "height": 4032,
+    "ratio": 0.75,
+    "shape": "portrait"
   },
   "portfolio/vest-pack/04.jpg": {
-    "width": 4032,
-    "height": 3024,
-    "ratio": 1.333,
-    "shape": "landscape"
+    "width": 3024,
+    "height": 4032,
+    "ratio": 0.75,
+    "shape": "portrait"
   }
 }

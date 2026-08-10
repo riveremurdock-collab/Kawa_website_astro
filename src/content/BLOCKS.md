@@ -56,30 +56,51 @@ save, and it resolves.
 
 ---
 
-## Plain images vs. blocks — when to use which
+## Two ways to place a photo, and nothing else
 
-For a photo inside a paragraph of writing, you can still just write normal
-Markdown, no import needed:
+Every image on the site is either a `<Photo>` (one photo on its own) or a
+cell in a `<Gallery>` (a row of photos side by side). That's the whole
+vocabulary. **Markdown image syntax — `![alt](./photo.jpg)` — is no longer
+used anywhere**; if you're copying from an old post, convert it to `<Photo>`.
 
+**You never import the blocks themselves.** `Photo`, `Gallery`, `RouteMap`
+and the Instagram blocks are registered once in
+`src/components/blocks/registry.ts` and are available in every `.mdx` file
+automatically. The only thing a file imports is its *images* — one `import`
+line per photo, as described above.
+
+Three things that will trip you up if you get them wrong:
+
+**1. `src` takes an expression, in curly braces — not a quoted filename.**
+
+```mdx
+<Photo src={img01} alt="…" />     ✅  the name from the import line
+<Photo src="./01.jpg" alt="…" />  ❌  will not work
 ```
-![A description of the photo](./ragslod-2.jpg "Optional caption")
+
+`alt`, `caption` and `title` are ordinary text and *do* take quotes. Only
+`src` is different, because it refers to the imported image rather than
+naming a file.
+
+**2. Leave a blank line above and below every block.**
+
+```mdx
+Some paragraph of writing.
+
+<Photo src={img01} alt="…" />
+
+The next paragraph.
 ```
 
-This is fully optimized automatically, same as everything else, **and it's
-part of the fullscreen lightbox automatically too** — no import line, no
-block, no extra step. Every image written as plain Markdown takes its place
-in the lightbox sequence in the order it appears on the page, mixed in
-correctly with any block images (`Photo`, `Gallery`) on the same page.
+Without the blank lines the block and the text run together and the page
+either fails to build or renders the tag as literal text.
 
-One thing plain Markdown images don't get: a caption in the lightbox
-viewer. That comes from a `<figcaption>`, which only blocks produce — the
-text after the filename in `![alt](src "this part")` is a native browser
-tooltip on hover, not a lightbox caption. If you want a caption to show up
-in the lightbox, use `<Photo>` or `<Gallery>` instead; both accept one.
+**3. Every photo is in the fullscreen lightbox automatically**, in the order
+it appears on the page — `<Photo>` and `<Gallery>` images mixed together in
+one sequence. There's no step to opt in.
 
 **If you want one specific image to *not* be part of the lightbox** — a
-small decorative photo, say — write it as an `<Image>` component instead of
-Markdown syntax:
+small decorative photo, say — write it as an `<Image>` component:
 
 ```mdx
 import { Image } from 'astro:assets';
@@ -88,9 +109,9 @@ import quietPhoto from './quiet-photo.jpg';
 <Image src={quietPhoto} alt="A short description" />
 ```
 
-Still fully optimized, just not clickable. This needs both import lines
-shown above (`Image` from `astro:assets`, plus your photo) since it's a
-genuine opt-out, not the default — reach for it rarely.
+Still fully optimized, just not clickable. This one needs two import lines
+(`Image` from `astro:assets`, plus your photo) since it's a genuine opt-out,
+not the default — reach for it rarely.
 
 ---
 
@@ -121,22 +142,42 @@ the page:
 
 | Prop | Type | Required | Notes |
 |---|---|---|---|
-| `src` | imported image | yes | |
+| `src` | imported image, in `{ }` | yes | The name from the `import` line |
 | `alt` | text | yes | |
-| `caption` | text | no | Shown under the photo, and in the lightbox viewer |
+| `title` | text | no | Hover tooltip. Not visible on the page and not shown in the lightbox — this is the text that used to go after the filename in Markdown image syntax |
+| `caption` | text | no | Visible under the photo, and in the lightbox viewer. Nothing on the site currently uses one |
 | `eager` | true/false | no | Defaults to `false`. Add it for the photo at the very top of a page, so it loads immediately instead of waiting to be scrolled to. Leave it off everywhere else — otherwise a page with six photos downloads all six before the reader has seen any of them |
+
+A photo fills the full width of the image area whatever the size of the
+original file, and is never cropped. The one exception is a very tall photo:
+those are capped at a little over one screen high, and a photo that hits the
+cap sits narrower than the rest, centred. Pairing a tall photo with another
+in a `<Gallery>` is usually the nicer fix.
 
 ### `Gallery` — a grid of images
 
-For a set of photos shown together in a grid. Every image is part of the
-lightbox, in the order listed.
+Photos side by side in a row. Every image is part of the lightbox, in the
+order listed.
 
-The number of columns comes from how many images you give it, up to three —
-two images make two columns, three make three, four go to a 2×2, and
-anything more stays three across. There's never an empty cell, and a short
-last row centres itself. Photos keep their own proportions and are never
-cropped to fit, so a grid looks tidiest when its photos are roughly the same
-shape; a panorama or a very tall photo is better on its own as a `<Photo>`.
+**Rows are justified.** Every photo in a row is scaled to the same height and
+the row fills the full width exactly, edge to edge — wider photos take
+proportionally more of the row, taller ones less. Nothing is cropped,
+stretched or letterboxed to make that work, so **you can put any photos
+together regardless of orientation**; a portrait beside a landscape is fine
+and looks deliberate.
+
+Up to three per row: two images make one row of two, four make two rows of
+two, and anything more goes three across. Row heights differ between rows —
+a row of two portraits is much taller than a row of two landscapes — and
+that's expected. On a phone, rows stack into a single column.
+
+The one thing to keep out of a gallery is a **panorama**. A very wide photo
+next to a normal one squeezes its neighbour to a sliver; put panoramas on
+their own with `<Photo>`.
+
+Note the shape of the `images` value: square brackets around the list, curly
+braces around each photo, a comma after each one. `src` takes the imported
+name with no quotes; the text fields are quoted.
 
 ```mdx
 import detail from './02.jpg';
@@ -144,13 +185,13 @@ import mounted from './03.jpg';
 
 <Gallery images={[
   { src: detail, alt: "Close-up of the hardware" },
-  { src: mounted, alt: "Mounted on the bike", caption: "Optional caption" },
+  { src: mounted, alt: "Mounted on the bike", title: "Optional hover tooltip" },
 ]} />
 ```
 
 | Prop | Type | Required | Notes |
 |---|---|---|---|
-| `images` | array of `{ src, alt, caption? }` | yes | `caption` is optional |
+| `images` | array of `{ src, alt, title?, caption? }` | yes | `src` and `alt` are required on every entry; `title` and `caption` are optional and mean the same as they do on `<Photo>` |
 
 ### `RouteMap` — an interactive GPX route map
 

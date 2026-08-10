@@ -13,18 +13,28 @@ interface Props {
   src: ImageMetadata;
   alt: string;
   caption?: string;
+  /** Hover tooltip. Not a caption — it isn't visible on the page and never
+   *  reaches the lightbox. Carries over the text that Markdown image syntax
+   *  put after the filename. */
+  title?: string;
   /** Load immediately rather than lazily. For a hero at the top of a page;
    *  anything further down the page should stay lazy. */
   eager?: boolean;
 }
 
-const { src, alt, caption, eager = false } = Astro.props;
+const { src, alt, caption, title, eager = false } = Astro.props;
+
+// The height cap is expressed as a max-width derived from the image's own
+// proportions, so a tall photo narrows instead of being squashed to meet it.
+// Nothing is ever cropped or letterboxed to fit.
+const ratio = src.width / src.height;
 ---
 
-<figure class="photo-figure">
+<figure class="photo-figure" style={`--photo-ratio: ${ratio.toFixed(4)};`}>
   <Image
     src={src}
     alt={alt}
+    title={title}
     loading={eager ? 'eager' : 'lazy'}
     data-lightbox-group="page"
     width={FULL_WIDTH_IMAGE_WIDTHS.at(-1)}
@@ -40,15 +50,19 @@ const { src, alt, caption, eager = false } = Astro.props;
     text-align: center;
   }
 
-  /* The height cap is what keeps a tall portrait from filling the whole
-     screen. Width stays auto so nothing is ever squashed to meet it — the
-     image just gets narrower and stays centred. */
+  /* width:100% rather than auto, so every photo fills the media zone
+     regardless of how many pixels the source file happens to have — a small
+     original is upscaled to match its neighbours rather than sitting smaller.
+
+     The height cap arrives as a max-width instead of a max-height: at a given
+     height, an image's width is its ratio times that height, so capping width
+     at `ratio * cap` caps the height exactly, and does it by narrowing the
+     image rather than squashing it. Nothing is cropped or letterboxed. */
   .photo-figure img {
     display: block;
-    width: auto;
-    max-width: 100%;
+    width: 100%;
+    max-width: calc(var(--photo-ratio) * var(--content-image-max-height));
     height: auto;
-    max-height: var(--content-image-max-height);
     margin-inline: auto;
     border-radius: 10px;
     cursor: pointer;
