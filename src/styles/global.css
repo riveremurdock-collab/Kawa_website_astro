@@ -114,15 +114,15 @@
        itself independently (see Lightbox.astro). */
     --content-image-max-height: 80vh;
 
-    /* The text edge. Titles, body prose and the inline photo block all line
-       up on this width, centred in the content column; photography breaks
-       out past it to the full width above. One value moves all of them. */
-    --content-text-width: 900px;
+    /* The page has exactly two content widths, and this is the wider one:
+       photos and photo grids. Matches the content box's inner width
+       (--content-max-width minus its 80px side padding), so photography fills
+       the box and its margins are the box's own padding.
 
-    /* Reading measure for running prose, inside that text column. The content
-       column is 1400px wide so images have room, and text set across all of
-       it runs ~150 characters a line — roughly double what's comfortable. */
-    --content-measure: 70ch;
+       Text is derived from it rather than set independently, so it can never
+       come out wider than the media at any font size or viewport. */
+    --content-width: 1240px;
+    --measure: min(65ch, var(--content-width));
 }
 
 /* -----------------------------------------
@@ -395,22 +395,21 @@ html::-webkit-scrollbar-thumb:hover { background-color: var(--color-olive); }
 
 /* Layout spine for the article body.
    ------------------------------------------------------------------
-   Three tracks: a centred text column at --content-text-width, with a
-   flexible gutter either side. Everything lands in the middle track by
-   default, so the title, the prose and the inline photo block all share one
-   left and right edge. Photography opts out into `1 / -1` and spans the whole
-   content column, gutters included.
+   Three tracks: the reading measure in the middle, a flexible gutter either
+   side. Everything lands in the middle track by default; photos and grids opt
+   into `1 / -1` and take the wider media width instead. Two widths, one
+   centre axis, symmetric margins on both.
 
-   Done as a grid rather than a max-width on each element because the media
-   has to be *wider* than its container's text column — which a plain block
-   layout can only fake with negative margins. Here "break out" is one
-   declaration, and a block added later gets the text edge automatically by
-   simply not asking for anything. */
+   Kept as a grid rather than switching to max-widths on each element: the
+   container was already one, so this is a change of track values rather than
+   a change of approach, and "break out to the wider width" stays a single
+   declaration. A block added later gets the measure by not asking for
+   anything. */
 .article-body {
     display: grid;
     grid-template-columns:
         minmax(0, 1fr)
-        min(var(--content-text-width), 100%)
+        min(var(--measure), 100%)
         minmax(0, 1fr);
 }
 
@@ -418,7 +417,7 @@ html::-webkit-scrollbar-thumb:hover { background-color: var(--color-olive); }
     grid-column: 2;
 }
 
-/* Full-bleed: the photography, and the map. `.content-image-block` is the
+/* The media width: photos, grids, and the map. `.content-image-block` is the
    <p> Markdown wraps a lone image in — tagged as such by the rehype plugin,
    because it's a picture frame rather than prose and must not take the
    reading measure. */
@@ -429,14 +428,15 @@ html::-webkit-scrollbar-thumb:hover { background-color: var(--color-olive); }
 .article-body > figure,
 .article-body > p.content-image-block {
     grid-column: 1 / -1;
+    max-width: min(var(--content-width), 100%);
+    margin-inline: auto;
 }
 
-/* Centre the media in that full-bleed area. The image's own width is settled
-   by its proportions and the height cap, so it's usually narrower than the
-   area it sits in; flex on the wrapper centres it whatever it lands on,
-   without depending on auto margins resolving against a shrunk width. */
+/* Centre the image inside that area. Its own width is settled by its
+   proportions and the height cap, so it's often narrower than the width it's
+   allowed; flex centres it wherever it lands, without depending on auto
+   margins resolving against a height-shrunk width. */
 .article-body > p.content-image-block {
-    max-width: none;
     display: flex;
     justify-content: center;
 }
@@ -446,31 +446,10 @@ html::-webkit-scrollbar-thumb:hover { background-color: var(--color-olive); }
     justify-self: center;
 }
 
-/* Reading measure, inside the text column. These sit at the start of the
-   track, so prose keeps a comfortable line length while still beginning on
-   the same edge as the title above it.
-
-   The child combinator does the scoping: it only ever matches prose sitting
-   directly in the article body, never a <p> inside a block like PhotoInline
-   (which sizes its own text column) or a figcaption. */
-.article-body > p,
-.article-body > ul,
-.article-body > ol,
-.article-body > dl,
-.article-body > blockquote,
-.article-body > h1,
-.article-body > h2,
-.article-body > h3,
-.article-body > h4,
-.article-body > h5,
-.article-body > h6 {
-    max-width: var(--content-measure);
-}
-
-/* The title block sits outside .article-body, so it takes the same width
-   directly to land on the same edges as the text column. */
+/* The title block sits outside .article-body, so it takes the measure
+   directly to land on the same edges as the prose below it. */
 .article-header {
-    max-width: var(--content-text-width);
+    max-width: var(--measure);
     margin-inline: auto;
 }
 
