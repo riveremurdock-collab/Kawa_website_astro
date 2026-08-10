@@ -1,0 +1,368 @@
+{
+  "articles/about/kawa-display.jpg": {
+    "width": 3024,
+    "height": 3218,
+    "ratio": 0.94,
+    "shape": "square-ish"
+  },
+  "articles/piolet-bike-check/piolet-04.jpg": {
+    "width": 4284,
+    "height": 3808,
+    "ratio": 1.125,
+    "shape": "square-ish"
+  },
+  "articles/piolet-bike-check/piolet-06.jpg": {
+    "width": 4284,
+    "height": 4335,
+    "ratio": 0.988,
+    "shape": "square-ish"
+  },
+  "articles/piolet-bike-check/piolet-09.jpg": {
+    "width": 5712,
+    "height": 4284,
+    "ratio": 1.333,
+    "shape": "landscape"
+  },
+  "articles/piolet-bike-check/piolet-10.jpg": {
+    "width": 5712,
+    "height": 4284,
+    "ratio": 1.333,
+    "shape": "landscape"
+  },
+  "articles/piolet-bike-check/piolet-12.jpg": {
+    "width": 5712,
+    "height": 4284,
+    "ratio": 1.333,
+    "shape": "landscape"
+  },
+  "articles/piolet-bike-check/piolet-16.jpg": {
+    "width": 4284,
+    "height": 3842,
+    "ratio": 1.115,
+    "shape": "square-ish"
+  },
+  "articles/piolet-bike-check/piolet-17.jpg": {
+    "width": 5712,
+    "height": 4284,
+    "ratio": 1.333,
+    "shape": "landscape"
+  },
+  "articles/piolet-bike-check/piolet-21.jpg": {
+    "width": 5712,
+    "height": 4284,
+    "ratio": 1.333,
+    "shape": "landscape"
+  },
+  "articles/piolet-bike-check/piolet-22.jpg": {
+    "width": 4284,
+    "height": 5712,
+    "ratio": 0.75,
+    "shape": "portrait"
+  },
+  "articles/ragslod-attempt/ragslod-1.jpg": {
+    "width": 4032,
+    "height": 3024,
+    "ratio": 1.333,
+    "shape": "landscape"
+  },
+  "articles/ragslod-attempt/ragslod-2.jpg": {
+    "width": 4032,
+    "height": 3024,
+    "ratio": 1.333,
+    "shape": "landscape"
+  },
+  "articles/ragslod-attempt/ragslod-3.jpg": {
+    "width": 3024,
+    "height": 4032,
+    "ratio": 0.75,
+    "shape": "portrait"
+  },
+  "articles/ragslod-attempt/ragslod-4.jpg": {
+    "width": 4032,
+    "height": 3024,
+    "ratio": 1.333,
+    "shape": "landscape"
+  },
+  "articles/ragslod-attempt/ragslod-5.jpg": {
+    "width": 4032,
+    "height": 3024,
+    "ratio": 1.333,
+    "shape": "landscape"
+  },
+  "articles/ragslod-attempt/ragslod-7.jpg": {
+    "width": 2894,
+    "height": 3859,
+    "ratio": 0.75,
+    "shape": "portrait"
+  },
+  "articles/ragslod-attempt/ragslod-8.jpg": {
+    "width": 3015,
+    "height": 4020,
+    "ratio": 0.75,
+    "shape": "portrait"
+  },
+  "articles/ragslod-attempt/ragslod-9.jpg": {
+    "width": 3024,
+    "height": 4032,
+    "ratio": 0.75,
+    "shape": "portrait"
+  },
+  "portfolio/crs-brochure/01.jpg": {
+    "width": 1725,
+    "height": 1238,
+    "ratio": 1.393,
+    "shape": "landscape"
+  },
+  "portfolio/crs-brochure/02.jpg": {
+    "width": 3450,
+    "height": 1238,
+    "ratio": 2.787,
+    "shape": "panoramic"
+  },
+  "portfolio/crs-brochure/03.jpg": {
+    "width": 3450,
+    "height": 1238,
+    "ratio": 2.787,
+    "shape": "panoramic"
+  },
+  "portfolio/crs-brochure/04.jpg": {
+    "width": 3450,
+    "height": 1238,
+    "ratio": 2.787,
+    "shape": "panoramic"
+  },
+  "portfolio/crs-brochure/05.jpg": {
+    "width": 3450,
+    "height": 1238,
+    "ratio": 2.787,
+    "shape": "panoramic"
+  },
+  "portfolio/crs-brochure/06.jpg": {
+    "width": 3450,
+    "height": 1238,
+    "ratio": 2.787,
+    "shape": "panoramic"
+  },
+  "portfolio/crs-brochure/07.jpg": {
+    "width": 3450,
+    "height": 1238,
+    "ratio": 2.787,
+    "shape": "panoramic"
+  },
+  "portfolio/crs-brochure/08.jpg": {
+    "width": 3450,
+    "height": 1238,
+    "ratio": 2.787,
+    "shape": "panoramic"
+  },
+  "portfolio/crs-brochure/09.jpg": {
+    "width": 3450,
+    "height": 1238,
+    "ratio": 2.787,
+    "shape": "panoramic"
+  },
+  "portfolio/crs-brochure/10.jpg": {
+    "width": 3450,
+    "height": 1238,
+    "ratio": 2.787,
+    "shape": "panoramic"
+  },
+  "portfolio/crs-brochure/11.jpg": {
+    "width": 3450,
+    "height": 1238,
+    "ratio": 2.787,
+    "shape": "panoramic"
+  },
+  "portfolio/crs-brochure/12.jpg": {
+    "width": 3450,
+    "height": 1238,
+    "ratio": 2.787,
+    "shape": "panoramic"
+  },
+  "portfolio/crs-brochure/13.jpg": {
+    "width": 3450,
+    "height": 1238,
+    "ratio": 2.787,
+    "shape": "panoramic"
+  },
+  "portfolio/crs-brochure/14.jpg": {
+    "width": 3450,
+    "height": 1238,
+    "ratio": 2.787,
+    "shape": "panoramic"
+  },
+  "portfolio/crs-brochure/15.jpg": {
+    "width": 1725,
+    "height": 1238,
+    "ratio": 1.393,
+    "shape": "landscape"
+  },
+  "portfolio/custom-panniers/01.jpg": {
+    "width": 3024,
+    "height": 4032,
+    "ratio": 0.75,
+    "shape": "portrait"
+  },
+  "portfolio/custom-panniers/02.jpg": {
+    "width": 1440,
+    "height": 1440,
+    "ratio": 1,
+    "shape": "square-ish"
+  },
+  "portfolio/custom-panniers/03.jpg": {
+    "width": 1440,
+    "height": 1440,
+    "ratio": 1,
+    "shape": "square-ish"
+  },
+  "portfolio/custom-panniers/04.jpg": {
+    "width": 1440,
+    "height": 1910,
+    "ratio": 0.754,
+    "shape": "portrait"
+  },
+  "portfolio/kawa-logo-design/01.png": {
+    "width": 5627,
+    "height": 1740,
+    "ratio": 3.234,
+    "shape": "panoramic"
+  },
+  "portfolio/kawa-logo-design/02.png": {
+    "width": 5175,
+    "height": 5176,
+    "ratio": 1,
+    "shape": "square-ish"
+  },
+  "portfolio/kawa-logo-design/03.jpg": {
+    "width": 415,
+    "height": 1275,
+    "ratio": 0.325,
+    "shape": "portrait"
+  },
+  "portfolio/kawa-logo-design/04.jpg": {
+    "width": 1440,
+    "height": 1440,
+    "ratio": 1,
+    "shape": "square-ish"
+  },
+  "portfolio/kawa-x-hitch/01.jpg": {
+    "width": 828,
+    "height": 817,
+    "ratio": 1.013,
+    "shape": "square-ish"
+  },
+  "portfolio/kawa-x-hitch/02.jpg": {
+    "width": 3000,
+    "height": 3750,
+    "ratio": 0.8,
+    "shape": "portrait"
+  },
+  "portfolio/kawa-x-hitch/03.jpg": {
+    "width": 3000,
+    "height": 3750,
+    "ratio": 0.8,
+    "shape": "portrait"
+  },
+  "portfolio/kawa-x-hitch/04.jpg": {
+    "width": 3000,
+    "height": 3750,
+    "ratio": 0.8,
+    "shape": "portrait"
+  },
+  "portfolio/kawa-x-hitch/05.jpg": {
+    "width": 3000,
+    "height": 3750,
+    "ratio": 0.8,
+    "shape": "portrait"
+  },
+  "portfolio/kawa-x-hitch/06.jpg": {
+    "width": 3000,
+    "height": 3750,
+    "ratio": 0.8,
+    "shape": "portrait"
+  },
+  "portfolio/kawa-x-hitch/07.jpg": {
+    "width": 3000,
+    "height": 3750,
+    "ratio": 0.8,
+    "shape": "portrait"
+  },
+  "portfolio/kawa-x-hitch/08.jpg": {
+    "width": 3000,
+    "height": 3750,
+    "ratio": 0.8,
+    "shape": "portrait"
+  },
+  "portfolio/kawa-x-hitch/09.jpg": {
+    "width": 3000,
+    "height": 3750,
+    "ratio": 0.8,
+    "shape": "portrait"
+  },
+  "portfolio/kawa-x-hitch/10.jpg": {
+    "width": 3000,
+    "height": 3750,
+    "ratio": 0.8,
+    "shape": "portrait"
+  },
+  "portfolio/kawa-x-hitch/11.jpg": {
+    "width": 3000,
+    "height": 3750,
+    "ratio": 0.8,
+    "shape": "portrait"
+  },
+  "portfolio/kawa-x-hitch/12.jpg": {
+    "width": 3000,
+    "height": 3750,
+    "ratio": 0.8,
+    "shape": "portrait"
+  },
+  "portfolio/kawa-x-hitch/13.jpg": {
+    "width": 3000,
+    "height": 3750,
+    "ratio": 0.8,
+    "shape": "portrait"
+  },
+  "portfolio/kawa-x-hitch/14.jpg": {
+    "width": 3000,
+    "height": 3750,
+    "ratio": 0.8,
+    "shape": "portrait"
+  },
+  "portfolio/kawa-x-hitch/15.jpg": {
+    "width": 3000,
+    "height": 3750,
+    "ratio": 0.8,
+    "shape": "portrait"
+  },
+  "portfolio/kawa-x-hitch/16.jpg": {
+    "width": 3000,
+    "height": 3750,
+    "ratio": 0.8,
+    "shape": "portrait"
+  },
+  "portfolio/vest-pack/01.jpg": {
+    "width": 4972,
+    "height": 3217,
+    "ratio": 1.546,
+    "shape": "landscape"
+  },
+  "portfolio/vest-pack/02.jpg": {
+    "width": 3024,
+    "height": 4032,
+    "ratio": 0.75,
+    "shape": "portrait"
+  },
+  "portfolio/vest-pack/03.jpg": {
+    "width": 4032,
+    "height": 3024,
+    "ratio": 1.333,
+    "shape": "landscape"
+  },
+  "portfolio/vest-pack/04.jpg": {
+    "width": 4032,
+    "height": 3024,
+    "ratio": 1.333,
+    "shape": "landscape"
+  }
+}
