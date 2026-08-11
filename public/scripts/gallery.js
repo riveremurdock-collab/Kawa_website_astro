@@ -22,6 +22,10 @@ class ImageGallery {
         this.currentIndex = 0;
         this.isOpen = false;
         this.triggerElement = null;
+        // Incremented on every navigation. A load that finishes after the
+        // reader has moved on carries a stale token and is discarded, so
+        // slow images can never overwrite a newer selection.
+        this.renderToken = 0;
 
         this.bindEvents();
     }
@@ -105,7 +109,7 @@ class ImageGallery {
         this.nextBtn.style.display = multi ? '' : 'none';
         this.counterEl.style.display = multi ? '' : 'none';
 
-        this.render();
+        this.showImage();
 
         this.lightbox.classList.add('is-active');
         document.body.style.overflow = 'hidden';
@@ -133,32 +137,71 @@ class ImageGallery {
         }
     }
 
-    render() {
+    /**
+     * Show the current image.
+     *
+     * The <img> keeps painting the previous photo until its new src has
+     * downloaded, and the lightbox shows the full-size file — which the page
+     * never fetched, since the thumbnail only needed a smaller srcset
+     * candidate. Swapping src and un-hiding the element in the same breath
+     * therefore just fades the *old* photo back in, and it stays there until
+     * the new one happens to arrive.
+     *
+     * So: load it off-document first, and only reveal once it's ready. The
+     * caption and counter update immediately, since those are what tell the
+     * reader the click registered.
+     */
+    showImage() {
         const image = this.images[this.currentIndex];
-        this.imageEl.src = image.src;
-        this.imageEl.alt = image.alt || '';
+        if (!image) return;
+
+        const token = ++this.renderToken;
+
         this.captionEl.textContent = image.caption || '';
         this.counterEl.textContent = `${this.currentIndex + 1} / ${this.images.length}`;
+        this.imageEl.style.opacity = '0';
+
+        const reveal = () => {
+            if (token !== this.renderToken) return;
+            this.imageEl.src = image.src;
+            this.imageEl.alt = image.alt || '';
+            this.imageEl.style.opacity = '1';
+            this.preloadNeighbours();
+        };
+
+        const loader = new Image();
+        loader.onload = reveal;
+        loader.onerror = reveal; // a broken image should still advance
+        loader.src = image.src;
+        if (loader.complete) reveal(); // already cached
     }
 
-    renderWithFade() {
-        this.imageEl.style.opacity = '0';
-        setTimeout(() => {
-            this.render();
-            this.imageEl.style.opacity = '1';
-        }, 150);
+    /** Fetch the images either side, so stepping through feels immediate. */
+    preloadNeighbours() {
+        const total = this.images.length;
+        if (total <= 1) return;
+
+        const neighbours = [
+            (this.currentIndex + 1) % total,
+            (this.currentIndex - 1 + total) % total,
+        ];
+
+        for (const i of neighbours) {
+            const preload = new Image();
+            preload.src = this.images[i].src;
+        }
     }
 
     prev() {
         if (this.images.length <= 1) return;
         this.currentIndex = (this.currentIndex - 1 + this.images.length) % this.images.length;
-        this.renderWithFade();
+        this.showImage();
     }
 
     next() {
         if (this.images.length <= 1) return;
         this.currentIndex = (this.currentIndex + 1) % this.images.length;
-        this.renderWithFade();
+        this.showImage();
     }
 }
 
