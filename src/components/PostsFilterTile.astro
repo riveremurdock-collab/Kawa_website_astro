@@ -46,7 +46,12 @@ const { tags, posts } = Astro.props;
   .filter-tile {
     aspect-ratio: 1;
     border-radius: 16px;
-    background: var(--color-dark-grey);
+    /* Same treatment as the nav pill in Header.astro: --color-dark-grey at
+       45%, over a blurred backdrop. Both sit directly on the sandstone
+       background, so the tile reads as part of the same set of controls. */
+    background: rgba(63, 63, 63, 0.45);
+    backdrop-filter: blur(4px);
+    -webkit-backdrop-filter: blur(4px);
     padding: 20px;
     display: flex;
     flex-direction: column;

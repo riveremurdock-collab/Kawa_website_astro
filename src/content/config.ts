@@ -2,7 +2,7 @@ import { defineCollection, z } from 'astro:content';
 import { glob } from 'astro/loaders';
 
 const ARTICLE_TAGS = ['about', 'cool-bikes', 'trip-report', 'utah', 'biking'] as const;
-const PORTFOLIO_TAGS = ['Product Design', 'Graphic Design'] as const;
+const PORTFOLIO_TAGS = ['Product Design', 'Graphic Design', 'Photography'] as const;
 
 // Fields every content page shares. Tags are constrained per collection —
 // articles and portfolio use different, unrelated vocabularies, so each

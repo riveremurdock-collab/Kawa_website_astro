@@ -1,10 +1,4 @@
 ---
-// One photo on its own. With Gallery and plain body text, this is the whole
-// layout vocabulary — there is no block that puts text beside an image.
-//
-// Always a <figure>, so an optional caption has somewhere semantic to sit.
-// That's also where the lightbox reads its caption from: gallery.js walks up
-// from the image with closest('figure') and takes the <figcaption> text.
 import { Image } from 'astro:assets';
 import type { ImageMetadata } from 'astro';
 import { FULL_WIDTH_IMAGE_WIDTHS, FULL_WIDTH_IMAGE_SIZES } from '../../lib/content-image-sizes';
@@ -46,20 +40,10 @@ const ratio = src.width / src.height;
 
 <style>
   .photo-figure {
-    /* Half of --media-gap, so two stacked photos sit exactly one gap apart —
-       the same distance as the columns inside a gallery row. */
-    margin-block: calc(var(--media-gap) / 2);
+       margin-block: calc(var(--media-gap) / 2);
     text-align: center;
   }
 
-  /* width:100% rather than auto, so every photo fills the media zone
-     regardless of how many pixels the source file happens to have — a small
-     original is upscaled to match its neighbours rather than sitting smaller.
-
-     The height cap arrives as a max-width instead of a max-height: at a given
-     height, an image's width is its ratio times that height, so capping width
-     at `ratio * cap` caps the height exactly, and does it by narrowing the
-     image rather than squashing it. Nothing is cropped or letterboxed. */
   .photo-figure img {
     display: block;
     width: 100%;
