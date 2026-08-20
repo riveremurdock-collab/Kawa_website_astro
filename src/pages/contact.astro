@@ -6,23 +6,24 @@ import InnerPageLayout from '../layouts/InnerPageLayout.astro';
     <div class="page-content-box contact-box">
         <h1>Stay In Touch</h1>
 
-        <div class="contact-columns">
-            <section class="contact-section">
-                <h2>Social Media</h2>
-                <p>Follow Kawa Designs for updates, behind-the-scenes content, and adventure inspiration.</p>
-                <div class="social-links">
-                    <a href="https://www.instagram.com/kawa.designs" class="social-link" target="_blank" rel="noopener noreferrer">Instagram</a>
-                    <a href="https://www.youtube.com/channel/UC30b-MFWLis865vGaivkwrQ" class="social-link" target="_blank" rel="noopener noreferrer">YouTube</a>
-                    <a href="https://www.facebook.com/p/Kawa-Designs-61550865273634/" class="social-link" target="_blank" rel="noopener noreferrer">Facebook</a>
-                </div>
-            </section>
-
-            <section class="contact-section">
-                <h2>Get In Touch</h2>
+        <section class="contact-section contact-info-section">
+            <div class="contact-info-row">
                 <p><strong>Email:</strong> <a href="mailto:kawa.outdoor.designs@gmail.com" class="contact-email">kawa.outdoor.designs@gmail.com</a></p>
                 <p><strong>Location:</strong> Salt Lake City, Utah</p>
-            </section>
-        </div>
+            </div>
+        </section>
+
+        <hr class="contact-divider" />
+
+        <section class="contact-section">
+            <h2>Social Media</h2>
+            <p>Follow Kawa Designs for updates, behind-the-scenes content, and adventure inspiration.</p>
+            <div class="social-links">
+                <a href="https://www.instagram.com/kawa.designs" class="social-link" target="_blank" rel="noopener noreferrer">Instagram</a>
+                <a href="https://www.youtube.com/channel/UC30b-MFWLis865vGaivkwrQ" class="social-link" target="_blank" rel="noopener noreferrer">YouTube</a>
+                <a href="https://www.facebook.com/p/Kawa-Designs-61550865273634/" class="social-link" target="_blank" rel="noopener noreferrer">Facebook</a>
+            </div>
+        </section>
     </div>
 </InnerPageLayout>
 
@@ -31,22 +32,33 @@ import InnerPageLayout from '../layouts/InnerPageLayout.astro';
         gap: 20px;
     }
 
-    .contact-columns {
-        display: grid;
-        grid-template-columns: 1fr 1fr;
-        gap: 20px;
-        align-items: start;
-    }
-
     .contact-section {
-        background: #d6e8bd;
         border-radius: 16px;
         padding: 24px;
     }
 
+    .contact-divider {
+        width: 100%;
+        border: none;
+        border-top: 1px solid #d6e8bd;
+        margin: 4px 0;
+    }
+
+    .contact-info-row {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        gap: 8px 32px;
+    }
+
+    .contact-info-row p {
+        margin: 0;
+    }
+
     .social-links {
         display: flex;
-        flex-direction: column;
+        flex-direction: row;
+        flex-wrap: wrap;
         gap: 10px;
         margin-top: 16px;
     }
@@ -61,6 +73,7 @@ import InnerPageLayout from '../layouts/InnerPageLayout.astro';
         text-align: center;
         transition: background 0.2s ease;
         text-decoration: none;
+        flex: 1 1 0;
     }
 
     .social-link:hover {
@@ -78,8 +91,18 @@ import InnerPageLayout from '../layouts/InnerPageLayout.astro';
     }
 
     @media (max-width: 600px) {
-        .contact-columns {
-            grid-template-columns: 1fr;
+        .contact-info-row {
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 8px;
+        }
+
+        .social-links {
+            flex-direction: column;
+        }
+
+        .social-link {
+            flex: none;
         }
     }
 </style>
