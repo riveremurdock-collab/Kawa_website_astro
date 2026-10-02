@@ -2,7 +2,7 @@
 import InnerPageLayout from '../layouts/InnerPageLayout.astro';
 ---
 
-<InnerPageLayout title="Photo Inker | Kawa Designs" description="Turn any photo into a risograph-style print, or into print-ready riso layers, with the Kawa Designs Photo Inker">
+<InnerPageLayout app customCursor={false} title="Photo Inker | Kawa Designs" description="Turn any photo into a risograph-style print, or into print-ready riso layers, with the Kawa Designs Photo Inker">
     <div class="page-content-box inker-box">
         <h1 class="visually-hidden">Photo Inker</h1>
         <div class="inker-wrapper">
@@ -17,9 +17,8 @@ import InnerPageLayout from '../layouts/InnerPageLayout.astro';
 </InnerPageLayout>
 
 <style>
-    /* The tool is the whole page: no padding, so it fills the box edge to edge. */
+    /* The tool fills the window below the nav bar (the layout's app mode). */
     .inker-box {
-        padding: 0;
         overflow: hidden;
     }
 
@@ -52,18 +51,5 @@ import InnerPageLayout from '../layouts/InnerPageLayout.astro';
         min-height: 0;
         display: block;
         border: none;
-    }
-
-    /* The tool needs more room than a phone's leftover height gives it, so
-       on small screens the box scrolls and the tool keeps a usable height. */
-    @media (max-width: 768px) {
-        .inker-box {
-            overflow-y: auto;
-        }
-
-        .inker-wrapper {
-            flex: none;
-            height: 760px;
-        }
     }
 </style>

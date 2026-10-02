@@ -13,12 +13,21 @@ interface Props {
     title?: string;
     description?: string;
     fullScroll?: boolean;
+    /** Full-window app (Photo Inker): the nav as a slim bar on top, the page filling the rest edge to edge. */
+    app?: boolean;
+    /**
+     * The animated site cursor. Off for pages built around an iframe: the cursor
+     * can't follow the mouse inside it, so those pages keep the normal cursor.
+     */
+    customCursor?: boolean;
 }
 
 const {
     title = "Kawa Designs",
     description = "Kawa Designs — outdoor adventure blog and design",
     fullScroll = false,
+    app = false,
+    customCursor = true,
 } = Astro.props;
 ---
 
@@ -39,11 +48,11 @@ const {
     </style>
 </head>
 <body class="inner-body">
-    <div class:list={['inner-shell', { 'inner-shell--scroll': fullScroll }]}>
+    <div class:list={['inner-shell', { 'inner-shell--scroll': fullScroll, 'inner-shell--app': app }]}>
         <Header />
         <slot />
     </div>
-    <Cursor />
+    {customCursor && <Cursor />}
 </body>
 </html>
 
@@ -96,6 +105,30 @@ const {
         padding-bottom: 40px;
     }
 
+    /* Full-window app pages: a slim nav bar across the top, then the app
+       filling the rest of the window, edge to edge. */
+    .inner-shell--app {
+        height: 100vh;
+        height: 100dvh;
+        padding: 0;
+        gap: 0;
+    }
+
+    .inner-shell--app .inner-topbar {
+        max-width: none;
+        padding: 8px 20px;
+        box-sizing: border-box;
+    }
+
+    .inner-shell--app .inner-logo {
+        height: 40px;
+    }
+
+    .inner-shell--app .page-content-box {
+        border-radius: 0;
+        padding: 0;
+    }
+
     /* Shared content box used by all inner pages */
     .page-content-box {
         background: #edf2e9;
@@ -146,9 +179,28 @@ const {
         }
     }
 
+    @media (max-width: 768px) {
+        .inner-shell--app {
+            padding: 0;
+            gap: 0;
+        }
+
+        .inner-shell--app .inner-topbar {
+            padding: 6px 12px;
+        }
+
+        .inner-shell--app .inner-logo {
+            height: 36px;
+        }
+    }
+
     @media (max-width: 480px) {
         .inner-shell {
             padding: 12px;
+        }
+
+        .inner-shell.inner-shell--app {
+            padding: 0;
         }
 
         .page-content-box {
