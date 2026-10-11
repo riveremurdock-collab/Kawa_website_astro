@@ -1,7 +1,8 @@
 /**
  * Generate Route Data
- * Scans each article's MDX body for a <RouteMap gpxFile="..."> block —
- * the same block the article renders in-page — and extracts starting
+ * Scans each article's MDX body for a <RouteMap gpxFile="..."> block, or a
+ * photo book's <BookRoute gpxFile="..."> — the same block the article
+ * renders in-page — and extracts starting
  * coordinates from the referenced GPX file to build the overview map's
  * route data. The GPX block is the single source of truth: nothing here
  * reads frontmatter for route info.
@@ -43,11 +44,12 @@ function parseFrontmatter(content) {
 }
 
 /**
- * Find a <RouteMap gpxFile="..."> block anywhere in the MDX body and
- * return its gpxFile prop value, or null if there's no such block.
+ * Find a <RouteMap gpxFile="..."> or <BookRoute gpxFile="..."> block
+ * anywhere in the MDX body and return its gpxFile prop value, or null if
+ * there's no such block.
  */
 function extractRouteMapGpxFile(content) {
-    const match = content.match(/<RouteMap\b[^>]*\bgpxFile=["']([^"']+)["']/);
+    const match = content.match(/<(?:RouteMap|BookRoute)\b[^>]*\bgpxFile=["']([^"']+)["']/);
     return match ? match[1] : null;
 }
 
@@ -91,10 +93,14 @@ async function main() {
             continue;
         }
 
+        // Drafts stay off the overview map (like the blog list), so an unfinished article
+        // isn't linked from there.
+        if (frontmatter.draft === 'true') continue;
+
         const gpxRelativeFile = extractRouteMapGpxFile(content);
         if (!gpxRelativeFile) {
-            if (content.includes('<RouteMap')) {
-                skipped.push(`${slug}: found a <RouteMap> tag but couldn't read its gpxFile prop — check it's written as gpxFile="/gpx/your-file.gpx" with straight quotes`);
+            if (content.includes('<RouteMap') || content.includes('<BookRoute')) {
+                skipped.push(`${slug}: found a <RouteMap> or <BookRoute> tag but couldn't read its gpxFile prop — check it's written as gpxFile="/gpx/your-file.gpx" with straight quotes`);
             }
             continue;
         }

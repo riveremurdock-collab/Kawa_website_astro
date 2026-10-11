@@ -32,6 +32,13 @@ Copy `TEMPLATE.mdx` in this folder as a starting point for a new post.
 
 ---
 
+## Two kinds of post
+
+- **Standard** — a scrolling article of text, photos and blocks. This is the default; start from `TEMPLATE.mdx`.
+- **Photo book** — full-screen photo pages you slide between, for showing off a trip's photos. Add `format: photobook` to the frontmatter and build the post from `BookPage` blocks. Start from `TEMPLATE-photobook.mdx`, and see the "Photo book blocks" section of [`BLOCKS.md`](../BLOCKS.md). Both kinds appear together in the blog grid, search, tag filters and prev/next links.
+
+---
+
 ## Which image formats are accepted
 
 - **JPEG / JPG** — best for photographs

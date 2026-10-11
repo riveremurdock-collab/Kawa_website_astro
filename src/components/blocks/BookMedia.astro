@@ -1,0 +1,62 @@
+---
+// A small photo (or short video clip) on a photo book page. Click to bring
+// it up large in the middle of the page; click again to put it back.
+//
+// area  — top-left, top-center, top-right, bottom-center or bottom-right.
+//         (bottom-left belongs to the page text.)
+// src   — a photo filename in the post folder, e.g. "./IMG_3438.jpg".
+// video — instead of src: a short, compressed .mp4/.webm in the post folder.
+//         It plays muted, on a loop.
+// size  — "large" (the whole photo, as big as fits in its cell — the
+//         default), "medium" or "small"; or "xl", which fills the cell
+//         completely and crops whatever doesn't fit.
+import { Image } from 'astro:assets';
+import type { ImageMetadata } from 'astro';
+import { resolveImage, resolveVideo } from '../../lib/photobook-media';
+
+type Area = 'top-left' | 'top-center' | 'top-right' | 'bottom-center' | 'bottom-right';
+
+interface Props {
+  area: Area;
+  src?: string | ImageMetadata;
+  video?: string;
+  alt?: string;
+  size?: 'xl' | 'large' | 'medium' | 'small';
+}
+
+const { area, src, video, alt = '', size = 'large' } = Astro.props;
+
+const AREAS: Area[] = ['top-left', 'top-center', 'top-right', 'bottom-center', 'bottom-right'];
+if (!AREAS.includes(area)) {
+  throw new Error(`BookMedia: area="${area}" isn't a cell it can use. Pick one of: ${AREAS.join(', ')}.`);
+}
+if (!src && !video) {
+  throw new Error(`BookMedia in "${area}": give it a src="./photo.jpg" or a video="./clip.mp4".`);
+}
+
+const image = src ? (await resolveImage(src, Astro.url)).image : null;
+const videoUrl = video ? await resolveVideo(video, Astro.url) : null;
+---
+
+<figure
+  class="pb-media"
+  data-pb-media=""
+  data-area={area}
+  data-size={size}
+  tabindex="0"
+  role="button"
+  aria-label={alt ? `Enlarge: ${alt}` : 'Enlarge'}
+>
+  {image ? (
+    <Image
+      src={image}
+      alt={alt}
+      widths={[400, 700, 1000, 1400, 2000, 2800]}
+      sizes="(max-width: 768px) 70vw, 34vw"
+      loading="lazy"
+      draggable="false"
+    />
+  ) : (
+    <video src={videoUrl} muted autoplay loop playsinline preload="metadata" aria-label={alt} />
+  )}
+</figure>

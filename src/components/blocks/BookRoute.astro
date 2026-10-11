@@ -1,0 +1,52 @@
+---
+// The route title page feature: title and stats in the top-left cell, and
+// the GPX drawn as a white line down the centre column. The line draws
+// itself (after a 1 s pause, over 3 s) the first time the page is shown.
+//
+// gpxFile — path to the GPX in public/, e.g. "/gpx/ha-giang-loop.gpx".
+//           The same file is picked up for the Map Overview page.
+// miles / feet — optional: type in the distance and total climbing yourself
+//           (e.g. from a bike computer) instead of using the figures
+//           calculated from the GPX. km and metres are worked out from them.
+import { readGpx, routeStats, routeSvg } from '../../lib/gpx';
+
+interface Props {
+  gpxFile: string;
+  title: string;
+  miles?: number;
+  feet?: number;
+}
+
+const { gpxFile, title, miles, feet } = Astro.props;
+
+const points = readGpx(gpxFile);
+const stats = routeStats(points);
+const { d, viewBox } = routeSvg(points);
+
+const km = miles !== undefined ? miles * 1.609344 : stats.distance / 1000;
+const mi = miles ?? stats.distance / 1609.344;
+const ft = feet ?? stats.climbing * 3.28084;
+const m = feet !== undefined ? feet / 3.28084 : stats.climbing;
+
+const fmt = (n: number) => Math.round(n).toLocaleString('en-US');
+---
+
+<div class="pb-route-info" data-area="top-left">
+  <h2 class="pb-route-title">{title}</h2>
+  <dl class="pb-route-stats">
+    <div>
+      <dt>Distance</dt>
+      <dd>{fmt(mi)} mi <span>{fmt(km)} km</span></dd>
+    </div>
+    <div>
+      <dt>Climbing</dt>
+      <dd>{fmt(ft)} ft <span>{fmt(m)} m</span></dd>
+    </div>
+  </dl>
+</div>
+
+<div class="pb-route-line" data-area="center" data-pb-route>
+  <svg viewBox={viewBox} preserveAspectRatio="xMidYMid meet" role="img" aria-label={`Route map: ${title}`}>
+    <path d={d} pathLength="1" />
+  </svg>
+</div>

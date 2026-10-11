@@ -1,13 +1,16 @@
 ---
 import { Image } from 'astro:assets';
 import logo from '../assets/logos/kawa lichen landing page logo.png';
+import squareLogo from '../assets/logos/kawa square white.png';
 import bullet from '../assets/icons/lichen bullet point.png';
 import arrow from '../assets/icons/lichen arrow 2.png';
 
 interface Props {
   variant?: 'landing' | 'inner';
+  /** Small white square logo — photo book pages, where the header sits over photos. */
+  squareLogo?: boolean;
 }
-const { variant = 'inner' } = Astro.props;
+const { variant = 'inner', squareLogo: useSquareLogo = false } = Astro.props;
 const pathname = Astro.url.pathname;
 
 // Inner-page sitewide nav — edit these three arrays to change nav content/order.
@@ -70,7 +73,9 @@ function isCurrent(href: string): boolean {
 ) : (
   <header class="inner-topbar">
     <a href="/" class="inner-logo-link">
-      <Image src={logo} alt="KAWA" class="inner-logo" />
+      {useSquareLogo
+        ? <Image src={squareLogo} alt="KAWA" class="inner-logo inner-logo--square" width={160} />
+        : <Image src={logo} alt="KAWA" class="inner-logo" />}
     </a>
 
     <!-- Desktop nav pill -->
@@ -186,6 +191,13 @@ function isCurrent(href: string): boolean {
 
   .inner-logo-link:hover .inner-logo {
     transform: scale(1.06);
+  }
+
+  /* Square white logo over photos: a soft shadow keeps it visible on sky and fog. */
+  .inner-logo--square {
+    /* The file is trimmed to the logo's edges, so this is the visible size. */
+    height: 52px;
+    filter: drop-shadow(0 1px 6px rgba(0, 0, 0, 0.45));
   }
 
   /* ---- Desktop nav pill ---- */

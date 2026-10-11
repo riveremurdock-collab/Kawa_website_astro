@@ -1,0 +1,15 @@
+---
+// The text on a photo book page — always in the bottom-left cell.
+// Optional heading, then ordinary paragraphs. Clicking it blurs and darkens
+// the photo behind so it's easier to read.
+interface Props {
+  heading?: string;
+}
+
+const { heading } = Astro.props;
+---
+
+<div class="pb-text" data-area="bottom-left" tabindex="0">
+  {heading && <h2 class="pb-text-heading">{heading}</h2>}
+  <div class="pb-text-body"><slot /></div>
+</div>

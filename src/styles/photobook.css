@@ -1,0 +1,738 @@
+/* =========================================
+   Photo book layout (format: photobook posts)
+   Structure: .photobook > .pb-viewport > .pb-track > .pb-page × n
+   Each page: .pb-backdrop (glass + photo/video sections) + .pb-grid.
+   The book fills the whole window; the site header floats over the top.
+   ========================================= */
+
+.photobook {
+    /* Tuning knobs */
+    --pb-pad: 28px;            /* space around the grid */
+    --pb-gap: 16px;            /* space between grid cells */
+    --pb-nav-h: 60px;          /* bottom bar height */
+    --pb-top: 108px;           /* clears the floating header (28 + 60 logo + 20) */
+    --pb-slide: 0.7s cubic-bezier(0.65, 0, 0.35, 1);
+    --pb-fade: 0.4s ease;
+    --pb-shadow-dark: 0 1px 10px rgba(0, 0, 0, 0.55);
+    --pb-shadow-light: 0 1px 10px rgba(255, 255, 255, 0.45);
+
+    position: relative;
+    flex: 1;
+    min-height: 0;
+    color: #fff;
+    user-select: none;
+}
+
+.pb-visually-hidden {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
+}
+
+/* ---- Track & pages ---- */
+
+.pb-viewport {
+    position: absolute;
+    inset: 0;
+    overflow: hidden;
+}
+
+.pb-track {
+    display: flex;
+    height: 100%;
+    transition: transform var(--pb-slide);
+    touch-action: pan-y;
+}
+
+.pb-track.is-dragging {
+    transition: none;
+}
+
+/* Anything in the post body that isn't a BookPage is ignored. */
+.pb-track > :not(.pb-page) {
+    display: none;
+}
+
+.pb-page {
+    position: relative;
+    flex: 0 0 100%;
+    height: 100%;
+    overflow: hidden;
+    isolation: isolate;
+}
+
+.pb-page[data-tone="light"] {
+    color: var(--color-black-grey);
+}
+
+/* ---- Backgrounds ----
+   .pb-backdrop holds the blurred glass and up to three .pb-bg sections,
+   each placed over one or more columns by data-span. Column edges sit in
+   the middle of the grid gaps, so sections line up with the content above. */
+
+.pb-backdrop {
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    overflow: hidden;
+    /* Width of an outer column, edge of the page to the middle of the gap. */
+    --pb-col: calc(var(--pb-pad) + (100% - 2 * var(--pb-pad) - 2 * var(--pb-gap)) / 3 + var(--pb-gap) / 2);
+}
+
+.pb-bg {
+    position: absolute;
+    top: 0;
+    height: 100%;
+    left: 0;
+    width: 100%;
+    overflow: hidden;
+    transition:
+        left 0.6s cubic-bezier(0.65, 0, 0.35, 1),
+        width 0.6s cubic-bezier(0.65, 0, 0.35, 1),
+        top 0.6s cubic-bezier(0.65, 0, 0.35, 1),
+        height 0.6s cubic-bezier(0.65, 0, 0.35, 1),
+        opacity var(--pb-fade);
+}
+
+.pb-bg[data-span="left"]         { left: 0;             width: var(--pb-col); }
+.pb-bg[data-span="center"]       { left: var(--pb-col); width: calc(100% - 2 * var(--pb-col)); }
+.pb-bg[data-span="right"]        { left: calc(100% - var(--pb-col)); width: var(--pb-col); }
+.pb-bg[data-span="left-center"]  { left: 0;             width: calc(100% - var(--pb-col)); }
+.pb-bg[data-span="center-right"] { left: var(--pb-col); width: calc(100% - var(--pb-col)); }
+
+.pb-bg img,
+.pb-bg video {
+    width: 100%;
+    height: 100%;
+    max-width: none;
+    object-fit: cover;
+    display: block;
+    transition: filter 0.5s ease, transform 0.5s ease;
+}
+
+/* A clicked section grows to fill the page; the others fade away. */
+.pb-bg.is-expanded,
+.pb-bg.is-shrinking {
+    z-index: 1;
+}
+
+.pb-bg.is-expanded {
+    left: 0;
+    width: 100%;
+    top: 0;
+    height: 100%;
+}
+
+.pb-page.is-bare .pb-bg:not(.is-expanded) {
+    opacity: 0;
+}
+
+/* Same glass as the nav pill, over the site background. */
+.pb-blur {
+    position: absolute;
+    inset: 0;
+    background: rgba(63, 63, 63, 0.45);
+    backdrop-filter: blur(14px);
+    -webkit-backdrop-filter: blur(14px);
+    transition: background 0.5s ease;
+}
+
+/* Reading mode (text clicked): soften the photos, force white text. */
+.pb-page.is-reading .pb-bg img,
+.pb-page.is-reading .pb-bg video {
+    filter: blur(10px) brightness(0.45);
+    transform: scale(1.05);
+}
+
+.pb-page.is-reading .pb-blur {
+    background: rgba(28, 28, 28, 0.7);
+}
+
+.pb-page.is-reading {
+    color: #fff;
+}
+
+/* Zoomed photo: darken what is behind so it stands out. */
+.pb-page.is-zoomed .pb-bg img,
+.pb-page.is-zoomed .pb-bg video {
+    filter: brightness(0.35);
+}
+
+.pb-page.is-zoomed .pb-blur {
+    background: rgba(20, 20, 20, 0.75);
+}
+
+/* ---- Grid ---- */
+
+.pb-grid {
+    position: absolute;
+    inset: 0;
+    padding: var(--pb-top) var(--pb-pad) var(--pb-nav-h);
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    grid-template-rows: repeat(2, minmax(0, 1fr));
+    grid-template-areas:
+        "top-left    top-center    top-right"
+        "bottom-left bottom-center bottom-right";
+    gap: var(--pb-gap);
+    transition: opacity var(--pb-fade);
+    /* Empty cells let clicks through to the photo underneath. */
+    pointer-events: none;
+}
+
+.pb-grid > *,
+.pb-strip > * {
+    pointer-events: auto;
+}
+
+/* Desktop: the media strip is invisible, its items sit straight in the grid. */
+.pb-strip {
+    display: contents;
+}
+
+.pb-grid [data-area="top-left"]      { grid-area: top-left; }
+.pb-grid [data-area="top-center"]    { grid-area: top-center; }
+.pb-grid [data-area="top-right"]     { grid-area: top-right; }
+.pb-grid [data-area="bottom-left"]   { grid-area: bottom-left; }
+.pb-grid [data-area="bottom-center"] { grid-area: bottom-center; }
+.pb-grid [data-area="bottom-right"]  { grid-area: bottom-right; }
+.pb-grid [data-area="center"]        { grid-column: 2; grid-row: 1 / span 2; }
+
+.pb-page.is-zoomed .pb-grid,
+.pb-page.is-bare .pb-grid {
+    opacity: 0;
+}
+
+.pb-page.is-zoomed .pb-grid *,
+.pb-page.is-bare .pb-grid * {
+    pointer-events: none;
+}
+
+/* ---- Media ---- */
+
+.pb-media {
+    margin: 0;
+    min-width: 0;
+    min-height: 0;
+    display: flex;
+    /* Hug the page edges so the middle of the photo stays clear. */
+    align-items: flex-start;
+    justify-content: center;
+    cursor: zoom-in;
+    outline: none;
+}
+
+.pb-media[data-area^="bottom"]  { align-items: flex-end; }
+.pb-media[data-area$="left"]    { justify-content: flex-start; }
+.pb-media[data-area$="right"]   { justify-content: flex-end; }
+
+.pb-media img,
+.pb-media video {
+    display: block;
+    width: auto;
+    height: auto;
+    max-width: 100%;
+    max-height: 100%;
+    min-width: 0;
+    min-height: 0;
+    object-fit: contain;
+    border-radius: 6px;
+    box-shadow: 0 6px 28px rgba(0, 0, 0, 0.28);
+    transition: transform 0.25s ease;
+}
+
+.pb-media[data-size="medium"] img,
+.pb-media[data-size="medium"] video { max-width: 75%; max-height: 75%; }
+
+.pb-media[data-size="small"] img,
+.pb-media[data-size="small"] video { max-width: 50%; max-height: 50%; }
+
+/* XL: fills the whole cell, cropping whatever doesn't fit. */
+.pb-media[data-size="xl"] img,
+.pb-media[data-size="xl"] video {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.pb-media:hover img,
+.pb-media:hover video {
+    transform: scale(1.02);
+}
+
+.pb-media:focus-visible img,
+.pb-media:focus-visible video {
+    outline: 2px solid currentColor;
+    outline-offset: 4px;
+}
+
+/* ---- Text ---- */
+
+.pb-text {
+    align-self: end;
+    max-width: 32em;
+    max-height: 100%;
+    overflow-y: auto;
+    scrollbar-width: none;
+    font-family: var(--font-main);
+    font-size: clamp(0.95rem, 0.6rem + 0.5vw, 1.12rem);
+    line-height: 1.6;
+    text-shadow: var(--pb-shadow-dark);
+    cursor: pointer;
+    outline: none;
+    transition: color 0.5s ease;
+}
+
+.pb-page[data-tone="light"]:not(.is-reading) .pb-text,
+.pb-page[data-tone="light"]:not(.is-reading) .pb-route-info {
+    text-shadow: var(--pb-shadow-light);
+}
+
+/* More text below than fits: fade the bottom edge as a cue to scroll.
+   Added and removed by the script as the text is scrolled. */
+.pb-text.has-more {
+    -webkit-mask-image: linear-gradient(to bottom, #000 calc(100% - 3em), transparent);
+    mask-image: linear-gradient(to bottom, #000 calc(100% - 3em), transparent);
+}
+
+.pb-text-heading {
+    font-family: var(--font-display);
+    font-weight: 700;
+    font-size: clamp(1.4rem, 0.8rem + 1.4vw, 2.3rem);
+    line-height: 1.15;
+    letter-spacing: 1px;
+    margin: 0 0 0.45em;
+    color: inherit;
+}
+
+.pb-text p {
+    margin: 0 0 0.75em;
+    color: inherit;
+}
+
+.pb-text p:last-child {
+    margin-bottom: 0;
+}
+
+/* ---- Route ---- */
+
+.pb-route-info {
+    align-self: start;
+    text-shadow: var(--pb-shadow-dark);
+}
+
+.pb-route-title {
+    font-family: var(--font-display);
+    font-weight: 700;
+    font-size: clamp(2rem, 1rem + 2.6vw, 3.6rem);
+    line-height: 1.05;
+    letter-spacing: 1px;
+    margin: 0 0 0.5em;
+    color: inherit;
+}
+
+.pb-route-stats {
+    display: grid;
+    gap: 0.6em;
+    font-family: var(--font-main);
+}
+
+.pb-route-stats dt {
+    font-family: var(--font-display);
+    font-size: 0.8rem;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    opacity: 0.85;
+}
+
+.pb-route-stats dd {
+    font-size: clamp(1.1rem, 0.8rem + 0.6vw, 1.5rem);
+    font-weight: 500;
+}
+
+.pb-route-stats dd span {
+    opacity: 0.75;
+    margin-left: 0.4em;
+}
+
+.pb-route-line {
+    min-height: 0;
+    display: flex;
+}
+
+.pb-route-line svg {
+    width: 100%;
+    height: 100%;
+    overflow: visible;
+}
+
+.pb-route-line path {
+    fill: none;
+    stroke: #fff;
+    stroke-width: 5;
+    stroke-linejoin: round;
+    stroke-linecap: round;
+    stroke-dasharray: 1;
+    stroke-dashoffset: 1;
+    filter: drop-shadow(0 1px 3px rgba(0, 0, 0, 0.5));
+}
+
+/* Added by the script the first time the page is shown: 1 s pause, 3 s draw. */
+.pb-route-line.is-drawn path {
+    stroke-dashoffset: 0;
+    transition: stroke-dashoffset 3s ease-in-out 1s;
+}
+
+/* ---- Zoomed media ---- */
+
+.pb-zoom-layer {
+    position: absolute;
+    inset: 0;
+    z-index: 5;
+    pointer-events: none;
+}
+
+.pb-zoom-layer.is-active {
+    pointer-events: auto;
+    cursor: zoom-out;
+}
+
+.pb-zoom-layer img,
+.pb-zoom-layer video {
+    position: absolute;
+    display: block;
+    max-width: none;
+    max-height: none;
+    /* Cover, so an XL photo's crop opens out smoothly as it grows. At full
+       size the box matches the photo's shape, so nothing is cut off. */
+    object-fit: cover;
+    border-radius: 6px;
+    box-shadow: 0 12px 48px rgba(0, 0, 0, 0.4);
+}
+
+/* ---- Bottom bar ---- */
+
+.pb-nav {
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    height: var(--pb-nav-h);
+    padding: 0 var(--pb-pad);
+    display: grid;
+    grid-template-columns: 1fr auto 1fr;
+    align-items: center;
+    z-index: 6;
+    transition: opacity var(--pb-fade), color 0.5s ease;
+}
+
+.photobook[data-tone="light"] .pb-nav {
+    color: var(--color-black-grey);
+}
+
+.pb-nav-btn {
+    appearance: none;
+    background: none;
+    border: none;
+    padding: 8px 0;
+    color: inherit;
+    font-family: var(--font-display);
+    font-weight: 700;
+    font-size: 0.95rem;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    text-shadow: var(--pb-shadow-dark);
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    cursor: pointer;
+    justify-self: start;
+    transition: opacity 0.15s ease;
+}
+
+.photobook[data-tone="light"] .pb-nav .pb-nav-btn,
+.photobook[data-tone="light"] .pb-count {
+    text-shadow: var(--pb-shadow-light);
+}
+
+.pb-nav-btn:hover {
+    opacity: 0.7;
+}
+
+.pb-nav-btn:disabled {
+    visibility: hidden;
+}
+
+.pb-nav-btn svg {
+    width: 18px;
+    height: 18px;
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 2.5;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+    filter: drop-shadow(0 1px 3px rgba(0, 0, 0, 0.4));
+}
+
+.pb-nav-next {
+    justify-self: end;
+}
+
+.pb-count {
+    font-family: var(--font-display);
+    font-weight: 700;
+    letter-spacing: 2px;
+    text-shadow: var(--pb-shadow-dark);
+    font-variant-numeric: tabular-nums;
+}
+
+.photobook.is-zoomed .pb-nav,
+.photobook.is-bare .pb-nav {
+    opacity: 0;
+    pointer-events: none;
+}
+
+/* Small "Back" shown in place of the bar while looking at the bare photo. */
+.pb-restore {
+    position: absolute;
+    left: var(--pb-pad);
+    bottom: calc((var(--pb-nav-h) - 36px) / 2);
+    z-index: 6;
+    font-size: 0.8rem;
+    color: #fff;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity var(--pb-fade);
+}
+
+.photobook.is-bare .pb-restore {
+    opacity: 1;
+    pointer-events: auto;
+}
+
+/* ---- Last page ---- */
+
+.pb-end-inner {
+    position: absolute;
+    /* Stops above the bottom bar, so scrolled comments never slide under it. */
+    inset: 0 0 var(--pb-nav-h);
+    padding: var(--pb-top) var(--pb-pad) var(--pb-gap);
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 2fr);
+    gap: 48px;
+    user-select: text;
+}
+
+.pb-end-links {
+    align-self: center;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 18px;
+    text-shadow: var(--pb-shadow-dark);
+}
+
+.pb-end-link {
+    appearance: none;
+    background: none;
+    border: none;
+    padding: 0;
+    cursor: pointer;
+    color: #fff;
+    font-family: var(--font-display);
+    font-weight: 700;
+    font-size: 1.1rem;
+    letter-spacing: 1px;
+    text-align: left;
+    display: inline-flex;
+    flex-direction: column;
+    gap: 2px;
+    transition: opacity 0.15s ease;
+}
+
+button.pb-end-link {
+    flex-direction: row;
+    align-items: center;
+    gap: 6px;
+}
+
+.pb-end-link:hover {
+    color: #fff;
+    opacity: 0.7;
+}
+
+.pb-end-link svg {
+    width: 18px;
+    height: 18px;
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 2.5;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+}
+
+.pb-end-label {
+    font-family: var(--font-main);
+    font-weight: 400;
+    font-size: 0.75rem;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    opacity: 0.8;
+}
+
+.pb-end-comments {
+    min-height: 0;
+    overflow-y: auto;
+    padding-right: 8px;
+}
+
+.pb-end-comments .pb-text-heading {
+    text-shadow: var(--pb-shadow-dark);
+}
+
+/* ---- Phones & narrow portrait screens ----
+   The desktop grid flipped along its diagonal: 2 columns × 3 rows, each
+   desktop column becoming a row. Text lands top-right.
+
+     top-left    | TEXT            ← desktop left column
+     top-center  | bottom-center   ← desktop center column
+     top-right   | bottom-right    ← desktop right column
+*/
+
+@media (max-width: 768px), (orientation: portrait) and (max-width: 1024px) {
+    .photobook {
+        --pb-pad: 16px;
+        --pb-gap: 12px;
+        --pb-nav-h: 52px;
+        --pb-top: 80px;
+    }
+
+    .pb-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        grid-template-rows: repeat(3, minmax(0, 1fr));
+        grid-template-areas:
+            "top-left    bottom-left"
+            "top-center  bottom-center"
+            "top-right   bottom-right";
+    }
+
+    /* Route line: the whole middle row. */
+    .pb-grid [data-area="center"] {
+        grid-column: 1 / span 2;
+        grid-row: 2;
+    }
+
+    /* Nothing top-left? The text takes the whole top row. */
+    .pb-grid:not(:has([data-area="top-left"])) .pb-text {
+        grid-column: 1 / span 2;
+    }
+
+    /* Background sections become rows, edges in the middle of the grid gaps
+       so they line up with the cells above them. */
+    .pb-backdrop {
+        --pb-row: calc((100% - var(--pb-top) - var(--pb-nav-h) - 2 * var(--pb-gap)) / 3);
+        --pb-edge1: calc(var(--pb-top) + var(--pb-row) + var(--pb-gap) / 2);
+        --pb-edge2: calc(var(--pb-top) + 2 * var(--pb-row) + 1.5 * var(--pb-gap));
+    }
+
+    .pb-bg[data-span] {
+        left: 0;
+        width: 100%;
+    }
+
+    .pb-bg[data-span="left"]         { top: 0;               height: var(--pb-edge1); }
+    .pb-bg[data-span="center"]       { top: var(--pb-edge1); height: calc(var(--pb-edge2) - var(--pb-edge1)); }
+    .pb-bg[data-span="right"]        { top: var(--pb-edge2); height: calc(100% - var(--pb-edge2)); }
+    .pb-bg[data-span="left-center"]  { top: 0;               height: var(--pb-edge2); }
+    .pb-bg[data-span="center-right"] { top: var(--pb-edge1); height: calc(100% - var(--pb-edge1)); }
+
+    .pb-bg.is-expanded {
+        top: 0;
+        height: 100%;
+    }
+
+    /* Text sits at the top of its cell, smaller, scrolling if it has to. */
+    .pb-text {
+        align-self: start;
+        max-width: none;
+        font-size: 0.85rem;
+        line-height: 1.5;
+    }
+
+    .pb-text-heading {
+        font-size: 1.2rem;
+    }
+
+    /* Photos hug the outside edges of the flipped grid. */
+    .pb-media[data-area]         { align-items: center;     justify-content: center; }
+    .pb-media[data-area^="top"]    { justify-content: flex-start; }
+    .pb-media[data-area^="bottom"] { justify-content: flex-end; }
+    .pb-media[data-area$="left"]   { align-items: flex-start; }
+    .pb-media[data-area$="right"]  { align-items: flex-end; }
+
+    /* Medium and small become large on phones (XL stays XL). */
+    .pb-media[data-size="medium"] img,
+    .pb-media[data-size="medium"] video,
+    .pb-media[data-size="small"] img,
+    .pb-media[data-size="small"] video {
+        max-width: 100%;
+        max-height: 100%;
+    }
+
+    .pb-route-title {
+        font-size: 1.5rem;
+        margin-bottom: 0.4em;
+    }
+
+    .pb-route-stats dd {
+        font-size: 1rem;
+    }
+
+    .pb-route-stats dd span {
+        display: block;
+        margin-left: 0;
+    }
+
+    .pb-route-line {
+        justify-content: center;
+    }
+
+    .pb-route-line path {
+        stroke-width: 7;
+    }
+
+    .pb-nav-btn {
+        font-size: 0.85rem;
+    }
+
+    .pb-end-inner {
+        display: block;
+        overflow-y: auto;
+    }
+
+    .pb-end-links {
+        margin-bottom: 40px;
+    }
+
+    .pb-end-comments {
+        overflow: visible;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .pb-track,
+    .pb-grid,
+    .pb-nav,
+    .pb-restore,
+    .pb-bg img,
+    .pb-media img {
+        transition-duration: 0.01s;
+    }
+
+    .pb-route-line.is-drawn path {
+        transition: none;
+    }
+}

@@ -1,0 +1,63 @@
+---
+# A photo book post: full-screen photo pages you slide between.
+# Copy this file into a new post folder as index.mdx, put the photos in the
+# same folder, and see src/content/BLOCKS.md ("Photo book blocks").
+# All the usual fields below work the same as in TEMPLATE.mdx.
+title: Your Trip Title
+date: 2026-01-01
+excerpt: One or two sentences for search results and link previews.
+tags:
+  - trip-report
+cover: ./01.jpg
+
+# This line is what makes it a photo book.
+format: photobook
+
+draft: true
+---
+
+{/* Title page: route line + stats. The GPX goes in public/gpx/. */}
+<BookPage background="./01.jpg">
+  <BookRoute gpxFile="/gpx/your-route.gpx" title="Your Trip Title" />
+  <BookMedia area="top-right" src="./02.jpg" alt="Describe the photo" size="medium" />
+  <BookText>
+    One or two sentences to set the scene.
+  </BookText>
+</BookPage>
+
+{/* A photo page: background + a couple of small photos + a snippet. */}
+<BookPage background="./03.jpg" focus="center bottom">
+  <BookMedia area="top-left" src="./04.jpg" alt="Describe the photo" size="medium" />
+  <BookMedia area="bottom-right" src="./05.jpg" alt="Describe the photo" size="small" />
+  <BookText heading="A heading">
+    A short story snippet.
+
+    A second paragraph, if it needs one.
+  </BookText>
+</BookPage>
+
+{/* A blurred page (no background): good for a collage of small photos. */}
+<BookPage>
+  <BookMedia area="top-left" src="./06.jpg" alt="Describe the photo" />
+  <BookMedia area="top-center" src="./07.jpg" alt="Describe the photo" />
+  <BookMedia area="top-right" src="./08.jpg" alt="Describe the photo" />
+  <BookMedia area="bottom-center" src="./09.jpg" alt="Describe the photo" />
+  <BookText heading="A heading">
+    A caption.
+  </BookText>
+</BookPage>
+
+{/* A split page: blurred left column, a photo across center + right.
+    Up to three BookBackground sections; spans are left, center, right,
+    left-center, center-right or all. Use video="./clip.mp4" for a clip. */}
+<BookPage>
+  <BookBackground span="center-right" src="./11.jpg" alt="Describe the photo" />
+  <BookText heading="A heading">
+    Text sits over the blurred column.
+  </BookText>
+</BookPage>
+
+{/* Just a photo — no text at all. */}
+<BookPage background="./10.jpg" />
+
+{/* The last page (links + comments) is added automatically. */}

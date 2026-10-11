@@ -8,6 +8,12 @@ import Gallery from './Gallery.astro';
 import RouteMap from './RouteMap.astro';
 import InstagramEmbed from './InstagramEmbed.astro';
 import InstagramInline from './InstagramInline.astro';
+// Photo book blocks — only meaningful in a post with `format: photobook`.
+import BookPage from './BookPage.astro';
+import BookBackground from './BookBackground.astro';
+import BookText from './BookText.astro';
+import BookMedia from './BookMedia.astro';
+import BookRoute from './BookRoute.astro';
 
 export const blockRegistry = {
   Photo,
@@ -15,4 +21,9 @@ export const blockRegistry = {
   RouteMap,
   InstagramEmbed,
   InstagramInline,
+  BookPage,
+  BookBackground,
+  BookText,
+  BookMedia,
+  BookRoute,
 };

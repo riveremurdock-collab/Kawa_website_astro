@@ -2,7 +2,9 @@
 import { getCollection } from 'astro:content';
 import InnerPageLayout from '../../layouts/InnerPageLayout.astro';
 import PostLayout from '../../layouts/PostLayout.astro';
+import PhotoBookLayout from '../../layouts/PhotoBookLayout.astro';
 import PrevNext from '../../components/PrevNext.astro';
+import Comments from '../../components/Comments.astro';
 
 const getSlug = (id: string): string =>
   id.replace(/\/index\.mdx$/, '').replace(/\.mdx$/, '');
@@ -44,6 +46,15 @@ const next = (showPrevNext && nextEntry)
 const currentSlug = getSlug(entry.id);
 ---
 
+{entry.data.format === 'photobook' ? (
+<InnerPageLayout
+  title={`${entry.data.title} | Kawa Designs`}
+  description={entry.data.excerpt}
+  book={true}
+>
+  <PhotoBookLayout entry={entry} prev={prev} next={next} slug={currentSlug} />
+</InnerPageLayout>
+) : (
 <InnerPageLayout
   title={`${entry.data.title} | Kawa Designs`}
   description={entry.data.excerpt}
@@ -62,17 +73,11 @@ const currentSlug = getSlug(entry.id);
 
     <div class="comments-section">
       <h2>Comments</h2>
-      <div id="cusdis_thread"
-        data-host="https://cusdis.com"
-        data-app-id="e5efd1f2-ea0a-4da1-b432-df5979658893"
-        data-page-id={currentSlug}
-        data-page-url={Astro.url.href}
-        data-page-title={entry.data.title}
-      ></div>
-      <script async defer src="https://cusdis.com/js/cusdis.es.js"></script>
+      <Comments slug={currentSlug} title={entry.data.title} />
     </div>
   </div>
 </InnerPageLayout>
+)}
 
 <style>
   .article-detail-box {

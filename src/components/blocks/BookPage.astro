@@ -1,0 +1,126 @@
+---
+// One page of a photo book. Everything inside it (BookText, BookMedia,
+// BookRoute) is placed on a 3 × 2 grid by its `area`. See BLOCKS.md.
+//
+// Backgrounds — either:
+//   background / backgroundVideo — one photo or clip filling the whole page
+//                                  (a shortcut for <BookBackground span="all">), or
+//   up to three <BookBackground span="…"> blocks inside the page, each
+//   covering one or more columns.
+// Columns with no background show a blurred glass over the site background.
+//
+// focus — for `background`: which part stays visible when cropped
+//         ("center", "center bottom", "30% 60%"…).
+// tone  — "dark" (white text) or "light" (black text). Worked out from the
+//         background behind the text (the left column); set it to override.
+import type { ImageMetadata } from 'astro';
+import BookBackground from './BookBackground.astro';
+import { imageKey, imageTone } from '../../lib/photobook-media';
+
+interface Props {
+  background?: string | ImageMetadata;
+  backgroundVideo?: string;
+  alt?: string;
+  focus?: string;
+  tone?: 'light' | 'dark';
+}
+
+const { background, backgroundVideo, alt = '', focus = 'center', tone } = Astro.props;
+
+const html = await Astro.slots.render('default');
+const pageName = typeof background === 'string' ? `the page with background "${background}"` : 'a page';
+
+// ---- Backgrounds ----
+const bgPattern = /<div class="pb-bg"[^>]*\bdata-pb-bg\b[\s\S]*?<\/div>/g;
+const innerBgs = html.match(bgPattern) ?? [];
+const withoutBgs = html.replace(bgPattern, '');
+
+if ((background || backgroundVideo) && innerBgs.length) {
+  throw new Error(`Photo book: ${pageName} has both a background="…" and <BookBackground> blocks. Use one or the other.`);
+}
+if (innerBgs.length > 3) {
+  throw new Error(`Photo book: a page can have at most three <BookBackground> blocks (found ${innerBgs.length}).`);
+}
+
+const COLUMNS: Record<string, string[]> = {
+  all: ['left', 'center', 'right'],
+  left: ['left'],
+  center: ['center'],
+  right: ['right'],
+  'left-center': ['left', 'center'],
+  'center-right': ['center', 'right'],
+};
+// Text colour per column: desktop reads the photo where the text sits on
+// desktop, phones where it sits on a phone.
+const covered = new Map<string, string>();
+const coveredPhone = new Map<string, string>();
+const coveredPhoneWide = new Map<string, string>();
+for (const bg of innerBgs) {
+  const span = bg.match(/data-span="([^"]+)"/)?.[1] ?? 'all';
+  for (const column of COLUMNS[span]) {
+    if (covered.has(column)) {
+      throw new Error(`Photo book: two <BookBackground> blocks both cover the ${column} column on ${pageName}.`);
+    }
+    covered.set(column, bg.match(/data-tone="([^"]+)"/)?.[1] ?? 'dark');
+    coveredPhone.set(column, bg.match(/data-tone-phone="([^"]+)"/)?.[1] ?? 'dark');
+    coveredPhoneWide.set(column, bg.match(/data-tone-phone-wide="([^"]+)"/)?.[1] ?? 'dark');
+  }
+}
+
+const shortcutKey = typeof background === 'string' ? imageKey(background, Astro.url) : null;
+const pageTone = tone ?? covered.get('left') ?? await imageTone(shortcutKey);
+// On phones the text sits in the top row, which is the left column's
+// background: in the right half, or the whole row when top-left is empty.
+const textSpansRow = !/\bdata-area="top-left"/.test(withoutBgs);
+const phoneTone = tone ?? (textSpansRow
+  ? coveredPhoneWide.get('left') ?? await imageTone(shortcutKey, 'phone-wide')
+  : coveredPhone.get('left') ?? await imageTone(shortcutKey, 'phone-right'));
+
+// ---- Grid cells ----
+// Check nothing is fighting over a grid cell. A route claims the top-left
+// cell for its title and the whole centre column for its line.
+const claims = [...withoutBgs.matchAll(/\bdata-area="([^"]+)"/g)].flatMap(m =>
+  m[1] === 'center' ? ['top-center', 'bottom-center'] : [m[1]],
+);
+const seen = new Set<string>();
+for (const area of claims) {
+  if (seen.has(area)) {
+    throw new Error(
+      `Photo book: two things are placed in "${area}" on ${pageName}. ` +
+      `Each cell holds one item. (A BookRoute uses top-left, top-center and bottom-center; BookText always uses bottom-left.)`,
+    );
+  }
+  seen.add(area);
+}
+
+// Media are gathered into one wrapper. It's invisible to the layout
+// (display: contents), so each item still sits in its own grid cell; it's
+// kept as a hook in case the media ever need laying out as a group.
+const mediaPattern = /<figure\b[^>]*\bdata-pb-media\b[\s\S]*?<\/figure>/g;
+const media = withoutBgs.match(mediaPattern) ?? [];
+const rest = withoutBgs.replace(mediaPattern, '');
+const hasBackground = Boolean(background || backgroundVideo || innerBgs.length);
+---
+
+<section
+  class="pb-page"
+  data-pb-page
+  data-kind={hasBackground ? 'image' : 'blur'}
+  data-tone={pageTone}
+  data-tone-desktop={pageTone}
+  data-tone-phone={phoneTone}
+  aria-roledescription="page"
+>
+  <div class="pb-backdrop">
+    <div class="pb-blur" />
+    {(background || backgroundVideo) && (
+      <BookBackground src={background} video={backgroundVideo} alt={alt} focus={focus} />
+    )}
+    <Fragment set:html={innerBgs.join('')} />
+  </div>
+
+  <div class="pb-grid">
+    <Fragment set:html={rest} />
+    {media.length > 0 && <div class="pb-strip"><Fragment set:html={media.join('')} /></div>}
+  </div>
+</section>

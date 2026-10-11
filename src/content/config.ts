@@ -22,6 +22,10 @@ const articles = defineCollection({
     ...basePageFields(ARTICLE_TAGS),
     excerpt: z.string(),
     cover: image(),
+    // 'photobook' renders the post as full-screen photo pages you slide
+    // between (BookPage blocks) instead of a scrolling article.
+    // (Not called `layout`: in MDX frontmatter that name is reserved for a layout file path.)
+    format: z.enum(['standard', 'photobook']).default('standard'),
   }),
 });
 

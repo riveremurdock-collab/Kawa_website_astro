@@ -1,0 +1,23 @@
+---
+// The comment thread for a post. Every post type renders comments through
+// this one component, so switching comment providers means editing only
+// this file. Currently Cusdis, which embeds itself as an iframe.
+interface Props {
+  slug: string;
+  title: string;
+  /** "dark" for pages on a dark background (photo books). */
+  theme?: 'light' | 'dark';
+}
+
+const { slug, title, theme = 'light' } = Astro.props;
+---
+
+<div id="cusdis_thread"
+  data-host="https://cusdis.com"
+  data-app-id="e5efd1f2-ea0a-4da1-b432-df5979658893"
+  data-page-id={slug}
+  data-page-url={Astro.url.href}
+  data-page-title={title}
+  data-theme={theme}
+></div>
+<script is:inline async defer src="https://cusdis.com/js/cusdis.es.js"></script>

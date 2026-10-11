@@ -1,0 +1,91 @@
+---
+// Renders a `format: photobook` post: the post's BookPage blocks side by
+// side on a track you slide along, a fixed last page (links + comments),
+// and the back / page count / next bar. Styles live in photobook.css and
+// behaviour in scripts/photobook.ts.
+import { render } from 'astro:content';
+import type { CollectionEntry } from 'astro:content';
+import { blockRegistry } from '../components/blocks/registry';
+import Comments from '../components/Comments.astro';
+import '../styles/photobook.css';
+
+interface PostLink {
+  slug: string;
+  title: string;
+}
+
+interface Props {
+  entry: CollectionEntry<'articles'>;
+  prev: PostLink | null;
+  next: PostLink | null;
+  slug: string;
+}
+
+const { entry, prev, next, slug } = Astro.props;
+const { Content } = await render(entry);
+
+const arrowLeft = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M15 5l-7 7 7 7"/></svg>';
+const arrowRight = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 5l7 7-7 7"/></svg>';
+---
+
+<div class="photobook" data-photobook>
+  <h1 class="pb-visually-hidden">{entry.data.title}</h1>
+
+  <div class="pb-viewport" data-pb-viewport>
+    <div class="pb-track" data-pb-track>
+      <Content components={blockRegistry} />
+
+      <!-- Last page: always present, not written in the post. -->
+      <section class="pb-page pb-end" data-pb-page data-kind="blur" data-tone="dark" aria-roledescription="page">
+        <div class="pb-blur" />
+        <div class="pb-end-inner">
+          <div class="pb-end-links">
+            <h2 class="pb-text-heading">Thanks for following along</h2>
+            <button type="button" class="pb-end-link" data-pb-goto="1">
+              <Fragment set:html={arrowLeft} /> Back to the first page
+            </button>
+            {prev && (
+              <a class="pb-end-link" href={`/articles/${prev.slug}`}>
+                <span class="pb-end-label">Previous post</span>
+                {prev.title}
+              </a>
+            )}
+            {next && (
+              <a class="pb-end-link" href={`/articles/${next.slug}`}>
+                <span class="pb-end-label">Next post</span>
+                {next.title}
+              </a>
+            )}
+            <a class="pb-end-link" href="/blog">Return to the blog</a>
+          </div>
+
+          <div class="pb-end-comments">
+            <h2 class="pb-text-heading">Comments</h2>
+            <Comments slug={slug} title={entry.data.title} theme="dark" />
+          </div>
+        </div>
+      </section>
+    </div>
+
+    <div class="pb-zoom-layer" data-pb-zoom-layer></div>
+  </div>
+
+  <nav class="pb-nav" aria-label="Photo book pages">
+    <button type="button" class="pb-nav-btn" data-pb-prev aria-label="Previous page">
+      <Fragment set:html={arrowLeft} /> Back
+    </button>
+    <span class="pb-count" aria-live="polite"><span data-pb-current>1</span>/<span data-pb-total></span></span>
+    <button type="button" class="pb-nav-btn pb-nav-next" data-pb-next aria-label="Next page">
+      Next <Fragment set:html={arrowRight} />
+    </button>
+  </nav>
+
+  <button type="button" class="pb-nav-btn pb-restore" data-pb-restore aria-label="Show the page again">
+    <Fragment set:html={arrowLeft} /> Back
+  </button>
+</div>
+
+<script>
+  import { initPhotoBook } from '../scripts/photobook';
+  document.querySelectorAll<HTMLElement>('[data-photobook]').forEach(initPhotoBook);
+</script>
