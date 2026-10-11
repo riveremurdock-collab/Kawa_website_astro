@@ -1,0 +1,44 @@
+{
+  "backgrounds": [
+    {
+      "id": "seaside-rock",
+      "name": "Basalt",
+      "category": "basalt",
+      "source": "material",
+      "credit": "Poly Haven — Seaside Rock",
+      "thumb": "backgrounds/seaside-rock/thumb.jpg"
+    },
+    {
+      "id": "tiger-rock",
+      "name": "Granite",
+      "category": "granite",
+      "source": "material",
+      "credit": "Poly Haven — Tiger Rock",
+      "thumb": "backgrounds/tiger-rock/thumb.jpg"
+    },
+    {
+      "id": "rock-01",
+      "name": "Limestone",
+      "category": "limestone",
+      "source": "material",
+      "credit": "Poly Haven — Rock 01",
+      "thumb": "backgrounds/rock-01/thumb.jpg"
+    },
+    {
+      "id": "aerial-grass-rock",
+      "name": "Mossy Sandstone",
+      "category": "sandstone",
+      "source": "material",
+      "credit": "Poly Haven — Aerial Grass Rock",
+      "thumb": "backgrounds/aerial-grass-rock/thumb.jpg"
+    },
+    {
+      "id": "rock-surface",
+      "name": "Sandstone",
+      "category": "sandstone",
+      "source": "material",
+      "credit": "Poly Haven — Rock Surface",
+      "thumb": "backgrounds/rock-surface/thumb.jpg"
+    }
+  ]
+}

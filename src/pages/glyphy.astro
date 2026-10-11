@@ -1,0 +1,55 @@
+---
+import InnerPageLayout from '../layouts/InnerPageLayout.astro';
+---
+
+<InnerPageLayout app customCursor={false} title="Glyphy | Kawa Designs" description="Draw petroglyph-style carvings into rock, or raised rock glyphs, and export images or a day-cycle video with Glyphy from Kawa Designs">
+    <div class="page-content-box glyphy-box">
+        <h1 class="visually-hidden">Glyphy</h1>
+        <div class="glyphy-wrapper">
+            <!-- Built from the separate Glyphy project with `npm run build:site`. -->
+            <iframe
+                src="/glyphy-app/index.html"
+                title="Glyphy"
+                loading="lazy"
+            ></iframe>
+        </div>
+    </div>
+</InnerPageLayout>
+
+<style>
+    /* The tool fills the window below the nav bar (the layout's app mode). */
+    .glyphy-box {
+        overflow: hidden;
+    }
+
+    /* Kept for screen readers and search engines; the tool itself is the visible content. */
+    .visually-hidden {
+        position: absolute;
+        width: 1px;
+        height: 1px;
+        margin: -1px;
+        padding: 0;
+        overflow: hidden;
+        clip: rect(0, 0, 0, 0);
+        white-space: nowrap;
+        border: 0;
+    }
+
+    /* Fills the box's full height in the flex column, giving the iframe a defined container */
+    .glyphy-wrapper {
+        background: white;
+        flex: 1;
+        min-height: 0;
+        display: flex;
+        flex-direction: column;
+    }
+
+    .glyphy-wrapper iframe {
+        width: 100%;
+        height: 100%;
+        flex: 1;
+        min-height: 0;
+        display: block;
+        border: none;
+    }
+</style>

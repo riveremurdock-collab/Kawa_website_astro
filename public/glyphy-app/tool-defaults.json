@@ -1,0 +1,96 @@
+{
+  "format": "glyphy-tool-defaults",
+  "version": 1,
+  "toolParams": {
+    "freehand": {
+      "size": 25,
+      "depth": 0.5
+    },
+    "fill": {
+      "mode": "brush",
+      "size": 80,
+      "depth": 0.5,
+      "texture": 0,
+      "gap": 8
+    },
+    "line": {
+      "mode": "polyline",
+      "size": 25,
+      "depth": 0.5,
+      "cornerRadius": 0
+    },
+    "circle": {
+      "size": 25,
+      "depth": 0.5,
+      "filled": false,
+      "aspect": 1,
+      "imperfection": 0.25
+    },
+    "rings": {
+      "size": 25,
+      "depth": 0.5,
+      "count": 5,
+      "spacing": 45,
+      "spacingVariation": 0.15,
+      "aspect": 1,
+      "imperfection": 0.22
+    },
+    "spiral": {
+      "size": 25,
+      "depth": 0.5,
+      "turns": 3.5,
+      "spiralType": "archimedean",
+      "direction": "ccw",
+      "tail": 0
+    },
+    "rays": {
+      "size": 25,
+      "depth": 0.5,
+      "count": 7,
+      "inner": 0,
+      "lengthVariation": 0.2,
+      "spacingVariation": 0.3
+    },
+    "rake": {
+      "size": 25,
+      "depth": 0.5,
+      "count": 4,
+      "spacing": 40,
+      "lengthVariation": 0.2,
+      "spacingVariation": 0.3
+    },
+    "zigzag": {
+      "size": 25,
+      "depth": 0.5,
+      "amplitude": 25,
+      "frequency": 1.2,
+      "sharpness": 0.2
+    },
+    "dotrow": {
+      "size": 30,
+      "depth": 0.6,
+      "spacing": 45,
+      "sizeVariation": 0.2,
+      "spacingVariation": 0.3
+    },
+    "cupule": {
+      "size": 40,
+      "depth": 0.5
+    },
+    "eraser": {
+      "mode": "area",
+      "size": 40
+    }
+  },
+  "strokeSettings": {
+    "smoothing": 20,
+    "stabilizer": 2,
+    "simplify": 1.5,
+    "fitTolerance": 3,
+    "taper": 20,
+    "speedWidth": 0,
+    "cornerMode": "round",
+    "cornerAngle": 66,
+    "cornerRadius": 59
+  }
+}
