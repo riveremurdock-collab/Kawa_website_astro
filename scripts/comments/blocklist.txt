@@ -1,0 +1,87 @@
+# Words that send a comment to manual review instead of publishing it.
+#
+# One entry per line; lines starting with # are ignored. Matching is
+# case-insensitive and whole-word, so "ass" won't catch "class" or "assess".
+#   word*   also matches anything starting with the word (fuck* → fucking)
+#   two words   matches the phrase, with any spacing between the words
+# Common disguises are caught automatically: sh1t, f*ck, $hit, fuuuck, s.h.i.t
+#
+# A false positive costs nothing but a review, so err on the side of adding.
+
+# Swearing
+fuck*
+motherfuck*
+shit*
+bullshit*
+bitch*
+bastard*
+ass
+asses
+asshole*
+arse
+arsehole*
+dumbass*
+jackass*
+badass*
+cunt*
+dick
+dicks
+dickhead*
+cock
+cocks
+cocksuck*
+prick
+pricks
+twat*
+wank*
+piss
+pissed
+pissing
+bollocks
+crap
+crappy
+douche*
+goddamn*
+
+# Crude / sexual
+pussy
+pussies
+whore*
+slut*
+tits
+titty
+titties
+boob*
+cum
+cumming
+jizz*
+porn*
+dildo*
+blowjob*
+handjob*
+horny
+anal
+rape*
+rapist*
+
+# Slurs and hate
+retard*
+fag
+fags
+faggot*
+nigger*
+nigga*
+spic
+spics
+chink*
+kike*
+tranny*
+dyke*
+coon
+coons
+wetback*
+nazi*
+
+# Abuse
+kys
+kill yourself

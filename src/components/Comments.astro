@@ -1,23 +1,439 @@
 ---
-// The comment thread for a post. Every post type renders comments through
-// this one component, so switching comment providers means editing only
-// this file. Currently Cusdis, which embeds itself as an iframe.
+// The comment thread for a post or the guestbook. Every page with comments
+// renders them through this one component.
+//
+// Comments are static: they're read from src/data/comments.json at build
+// time. New ones are sent to Netlify Forms, and the scheduled GitHub Action
+// in .github/workflows/comments.yml copies approved ones into that file
+// (see scripts/comments/sync.mjs). Until then the visitor sees their own
+// comment as "awaiting review", remembered in their browser only.
+import commentData from '../data/comments.json';
+
 interface Props {
+  /** Which thread this is — an article slug, or "guestbook". */
   slug: string;
-  title: string;
   /** "dark" for pages on a dark background (photo books). */
   theme?: 'light' | 'dark';
+  /** Newest at the top (guestbook) instead of oldest first (articles). */
+  newestFirst?: boolean;
+  /** Form above the list instead of below it. */
+  formFirst?: boolean;
 }
 
-const { slug, title, theme = 'light' } = Astro.props;
+const { slug, theme = 'light', newestFirst = false, formFirst = false } = Astro.props;
+
+const comments = commentData.comments
+  .filter(c => c.page === slug)
+  .sort((a, b) => a.date.localeCompare(b.date));
+if (newestFirst) comments.reverse();
+
+const formatDate = (iso: string) =>
+  new Date(iso).toLocaleDateString('en-US', {
+    month: 'short', day: 'numeric', year: 'numeric', timeZone: 'America/Denver',
+  });
+
+const isGuestbook = slug === 'guestbook';
+const id = (name: string) => `comment-${name}-${slug}`;
 ---
 
-<div id="cusdis_thread"
-  data-host="https://cusdis.com"
-  data-app-id="e5efd1f2-ea0a-4da1-b432-df5979658893"
-  data-page-id={slug}
-  data-page-url={Astro.url.href}
-  data-page-title={title}
-  data-theme={theme}
-></div>
-<script is:inline async defer src="https://cusdis.com/js/cusdis.es.js"></script>
+<div
+  class:list={['comments', `comments--${theme}`, { 'comments--form-first': formFirst }]}
+  data-comments={slug}
+  data-newest-first={newestFirst ? '' : undefined}
+>
+  <ol class="comment-list" data-comment-list>
+    {comments.map(c => (
+      <li class="comment" data-comment>
+        <div class="comment-meta">
+          <span class="comment-name" data-comment-name>{c.name}</span>
+          <time class="comment-date" datetime={c.date}>{formatDate(c.date)}</time>
+        </div>
+        <p class="comment-body" data-comment-body>{c.comment}</p>
+      </li>
+    ))}
+  </ol>
+  <p class="comments-empty" data-comments-empty hidden={comments.length > 0}>
+    {isGuestbook ? 'No entries yet. Be the first to sign!' : 'No comments yet. Be the first!'}
+  </p>
+
+  <form
+    class="comment-form"
+    name="comments"
+    method="POST"
+    data-netlify="true"
+    netlify-honeypot="bot-field"
+    data-comment-form
+  >
+    <h3 class="comment-form-heading">{isGuestbook ? 'Sign the guestbook' : 'Leave a comment'}</h3>
+    <input type="hidden" name="form-name" value="comments" />
+    <input type="hidden" name="page" value={slug} />
+    <p class="comment-honeypot" aria-hidden="true">
+      <label>Leave this empty: <input name="bot-field" tabindex="-1" autocomplete="off" /></label>
+    </p>
+
+    <label class="comment-label" for={id('name')}>Name</label>
+    <input class="comment-input" id={id('name')} name="name" type="text"
+      maxlength="60" autocomplete="name" required />
+
+    <label class="comment-label" for={id('text')}>{isGuestbook ? 'Message' : 'Comment'}</label>
+    <textarea class="comment-input comment-textarea" id={id('text')} name="comment"
+      rows="4" maxlength="2000" required></textarea>
+
+    <div class="comment-actions">
+      <button class="comment-submit" type="submit">{isGuestbook ? 'Sign' : 'Post comment'}</button>
+      <p class="comment-note">Comments are reviewed before they appear, usually within a day.</p>
+    </div>
+    <p class="comment-status" data-comment-status role="status" aria-live="polite"></p>
+  </form>
+</div>
+
+<script>
+  const STORAGE_KEY = 'kawa-pending-comments';
+  const MAX_AGE_MS = 30 * 24 * 60 * 60 * 1000;
+
+  interface Pending { page: string; name: string; comment: string; date: string }
+
+  const squash = (s: string) => s.replace(/\s+/g, ' ').trim();
+
+  function loadPending(): Pending[] {
+    try {
+      const parsed = JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]');
+      return Array.isArray(parsed) ? parsed : [];
+    } catch {
+      return [];
+    }
+  }
+
+  function savePending(list: Pending[]) {
+    try {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(list));
+    } catch {
+      // Private mode or storage blocked — the preview just won't persist.
+    }
+  }
+
+  function pendingItem(p: Pending): HTMLLIElement {
+    const li = document.createElement('li');
+    li.className = 'comment comment--pending';
+
+    const meta = document.createElement('div');
+    meta.className = 'comment-meta';
+    const name = document.createElement('span');
+    name.className = 'comment-name';
+    name.textContent = p.name;
+    const badge = document.createElement('span');
+    badge.className = 'comment-badge';
+    badge.textContent = 'Awaiting review';
+    meta.append(name, badge);
+
+    const body = document.createElement('p');
+    body.className = 'comment-body';
+    body.textContent = p.comment;
+
+    li.append(meta, body);
+    return li;
+  }
+
+  function showPending(root: HTMLElement, p: Pending) {
+    const list = root.querySelector<HTMLElement>('[data-comment-list]')!;
+    const item = pendingItem(p);
+    if ('newestFirst' in root.dataset) list.prepend(item);
+    else list.append(item);
+    root.querySelector<HTMLElement>('[data-comments-empty]')!.hidden = true;
+  }
+
+  // Drop previews that have since been published (or are too old to still be
+  // waiting), then show the rest on their pages.
+  const published = new Set(
+    Array.from(document.querySelectorAll<HTMLElement>('[data-comments]')).flatMap(root =>
+      Array.from(root.querySelectorAll<HTMLElement>('[data-comment]')).map(li =>
+        [root.dataset.comments,
+          squash(li.querySelector('[data-comment-name]')!.textContent || ''),
+          squash(li.querySelector('[data-comment-body]')!.textContent || '')].join('\n'))));
+
+  const onThisPage = new Set(
+    Array.from(document.querySelectorAll<HTMLElement>('[data-comments]')).map(r => r.dataset.comments));
+
+  const pending = loadPending().filter(p =>
+    Date.now() - Date.parse(p.date) < MAX_AGE_MS &&
+    !(onThisPage.has(p.page) && published.has([p.page, squash(p.name), squash(p.comment)].join('\n'))));
+  savePending(pending);
+
+  document.querySelectorAll<HTMLElement>('[data-comments]').forEach(root => {
+    const page = root.dataset.comments!;
+    pending.filter(p => p.page === page).forEach(p => showPending(root, p));
+
+    const form = root.querySelector<HTMLFormElement>('[data-comment-form]')!;
+    const status = root.querySelector<HTMLElement>('[data-comment-status]')!;
+    const button = form.querySelector<HTMLButtonElement>('button[type="submit"]')!;
+
+    form.addEventListener('submit', async event => {
+      event.preventDefault();
+      const data = new FormData(form);
+      const entry: Pending = {
+        page,
+        name: String(data.get('name') || '').trim(),
+        comment: String(data.get('comment') || '').trim(),
+        date: new Date().toISOString(),
+      };
+      if (!entry.name || !entry.comment) return;
+
+      button.disabled = true;
+      status.classList.remove('is-error');
+      status.textContent = 'Sending…';
+
+      try {
+        const res = await fetch('/', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+          body: new URLSearchParams(data as unknown as Record<string, string>).toString(),
+        });
+        if (!res.ok) throw new Error(String(res.status));
+
+        savePending([...loadPending(), entry]);
+        showPending(root, entry);
+        form.reset();
+        status.textContent = 'Thanks! Your comment will appear here once it has been reviewed.';
+      } catch {
+        status.classList.add('is-error');
+        status.textContent = 'Sorry, that didn’t send. Please try again in a moment.';
+      } finally {
+        button.disabled = false;
+      }
+    });
+  });
+</script>
+
+<style is:global>
+  /* Global (namespaced under .comments) because the script builds the
+     pending-preview items, and scoped styles never reach those. */
+  .comments {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+  }
+
+  .comments--form-first .comment-form {
+    order: -1;
+  }
+
+  /* ---- List ---- */
+
+  .comments .comment-list {
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  .comments .comment-list:empty {
+    display: none;
+  }
+
+  .comments .comment {
+    background: #fff;
+    border: 1px solid var(--color-mint);
+    border-radius: 12px;
+    padding: 14px 18px;
+  }
+
+  .comments .comment-meta {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: 4px 12px;
+    margin-bottom: 4px;
+  }
+
+  .comments .comment-name {
+    font-family: var(--font-display);
+    font-weight: 700;
+    letter-spacing: 0.5px;
+    color: var(--color-olive);
+    overflow-wrap: anywhere;
+  }
+
+  .comments .comment-date {
+    font-size: 0.8rem;
+    color: var(--color-dark-grey);
+  }
+
+  .comments .comment-body {
+    white-space: pre-line;
+    overflow-wrap: anywhere;
+    line-height: 1.6;
+  }
+
+  .comments .comment--pending {
+    border-style: dashed;
+    border-color: var(--color-sage);
+  }
+
+  .comments .comment-badge {
+    font-size: 0.7rem;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--color-dark-sandstone);
+  }
+
+  .comments .comments-empty {
+    color: var(--color-olive);
+    font-style: italic;
+  }
+
+  /* ---- Form ---- */
+
+  .comments .comment-form {
+    background: #fff;
+    border: 1px solid var(--color-mint);
+    border-radius: 12px;
+    padding: 18px 20px 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+
+  .comments .comment-form-heading {
+    font-family: var(--font-display);
+    font-weight: 700;
+    font-size: 1.15rem;
+    letter-spacing: 1px;
+    color: var(--color-olive);
+    margin-bottom: 4px;
+  }
+
+  .comments .comment-honeypot {
+    position: absolute;
+    left: -9999px;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+  }
+
+  .comments .comment-label {
+    font-size: 0.75rem;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--color-olive);
+  }
+
+  .comments .comment-input {
+    width: 100%;
+    padding: 9px 14px;
+    background: #fff;
+    border: 1px solid var(--color-sage);
+    border-radius: 12px;
+    color: var(--color-black-grey);
+    font-size: 1rem;
+    margin-bottom: 6px;
+  }
+
+  .comments .comment-textarea {
+    resize: vertical;
+    min-height: 96px;
+    line-height: 1.5;
+  }
+
+  .comments .comment-input:focus {
+    outline: none;
+    border-color: var(--color-orange);
+  }
+
+  .comments .comment-actions {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 8px 16px;
+  }
+
+  .comments .comment-submit {
+    appearance: none;
+    border: none;
+    cursor: pointer;
+    background: var(--color-dark-sandstone);
+    color: #fff;
+    font-family: var(--font-display);
+    font-weight: 700;
+    font-size: 1rem;
+    letter-spacing: 1px;
+    padding: 8px 22px;
+    border-radius: 20px;
+    transition: background 0.2s ease;
+  }
+
+  .comments .comment-submit:hover {
+    background: var(--color-orange);
+  }
+
+  .comments .comment-submit:disabled {
+    opacity: 0.6;
+    cursor: default;
+  }
+
+  .comments .comment-note {
+    font-size: 0.8rem;
+    color: var(--color-dark-grey);
+  }
+
+  .comments .comment-status {
+    font-size: 0.9rem;
+    color: var(--color-olive);
+  }
+
+  .comments .comment-status:empty {
+    display: none;
+  }
+
+  .comments .comment-status.is-error {
+    color: var(--color-dark-sandstone);
+  }
+
+  /* ---- Dark (photo books: white text over a blurred photo) ---- */
+
+  .comments--dark .comment,
+  .comments--dark .comment-form {
+    background: rgba(0, 0, 0, 0.25);
+    border-color: rgba(255, 255, 255, 0.22);
+  }
+
+  .comments--dark .comment--pending {
+    border-color: rgba(255, 255, 255, 0.45);
+  }
+
+  .comments--dark .comment-name,
+  .comments--dark .comment-form-heading,
+  .comments--dark .comments-empty,
+  .comments--dark .comment-status {
+    color: #fff;
+  }
+
+  .comments--dark .comment-date,
+  .comments--dark .comment-label,
+  .comments--dark .comment-note {
+    color: rgba(255, 255, 255, 0.75);
+  }
+
+  .comments--dark .comment-badge,
+  .comments--dark .comment-status.is-error {
+    color: var(--color-light-orange);
+  }
+
+  .comments--dark .comment-input {
+    background: rgba(0, 0, 0, 0.3);
+    border-color: rgba(255, 255, 255, 0.35);
+    color: #fff;
+  }
+
+  .comments--dark .comment-input:focus {
+    border-color: var(--color-light-orange);
+  }
+
+  .comments--dark .comment-submit {
+    background: #fff;
+    color: var(--color-black-grey);
+  }
+
+  .comments--dark .comment-submit:hover {
+    background: var(--color-light-orange);
+  }
+</style>

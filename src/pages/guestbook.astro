@@ -1,20 +1,14 @@
 ---
 import InnerPageLayout from '../layouts/InnerPageLayout.astro';
+import Comments from '../components/Comments.astro';
 ---
 
 <InnerPageLayout title="Guest Book | Kawa Designs" description="Sign the Kawa Designs guestbook and leave your mark">
     <div class="page-content-box guestbook-box">
         <h1>Guest Book</h1>
         <p class="guestbook-intro">Leave your mark on the trail! Say hello and sign the logbook.</p>
-        <div class="cusdis-wrapper">
-            <div id="cusdis_thread"
-                data-host="https://cusdis.com"
-                data-app-id="e5efd1f2-ea0a-4da1-b432-df5979658893"
-                data-page-id="guestbook"
-                data-page-url="https://kawadesign.us/guestbook"
-                data-page-title="Guestbook"
-            ></div>
-            <script async defer src="https://cusdis.com/js/cusdis.es.js"></script>
+        <div class="guestbook-wrapper">
+            <Comments slug="guestbook" newestFirst formFirst />
         </div>
     </div>
 </InnerPageLayout>
@@ -37,35 +31,14 @@ import InnerPageLayout from '../layouts/InnerPageLayout.astro';
         margin-bottom: 8px;
     }
 
-    /* Fills remaining height in the flex column, giving the iframe a defined container */
-    .cusdis-wrapper {
+    /* Fills remaining height in the flex column and scrolls the entries
+       inside it, so the page itself stays put. */
+    .guestbook-wrapper {
         background: white;
         border-radius: 16px;
         padding: 20px;
         flex: 1;
         min-height: 0;
-        display: flex;
-        flex-direction: column;
-    }
-
-    /* Reset global #cusdis_thread styles and fill the wrapper */
-    .cusdis-wrapper :global(#cusdis_thread) {
-        background: transparent;
-        border: none;
-        padding: 0;
-        border-radius: 0;
-        min-height: 0;
-        flex: 1;
-        display: flex;
-        flex-direction: column;
-    }
-
-    /* Lock the iframe to the container height — it scrolls its own content */
-    .cusdis-wrapper :global(#cusdis_thread iframe) {
-        width: 100% !important;
-        height: 100% !important;
-        flex: 1;
-        min-height: 0;
-        display: block;
+        overflow-y: auto;
     }
 </style>

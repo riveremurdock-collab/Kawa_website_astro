@@ -1,0 +1,48 @@
+name: Publish comments
+
+# Copies new comments from Netlify Forms onto the site.
+# See scripts/comments/sync.mjs for how it works and where the caps are set.
+
+on:
+  schedule:
+    # Every 4 hours. Cron here is UTC — in Mountain Time that's
+    # 7pm, 11pm, 3am, 7am, 11am and 3pm (an hour earlier in winter).
+    - cron: '0 1,5,9,13,17,21 * * *'
+  # Run right away when you approve a flagged comment (caps still apply).
+  issues:
+    types: [labeled]
+  # "Run workflow" button on the Actions tab.
+  workflow_dispatch:
+    inputs:
+      dry_run:
+        description: 'Only print what would happen'
+        type: boolean
+        default: false
+
+permissions:
+  contents: write
+  issues: write
+
+# Never two runs at once, so the deploy count can't be raced.
+concurrency:
+  group: comments
+  cancel-in-progress: false
+
+jobs:
+  sync:
+    if: github.event_name != 'issues' || github.event.label.name == 'approved'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0   # full history, to count today's deploys
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - run: node scripts/comments/sync.mjs ${{ inputs.dry_run && '--dry-run' || '' }}
+        env:
+          NETLIFY_AUTH_TOKEN: ${{ secrets.NETLIFY_AUTH_TOKEN }}
+          NETLIFY_SITE_ID: ${{ secrets.NETLIFY_SITE_ID }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

@@ -271,31 +271,65 @@
 
 /* ---- Text ---- */
 
+/* The body text sits on a soft patch of blurred, darkened photo (lightened
+   on light photos); the heading keeps a plain shadow. The patch's edges
+   fade out over --pb-text-feather, which is also its padding, so the words
+   themselves are never faded. Negative margins keep the words where they'd
+   be without the patch. The body scrolls when it doesn't fit; the heading
+   stays put. */
 .pb-text {
+    --pb-text-feather: 3em;
+    --pb-text-tint: rgba(0, 0, 0, 0.1);
+    --pb-text-filter: blur(2.5px) brightness(0.88);
+
     align-self: end;
     max-width: 32em;
     max-height: 100%;
-    overflow-y: auto;
-    scrollbar-width: none;
+    display: flex;
+    flex-direction: column;
     font-family: var(--font-main);
     font-size: clamp(0.95rem, 0.6rem + 0.5vw, 1.12rem);
     line-height: 1.6;
-    text-shadow: var(--pb-shadow-dark);
     cursor: pointer;
     outline: none;
     transition: color 0.5s ease;
 }
 
-.pb-page[data-tone="light"]:not(.is-reading) .pb-text,
-.pb-page[data-tone="light"]:not(.is-reading) .pb-route-info {
-    text-shadow: var(--pb-shadow-light);
+.pb-page[data-tone="light"]:not(.is-reading) .pb-text {
+    --pb-text-tint: rgba(255, 255, 255, 0.1);
+    --pb-text-filter: blur(2.5px) brightness(1.1);
+}
+
+.pb-text-body {
+    --pb-text-fade-x: linear-gradient(to right, transparent, #000 var(--pb-text-feather), #000 calc(100% - var(--pb-text-feather)), transparent);
+    --pb-text-fade-y: linear-gradient(to bottom, transparent, #000 var(--pb-text-feather), #000 calc(100% - var(--pb-text-feather)), transparent);
+
+    min-height: 0;
+    /* Shrink to the longest line, so a few words get a small patch. */
+    align-self: flex-start;
+    margin: calc(-1 * var(--pb-text-feather));
+    padding: var(--pb-text-feather);
+    overflow-y: auto;
+    scrollbar-width: none;
+    background: var(--pb-text-tint);
+    backdrop-filter: var(--pb-text-filter);
+    -webkit-backdrop-filter: var(--pb-text-filter);
+    -webkit-mask-image: var(--pb-text-fade-x), var(--pb-text-fade-y);
+    mask-image: var(--pb-text-fade-x), var(--pb-text-fade-y);
+    -webkit-mask-composite: source-in;
+    mask-composite: intersect;
+    transition: background 0.5s ease;
 }
 
 /* More text below than fits: fade the bottom edge as a cue to scroll.
    Added and removed by the script as the text is scrolled. */
-.pb-text.has-more {
-    -webkit-mask-image: linear-gradient(to bottom, #000 calc(100% - 3em), transparent);
-    mask-image: linear-gradient(to bottom, #000 calc(100% - 3em), transparent);
+.pb-text-body.has-more {
+    --pb-text-fade-y: linear-gradient(to bottom, transparent, #000 var(--pb-text-feather), #000 calc(100% - var(--pb-text-feather) - 3em), transparent);
+}
+
+.pb-page[data-tone="light"]:not(.is-reading) .pb-text-heading,
+.pb-page[data-tone="light"]:not(.is-reading) .pb-route-info {
+    text-shadow: var(--pb-shadow-light);
 }
 
 .pb-text-heading {
@@ -306,6 +340,11 @@
     letter-spacing: 1px;
     margin: 0 0 0.45em;
     color: inherit;
+    text-shadow: var(--pb-shadow-dark);
+    /* Above the body's patch, whose soft top edge reaches up behind it. */
+    position: relative;
+    z-index: 1;
+    flex-shrink: 0;
 }
 
 .pb-text p {
@@ -656,6 +695,7 @@ button.pb-end-link {
 
     /* Text sits at the top of its cell, smaller, scrolling if it has to. */
     .pb-text {
+        --pb-text-feather: 1.1em;
         align-self: start;
         max-width: none;
         font-size: 0.85rem;

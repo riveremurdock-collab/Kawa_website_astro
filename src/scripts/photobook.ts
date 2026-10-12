@@ -374,7 +374,7 @@ export function initPhotoBook(root: HTMLElement) {
   // Text that doesn't fit its cell scrolls; while there's more below, the
   // bottom edge fades (the has-more class) as a cue.
 
-  const texts = Array.from(root.querySelectorAll<HTMLElement>('.pb-text'));
+  const texts = Array.from(root.querySelectorAll<HTMLElement>('.pb-text-body'));
 
   function updateTextFade(text: HTMLElement) {
     const more = text.scrollHeight - text.scrollTop - text.clientHeight > 2;
