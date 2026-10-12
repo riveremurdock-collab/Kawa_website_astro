@@ -1,0 +1,208 @@
+---
+import { Image } from 'astro:assets';
+import logo from '../assets/logos/kawa lichen landing page logo.png';
+import { mainNav, extrasNav } from '../lib/nav';
+---
+
+<main class="lichen-landing">
+  <canvas class="lichen-canvas" aria-hidden="true"></canvas>
+
+  <h1 class="lichen-logo-wrap">
+    <Image
+      src={logo}
+      alt="KAWA"
+      class="lichen-logo"
+      widths={[640, 1040, 1560]}
+      sizes="(max-width: 640px) 82vw, 520px"
+      loading="eager"
+      fetchpriority="high"
+    />
+  </h1>
+
+  <!-- Without JS (or before it runs) this is a plain centred list under the
+       logo. The script adds .is-live and positions each link absolutely. -->
+  <nav class="lichen-nav" aria-label="Site navigation">
+    <ul class="lichen-list">
+      {mainNav.map(item => (
+        <li>
+          <a
+            class="lichen-link"
+            data-group="main"
+            href={item.href}
+            target={item.external ? '_blank' : undefined}
+            rel={item.external ? 'noopener noreferrer' : undefined}
+          >
+            {item.label}
+          </a>
+        </li>
+      ))}
+      <li>
+        <button
+          type="button"
+          class="lichen-link lichen-extras"
+          aria-expanded="false"
+          aria-controls="lichen-extras-list"
+        >
+          <span class="lichen-back-arrow" aria-hidden="true">←</span><span class="lichen-extras-label">EXTRAS</span>
+        </button>
+      </li>
+    </ul>
+    <ul id="lichen-extras-list" class="lichen-list lichen-extras-list">
+      {extrasNav.map(item => (
+        <li>
+          <a class="lichen-link" data-group="extras" href={item.href} inert>
+            {item.label}
+          </a>
+        </li>
+      ))}
+    </ul>
+  </nav>
+</main>
+
+<script>
+  import { initLichenLanding } from '../scripts/lichen/landing';
+  const root = document.querySelector<HTMLElement>('.lichen-landing');
+  if (root) initLichenLanding(root);
+</script>
+
+<style is:global>
+  .lichen-landing {
+    position: fixed;
+    inset: 0;
+    overflow: hidden;
+    background-color: #6f655d;
+    background-image: var(--landing-bg-desktop);
+    background-size: cover;
+    background-position: center;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 28px;
+    padding: 24px 16px;
+  }
+
+  @media (max-width: 768px) {
+    .lichen-landing { background-image: var(--landing-bg-mobile); }
+  }
+
+  .lichen-canvas {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    display: block;
+    touch-action: manipulation;
+  }
+
+  .lichen-logo-wrap {
+    position: relative;
+    margin: 0;
+    line-height: 0;
+    width: min(520px, 62vw);
+    pointer-events: none;
+  }
+
+  .lichen-logo {
+    width: 100%;
+    height: auto;
+  }
+
+  .lichen-list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 14px;
+  }
+
+  .lichen-extras-list { display: none; }
+
+  .lichen-link {
+    position: relative;
+    isolation: isolate;
+    display: inline-flex;
+    align-items: center;
+    gap: .35em;
+    padding: .3em .55em;
+    font-family: 'AveriaLibre', sans-serif;
+    font-weight: 700;
+    font-size: clamp(1rem, .75rem + .8vw, 1.4rem);
+    letter-spacing: 3px;
+    line-height: 1.1;
+    white-space: nowrap;
+    color: #fff;
+    background: none;
+    border: 0;
+    border-radius: 999px;
+    cursor: pointer;
+    text-decoration: none;
+    text-shadow: 0 1px 2px rgba(0, 0, 0, .9), 0 0 6px rgba(0, 0, 0, .7), 0 0 14px rgba(0, 0, 0, .55);
+    transition: scale .2s ease, opacity .45s ease;
+  }
+
+  /* Soft dark halo behind the text so it reads on orange, green or grey lichen. */
+  .lichen-link::before {
+    content: '';
+    position: absolute;
+    inset: -.1em -.25em;
+    z-index: -1;
+    border-radius: 999px;
+    background: rgba(12, 8, 5, .74);
+    filter: blur(11px);
+  }
+
+  .lichen-link:hover { scale: 1.07; }
+
+  .lichen-link:focus-visible {
+    outline: 2px solid #fff;
+    outline-offset: 4px;
+  }
+
+  .lichen-back-arrow { display: none; }
+  .lichen-extras.is-back .lichen-back-arrow { display: inline; }
+
+  /* ---- Live layout (script running) ---- */
+  .lichen-landing.is-live {
+    display: block;
+    padding: 0;
+  }
+
+  .is-live .lichen-logo-wrap {
+    position: absolute;
+    top: clamp(18px, 7vh, 72px);
+    left: 50%;
+    translate: -50% 0;
+  }
+
+  .is-live .lichen-nav {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+  }
+
+  .is-live .lichen-list { display: block; }
+
+  .is-live .lichen-link {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    /* The `translate` property (not `transform`) centres the link, so hover's
+       `scale` grows it from its centre and flights can own `transform`. */
+    translate: -50% -50%;
+    opacity: 0;
+    pointer-events: none;
+  }
+
+  .is-live .lichen-link.is-shown {
+    opacity: 1;
+    pointer-events: auto;
+  }
+
+  @media (max-width: 640px) {
+    .lichen-logo-wrap { width: 82vw; }
+    .lichen-link { letter-spacing: 2px; }
+  }
+</style>

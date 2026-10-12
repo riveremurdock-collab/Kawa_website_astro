@@ -2,39 +2,15 @@
 import { Image } from 'astro:assets';
 import logo from '../assets/logos/kawa lichen landing page logo.png';
 import squareLogo from '../assets/logos/kawa square white.png';
-import bullet from '../assets/icons/lichen bullet point.png';
 import arrow from '../assets/icons/lichen arrow 2.png';
+import { mainNav, extrasNav } from '../lib/nav';
 
 interface Props {
-  variant?: 'landing' | 'inner';
   /** Small white square logo — photo book pages, where the header sits over photos. */
   squareLogo?: boolean;
 }
-const { variant = 'inner', squareLogo: useSquareLogo = false } = Astro.props;
+const { squareLogo: useSquareLogo = false } = Astro.props;
 const pathname = Astro.url.pathname;
-
-// Inner-page sitewide nav — edit these three arrays to change nav content/order.
-const mainNav = [
-  { href: '/blog',    label: 'KAWA BLOG' },
-  { href: 'https://kawadesign.bigcartel.com', label: 'STORE', external: true },
-  { href: '/contact', label: 'STAY IN TOUCH' },
-];
-
-const extrasNav = [
-  { href: '/map',       label: 'MAP OVERVIEW' },
-  { href: '/guestbook', label: 'GUESTBOOK' },
-  { href: '/portfolio', label: 'PORTFOLIO' },
-  { href: '/photo-inker', label: 'PHOTO INKER' },
-  { href: '/glyphy', label: 'GLYPHY' },
-];
-
-// Landing page gets its own flat nav — no Extras dropdown.
-const landingNav = [
-  { href: '/blog',      label: 'KAWA BLOG' },
-  { href: 'https://kawadesign.bigcartel.com', label: 'STORE', external: true },
-  { href: '/portfolio', label: 'PORTFOLIO' },
-  { href: '/contact',   label: 'STAY IN TOUCH' },
-];
 
 function isCurrent(href: string): boolean {
   if (href.startsWith('http')) return false;
@@ -43,35 +19,6 @@ function isCurrent(href: string): boolean {
 }
 ---
 
-{variant === 'landing' ? (
-  <main class="landing">
-    <div class="landing-content">
-      <Image
-        src={logo}
-        alt="KAWA"
-        class="landing-logo"
-        fetchpriority="high"
-      />
-      <nav class="landing-nav site-nav">
-        <ul>
-          {landingNav.map(item => (
-            <li>
-              <Image src={bullet} alt="" class="nav-bullet" />
-              <a
-                href={item.href}
-                class:list={[{ 'is-current': isCurrent(item.href) }]}
-                target={item.external ? '_blank' : undefined}
-                rel={item.external ? 'noopener noreferrer' : undefined}
-              >
-                {item.label}
-              </a>
-            </li>
-          ))}
-        </ul>
-      </nav>
-    </div>
-  </main>
-) : (
   <header class="inner-topbar">
     <a href="/" class="inner-logo-link">
       {useSquareLogo
@@ -158,7 +105,6 @@ function isCurrent(href: string): boolean {
       </ul>
     </nav>
   </header>
-)}
 
 <style is:global>
   /* ============================================================
@@ -524,13 +470,6 @@ function isCurrent(href: string): boolean {
     .mobile-dropdown {
       display: block;
     }
-  }
-
-  /* ============================================================
-     LANDING NAV (unchanged)
-     ============================================================ */
-  .landing-nav a.is-current {
-    color: var(--color-dark-sandstone);
   }
 </style>
 
