@@ -1,4 +1,12 @@
 {
-  "comments": [],
+  "comments": [
+    {
+      "id": "6acd3c357a495e50bbfa4227",
+      "page": "guestbook",
+      "name": "KAWA",
+      "comment": "The new guestbook is now live!",
+      "date": "2026-10-12T19:59:49.745Z"
+    }
+  ],
   "skipped": []
 }
