@@ -279,7 +279,7 @@
    stays put. */
 .pb-text {
     --pb-text-feather: 3em;
-    --pb-text-tint: rgba(0, 0, 0, 0.1);
+    --pb-text-tint: rgba(0, 0, 0, 0.2);
     --pb-text-filter: blur(2.5px) brightness(0.88);
 
     align-self: end;
@@ -296,7 +296,7 @@
 }
 
 .pb-page[data-tone="light"]:not(.is-reading) .pb-text {
-    --pb-text-tint: rgba(255, 255, 255, 0.1);
+    --pb-text-tint: rgba(255, 255, 255, 0.2);
     --pb-text-filter: blur(2.5px) brightness(1.1);
 }
 

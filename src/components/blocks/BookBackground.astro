@@ -12,7 +12,7 @@
 //         "center" (default), "center bottom", "30% 60%"…
 import { Image } from 'astro:assets';
 import type { ImageMetadata } from 'astro';
-import { resolveImage, resolveVideo, imageTone } from '../../lib/photobook-media';
+import { resolveImage, resolveVideo, imageTone, coverSizes } from '../../lib/photobook-media';
 
 export type Span = 'all' | 'left' | 'center' | 'right' | 'left-center' | 'center-right';
 
@@ -35,6 +35,8 @@ if (!src && !video) {
 }
 
 const resolved = src ? await resolveImage(src, Astro.url) : null;
+// Sized for the whole page, cropped to fill it: a section crops tighter than
+// that, and clicking it grows it to the full page.
 const videoUrl = video ? await resolveVideo(video, Astro.url) : null;
 // Videos are usually darker and always moving — white text is the safe call.
 const tone = resolved ? await imageTone(resolved.key) : 'dark';
@@ -49,7 +51,7 @@ const phoneWideTone = resolved ? await imageTone(resolved.key, 'phone-wide') : '
       src={resolved.image}
       alt={alt}
       widths={[640, 960, 1440, 1920, 2560, 3840]}
-      sizes={span === 'all' ? '100vw' : span.includes('-') ? '67vw' : '34vw'}
+      sizes={coverSizes(resolved.image, [{ w: 1, h: 1 }])}
       loading="lazy"
       draggable="false"
       style={`object-position: ${focus};`}

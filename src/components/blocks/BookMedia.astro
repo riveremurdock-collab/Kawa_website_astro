@@ -2,19 +2,21 @@
 // A small photo (or short video clip) on a photo book page. Click to bring
 // it up large in the middle of the page; click again to put it back.
 //
-// area  — top-left, top-center, top-right, bottom-center or bottom-right.
-//         (bottom-left belongs to the page text.)
+// area  — top-left, top-center, top-right, bottom-left, bottom-center or
+//         bottom-right. (bottom-left only on a page with no BookText.)
 // src   — a photo filename in the post folder, e.g. "./IMG_3438.jpg".
 // video — instead of src: a short, compressed .mp4/.webm in the post folder.
 //         It plays muted, on a loop.
 // size  — "large" (the whole photo, as big as fits in its cell — the
 //         default), "medium" or "small"; or "xl", which fills the cell
 //         completely and crops whatever doesn't fit.
+// focus — for "xl": which part stays visible when cropped, as a CSS
+//         position: "center" (default), "center top", "30% 60%"…
 import { Image } from 'astro:assets';
 import type { ImageMetadata } from 'astro';
-import { resolveImage, resolveVideo } from '../../lib/photobook-media';
+import { resolveImage, resolveVideo, photoBookSizes } from '../../lib/photobook-media';
 
-type Area = 'top-left' | 'top-center' | 'top-right' | 'bottom-center' | 'bottom-right';
+type Area = 'top-left' | 'top-center' | 'top-right' | 'bottom-left' | 'bottom-center' | 'bottom-right';
 
 interface Props {
   area: Area;
@@ -22,11 +24,14 @@ interface Props {
   video?: string;
   alt?: string;
   size?: 'xl' | 'large' | 'medium' | 'small';
+  focus?: string;
 }
 
-const { area, src, video, alt = '', size = 'large' } = Astro.props;
+const { area, src, video, alt = '', size = 'large', focus } = Astro.props;
+// Inline, so the enlarged copy made on click keeps the same crop as it grows.
+const focusStyle = focus ? `object-position: ${focus};` : undefined;
 
-const AREAS: Area[] = ['top-left', 'top-center', 'top-right', 'bottom-center', 'bottom-right'];
+const AREAS: Area[] = ['top-left', 'top-center', 'top-right', 'bottom-left', 'bottom-center', 'bottom-right'];
 if (!AREAS.includes(area)) {
   throw new Error(`BookMedia: area="${area}" isn't a cell it can use. Pick one of: ${AREAS.join(', ')}.`);
 }
@@ -52,11 +57,14 @@ const videoUrl = video ? await resolveVideo(video, Astro.url) : null;
       src={image}
       alt={alt}
       widths={[400, 700, 1000, 1400, 2000, 2800]}
-      sizes="(max-width: 768px) 70vw, 34vw"
+      sizes={size === 'xl'
+        ? photoBookSizes(image, { w: 0.34, h: 0.5 }, { w: 0.5, h: 0.34 })
+        : '(max-width: 768px) 70vw, 34vw'}
       loading="lazy"
       draggable="false"
+      style={focusStyle}
     />
   ) : (
-    <video src={videoUrl} muted autoplay loop playsinline preload="metadata" aria-label={alt} />
+    <video src={videoUrl} muted autoplay loop playsinline preload="metadata" aria-label={alt} style={focusStyle} />
   )}
 </figure>

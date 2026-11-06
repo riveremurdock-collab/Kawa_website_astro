@@ -101,3 +101,41 @@ export async function imageTone(
   toneCache.set(cacheKey, tone);
   return tone;
 }
+
+// Phones and portrait tablets: the photo book's stacked layout (matches the
+// breakpoint in photobook.css).
+const PHONE_MEDIA = ['(max-width: 768px)', '(orientation: portrait) and (max-width: 1024px)'];
+
+/**
+ * A `sizes` value for a photo cropped to fill a box (object-fit: cover).
+ * Cropping draws the photo wider than its box whenever the photo is wider in
+ * shape than the box, so sizing it to the box alone makes the browser pick a
+ * file that's too small. Each box is a share of the window: w of its width,
+ * h of its height. Layouts are tried in order; the last one is the default.
+ */
+export function coverSizes(
+  image: ImageMetadata,
+  layouts: { media?: string; w: number; h: number }[],
+): string {
+  const aspect = image.width / image.height;
+  const parts: string[] = [];
+  for (const { media, w, h } of layouts) {
+    // The window shape at which the box is exactly as wide (in shape) as the
+    // photo: any wider and the photo fits the box's width.
+    const ratio = Math.round(((aspect * h) / w) * 1000);
+    const and = media ? `${media} and ` : '';
+    parts.push(`${and}(min-aspect-ratio: ${ratio}/1000) ${Math.ceil(w * 100)}vw`);
+    const tall = `${Math.ceil(aspect * h * 100)}vh`;
+    parts.push(media ? `${media} ${tall}` : tall);
+  }
+  return parts.join(', ');
+}
+
+/** Phone layouts first, then desktop, for boxes of the given shares. */
+export function photoBookSizes(
+  image: ImageMetadata,
+  desktop: { w: number; h: number },
+  phone: { w: number; h: number },
+): string {
+  return coverSizes(image, [...PHONE_MEDIA.map(media => ({ media, ...phone })), desktop]);
+}

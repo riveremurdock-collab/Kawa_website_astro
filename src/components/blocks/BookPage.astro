@@ -27,7 +27,8 @@ interface Props {
 
 const { background, backgroundVideo, alt = '', focus = 'center', tone } = Astro.props;
 
-const html = await Astro.slots.render('default');
+// An empty page (just a background) has no slot at all.
+const html = Astro.slots.has('default') ? await Astro.slots.render('default') : '';
 const pageName = typeof background === 'string' ? `the page with background "${background}"` : 'a page';
 
 // ---- Backgrounds ----
@@ -87,7 +88,7 @@ for (const area of claims) {
   if (seen.has(area)) {
     throw new Error(
       `Photo book: two things are placed in "${area}" on ${pageName}. ` +
-      `Each cell holds one item. (A BookRoute uses top-left, top-center and bottom-center; BookText always uses bottom-left.)`,
+      `Each cell holds one item. (A BookRoute uses top-left, top-center and bottom-center; BookText always uses bottom-left, so a photo there means no text on that page.)`,
     );
   }
   seen.add(area);

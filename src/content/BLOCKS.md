@@ -265,7 +265,8 @@ Every page is a grid of three columns and two rows, with the back / page count
 │  top-left    │  top-center  │  top-right   │
 ├──────────────┼──────────────┼──────────────┤
 │  bottom-left │ bottom-center│ bottom-right │
-│  (text)      │              │              │
+│  (text or a  │              │              │
+│   photo)     │              │              │
 └──────────────┴──────────────┴──────────────┘
    ‹ BACK              3/22             NEXT ›
 ```
@@ -279,7 +280,8 @@ twice:
 
 ```
 ┌──────────────┬──────────────┐
-│  top-left    │  (text)      │  ← desktop left column
+│  top-left    │  (text or    │  ← desktop left column
+│              │   a photo)   │
 ├──────────────┼──────────────┤
 │  top-center  │ bottom-center│  ← desktop center column
 ├──────────────┼──────────────┤
@@ -353,7 +355,8 @@ right → bottom.
 
 ### `BookText` — the page text
 
-Always goes in the bottom-left cell. Optional heading, then ordinary
+Always goes in the bottom-left cell (leave it out to put a photo there
+instead). Optional heading, then ordinary
 paragraphs (leave a blank line between them). Keep it short — a caption or a
 story snippet. Clicking the text blurs and darkens the photo behind it.
 
@@ -379,11 +382,12 @@ back.
 
 | Prop | Type | Required | Notes |
 |---|---|---|---|
-| `area` | cell name | yes | `top-left`, `top-center`, `top-right`, `bottom-center` or `bottom-right`. |
+| `area` | cell name | yes | `top-left`, `top-center`, `top-right`, `bottom-left`, `bottom-center` or `bottom-right`. `bottom-left` is the text cell, so only use it on a page with no `BookText`. |
 | `src` | filename | one of `src`/`video` | A photo in the post folder. |
 | `video` | filename | one of `src`/`video` | A short `.mp4` or `.webm` in the post folder. Plays muted, on a loop. The site doesn't compress video — keep clips to a few seconds and a few MB. |
 | `alt` | text | yes, for photos | |
 | `size` | `xl` / `large` / `medium` / `small` | no | `large` (default): the whole photo, as big as fits in its cell. `medium` / `small`: 75% / 50% of that. `xl`: fills the cell edge to edge, cropping whatever doesn't fit (the full photo shows when it's clicked). |
+| `focus` | text | no | For `xl` only: which part of the photo stays visible in the crop. Same values as `BookPage` — horizontal first, then vertical, e.g. `center 20%`. |
 
 Each photo sits against the outside edges of its cell, so the middle of the
 background stays clear.

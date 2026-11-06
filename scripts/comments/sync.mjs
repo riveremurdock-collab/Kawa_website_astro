@@ -267,7 +267,23 @@ async function main() {
   }
 }
 
+// Plain-English hints for the setup mistakes that are easy to make.
+function hint(message) {
+  if (/Missing (NETLIFY_\w+)/.test(message)) {
+    return `The GitHub secret ${RegExp.$1} isn't set. Check it exists under Settings → Secrets and variables → Actions, spelled exactly like that.`;
+  }
+  if (message.includes('api.netlify.com') && message.includes('→ 401')) {
+    return 'Netlify rejected the token. Make a new personal access token in Netlify and paste it into the NETLIFY_AUTH_TOKEN secret again.';
+  }
+  if (message.includes('api.netlify.com') && /→ (403|404)/.test(message)) {
+    return 'Netlify couldn\'t find the site. Check NETLIFY_SITE_ID is the Project ID from Project configuration → General → Project details.';
+  }
+  return null;
+}
+
 main().catch(err => {
-  console.error(err);
+  console.error(`\nFAILED: ${err.message}`);
+  const help = hint(err.message);
+  if (help) console.error(`\n→ ${help}`);
   process.exit(1);
 });
